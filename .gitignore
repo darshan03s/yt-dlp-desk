@@ -8,3 +8,4 @@ out
 *db-shm
 *db-wal
 app-data
+.context
