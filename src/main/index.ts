@@ -6,6 +6,9 @@ import { makeDirs, pathExistsSync } from './utils/fsUtils'
 import { initStoreManager } from './store'
 import { initDatabase, runMigrations } from './db'
 import { defaultSettings } from './defaultSettings'
+import log from 'electron-log'
+
+log.transports.file.level = 'info'
 
 const APP_USER_MODEL_ID = 'com.ytdlpui'
 export const APP_PATH = app.getAppPath()
@@ -19,12 +22,11 @@ export const MIGRATIONS_FOLDER = is.dev
   ? path.join(APP_PATH, 'drizzle')
   : path.join(process.resourcesPath, 'app.asar.unpacked', 'drizzle')
 
-console.log(`is.dev: ${is.dev}`)
-console.log(`APP_DATA_PATH: ${APP_DATA_PATH}`)
-console.log(`DATA_DIR: ${DATA_DIR}`)
-console.log(`DB_PATH: ${DB_PATH}`)
-console.log(`SETTINGS_PATH: ${SETTINGS_PATH}`)
-console.log()
+log.info(`is.dev: ${is.dev}`)
+log.info(`APP_DATA_PATH: ${APP_DATA_PATH}`)
+log.info(`DATA_DIR: ${DATA_DIR}`)
+log.info(`DB_PATH: ${DB_PATH}`)
+log.info(`SETTINGS_PATH: ${SETTINGS_PATH}`)
 
 function createWindow(): void {
   const mainWindow = new BrowserWindow({
@@ -61,37 +63,37 @@ function createWindow(): void {
 async function init() {
   if (!pathExistsSync(DATA_DIR)) {
     makeDirs(DATA_DIR)
-    console.log('Created DATA_DIR')
+    log.info('Created DATA_DIR')
   } else {
-    console.log('DATA_DIR exists')
+    log.info('DATA_DIR exists')
   }
 
   if (!pathExistsSync(MEDIA_DATA_FOLDER_PATH)) {
     makeDirs(MEDIA_DATA_FOLDER_PATH)
-    console.log('Created MEDIA_DATA_FOLDER')
+    log.info('Created MEDIA_DATA_FOLDER')
   } else {
-    console.log('MEDIA_DATA_FOLDER exists')
+    log.info('MEDIA_DATA_FOLDER exists')
   }
 
   if (!pathExistsSync(SETTINGS_PATH)) {
     const store = await initStoreManager()
     store.set('settings', defaultSettings)
-    console.log('Created settings.json')
+    log.info('Created settings.json')
   } else {
-    console.log('settings.json exists')
+    log.info('settings.json exists')
   }
 
   if (!pathExistsSync(DB_PATH)) {
     initDatabase()
-    console.log('Created app.db')
+    log.info('Created app.db')
     try {
       runMigrations()
-      console.log('Migrations applied')
+      log.info('Migrations applied')
     } catch (error) {
-      console.error('Migrations failed: ' + error)
+      log.error('Migrations failed: ' + error)
     }
   } else {
-    console.log('app.db exists')
+    log.info('app.db exists')
     initDatabase()
   }
 }
