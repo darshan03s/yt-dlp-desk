@@ -1,18 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { copyFileToFolder, copyFolder, makeDirs, pathExistsSync } from './utils/fsUtils'
-import { getStoreManager, initStoreManager } from './store'
-import { initDatabase, runMigrations } from './db'
 import log from 'electron-log'
-import {
-  getFfmpegFromPc,
-  getFfmpegFromSettings,
-  getYtdlpFromPc,
-  getYtdlpFromSettings
-} from './utils/appUtils'
-import { getDefaultAppSettings } from './defaultSettings'
+import { init } from './init'
+import { addListeners } from './addListeners'
 
 log.transports.file.level = 'info'
 
@@ -37,7 +29,7 @@ log.info(`DATA_DIR: ${DATA_DIR}`)
 log.info(`DB_PATH: ${DB_PATH}`)
 log.info(`SETTINGS_PATH: ${SETTINGS_PATH}`)
 
-let mainWindow: BrowserWindow
+export let mainWindow: BrowserWindow
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -69,107 +61,6 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-}
-
-async function init() {
-  if (!pathExistsSync(DATA_DIR)) {
-    makeDirs(DATA_DIR)
-    log.info('Created DATA_DIR')
-  } else {
-    log.info('DATA_DIR exists')
-  }
-
-  if (!pathExistsSync(MEDIA_DATA_FOLDER_PATH)) {
-    makeDirs(MEDIA_DATA_FOLDER_PATH)
-    log.info('Created MEDIA_DATA_FOLDER')
-  } else {
-    log.info('MEDIA_DATA_FOLDER exists')
-  }
-
-  const store = await initStoreManager()
-
-  if (!pathExistsSync(SETTINGS_PATH)) {
-    store.set('settings', getDefaultAppSettings())
-    log.info('Created settings.json')
-  } else {
-    log.info('settings.json exists')
-  }
-
-  if (!pathExistsSync(DB_PATH)) {
-    initDatabase()
-    log.info('Created app.db')
-    try {
-      runMigrations()
-      log.info('Migrations applied')
-    } catch (error) {
-      log.error('Migrations failed: ' + error)
-    }
-  } else {
-    log.info('app.db exists')
-    initDatabase()
-  }
-}
-
-async function addListeners() {
-  const store = await getStoreManager()
-  ipcMain.handle('renderer:init', async () => {
-    try {
-      log.info('Renderer initialized')
-
-      const { ytdlpVersion, ytdlpPath } = await getYtdlpFromSettings()
-      const { ffmpegVersion, ffmpegPath } = await getFfmpegFromSettings()
-
-      return { ytdlpPath, ytdlpVersion, ffmpegPath, ffmpegVersion }
-    } catch (err) {
-      log.error('Failed to initialize renderer:', err)
-      return { ytdlpPath: null, ytdlpVersion: null, ffmpegPath: null, ffmpegVersion: null }
-    }
-  })
-
-  ipcMain.handle('yt-dlp:confirm', async () => {
-    try {
-      log.info('Checking yt-dlp in PC...')
-
-      const { ytdlpVersionInPc, ytdlpPathInPc } = await getYtdlpFromPc()
-
-      if (ytdlpPathInPc) {
-        await copyFileToFolder(ytdlpPathInPc, YTDLP_FOLDER_PATH)
-        store.set('settings.ytdlpPath', YTDLP_EXE_PATH)
-        store.set('settings.ytdlpVersion', ytdlpVersionInPc)
-      }
-
-      log.info(`yt-dlp path in PC: ${ytdlpPathInPc}`)
-      log.info(`yt-dlp version in PC: ${ytdlpVersionInPc}`)
-
-      return { ytdlpVersionInPc, ytdlpPathInPc }
-    } catch (err) {
-      log.error(err)
-      return { ytdlpPathInPc: null, ytdlpVersionInPc: null }
-    }
-  })
-
-  ipcMain.handle('ffmpeg:confirm', async () => {
-    try {
-      log.info('Checking ffmpeg in PC...')
-
-      const { ffmpegVersionInPc, ffmpegPathInPc } = await getFfmpegFromPc()
-
-      if (ffmpegPathInPc) {
-        const ffmpegFolderInPc = path.dirname(ffmpegPathInPc)
-        copyFolder(ffmpegFolderInPc, FFMPEG_FOLDER_PATH)
-        store.set('settings.ffmpegPath', FFMPEG_FOLDER_PATH)
-        store.set('settings.ffmpegVersion', ffmpegVersionInPc)
-      }
-
-      log.info(`ffmpeg path in PC: ${ffmpegPathInPc}`)
-      log.info(`ffmpeg version in PC: ${ffmpegVersionInPc}`)
-
-      return { ffmpegVersionInPc, ffmpegPathInPc }
-    } catch (err) {
-      log.error(err)
-      return { ffmpegPathInPc: null, ffmpegVersionInPc: null }
-    }
-  })
 }
 
 // This method will be called when Electron has finished
