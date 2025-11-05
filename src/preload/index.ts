@@ -6,7 +6,8 @@ import log from 'electron-log'
 const api = {
   rendererInit: () => ipcRenderer.invoke('renderer:init'),
   confirmYtdlp: () => ipcRenderer.invoke('yt-dlp:confirm'),
-  confirmFfmpeg: () => ipcRenderer.invoke('ffmpeg:confirm')
+  confirmFfmpeg: () => ipcRenderer.invoke('ffmpeg:confirm'),
+  downloadYtdlp: () => ipcRenderer.invoke('yt-dlp:download')
 }
 
 if (process.contextIsolated) {

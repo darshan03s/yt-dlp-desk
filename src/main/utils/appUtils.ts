@@ -54,8 +54,8 @@ async function appExistsInPc(appName: string) {
   return found
 }
 
-async function getYtdlpVersionFromPc() {
-  const { stdout } = await execPromise('yt-dlp --version')
+export async function getYtdlpVersionFromPc(ytdlpPath: string = 'yt-dlp') {
+  const { stdout } = await execPromise(`${ytdlpPath} --version`)
   return stdout.trim()
 }
 

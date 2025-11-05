@@ -1,10 +1,16 @@
 import { ipcMain } from 'electron'
 import { getStoreManager } from './store'
 import log from 'electron-log'
-import { getFfmpegFromPc, getSettings, getYtdlpFromPc } from './utils/appUtils'
+import {
+  getFfmpegFromPc,
+  getSettings,
+  getYtdlpFromPc,
+  getYtdlpVersionFromPc
+} from './utils/appUtils'
 import { FFMPEG_FOLDER_PATH, YTDLP_EXE_PATH, YTDLP_FOLDER_PATH } from '.'
 import { copyFileToFolder, copyFolder } from './utils/fsUtils'
 import path from 'node:path'
+import { downloadYtDlpLatestRelease } from './utils/downloadYtdlp'
 
 export async function addListeners() {
   const store = await getStoreManager()
@@ -63,6 +69,28 @@ export async function addListeners() {
     } catch (err) {
       log.error(err)
       return { ffmpegPathInPc: null, ffmpegVersionInPc: null }
+    }
+  })
+
+  ipcMain.handle('yt-dlp:download', async () => {
+    try {
+      log.info('Downloading yt-dlp...')
+
+      const outputPath = await downloadYtDlpLatestRelease(YTDLP_FOLDER_PATH)
+      log.info('Downloaded yt-dlp latest release')
+
+      const ytdlpVersionInPc = await getYtdlpVersionFromPc(outputPath)
+
+      store.set('settings.ytdlpPath', outputPath)
+      store.set('settings.ytdlpVersion', ytdlpVersionInPc)
+
+      log.info(`yt-dlp downloaded: ${outputPath}`)
+      log.info(`yt-dlp downloaded version: ${ytdlpVersionInPc}`)
+
+      return { ytdlpVersionInPc, ytdlpPathInPc: outputPath }
+    } catch (err) {
+      log.error('Failed to download yt-dlp:', err)
+      return { ytdlpVersionInPc: null, ytdlpPathInPc: null }
     }
   })
 }

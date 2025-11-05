@@ -8,7 +8,7 @@ import {
   AlertDialogTitle
 } from '@renderer/components/ui/alert-dialog'
 import { IconCheck, IconDownload } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Spinner } from './ui/spinner'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
@@ -22,6 +22,7 @@ type YtdlpFfmpegConfirmModalProps = {
 type ConfirmYtdlpProps = {
   isYtdlpConfirmLoading: boolean
   isYtdlpPresentInPc: boolean
+  setIsYtdlpPresentInPc: Dispatch<SetStateAction<boolean>>
 }
 
 type ConfirmFfmpegProps = {
@@ -29,8 +30,26 @@ type ConfirmFfmpegProps = {
   isFfmpegPresentInPc: boolean
 }
 
-const ConfirmYtdlp = ({ isYtdlpConfirmLoading, isYtdlpPresentInPc }: ConfirmYtdlpProps) => {
+const ConfirmYtdlp = ({
+  isYtdlpConfirmLoading,
+  isYtdlpPresentInPc,
+  setIsYtdlpPresentInPc
+}: ConfirmYtdlpProps) => {
   const ytdlpVersion = useSettingsStore((state) => state.ytdlpVersion)
+  const [downloadingYtdlp, setDownloadingYtdlp] = useState(false)
+
+  function handleYtdlpDownload() {
+    setDownloadingYtdlp(true)
+    window.api.downloadYtdlp().then(({ ytdlpPathInPc, ytdlpVersionInPc }) => {
+      if (ytdlpPathInPc && ytdlpVersionInPc) {
+        useSettingsStore.setState({ ytdlpVersion: ytdlpVersionInPc, ytdlpPath: ytdlpPathInPc })
+        setDownloadingYtdlp(false)
+        setIsYtdlpPresentInPc(true)
+      } else {
+        setIsYtdlpPresentInPc(false)
+      }
+    })
+  }
   return (
     <div className="w-full flex justify-between items-center">
       <div className="left flex flex-col gap-1">
@@ -45,8 +64,8 @@ const ConfirmYtdlp = ({ isYtdlpConfirmLoading, isYtdlpPresentInPc }: ConfirmYtdl
         ) : isYtdlpPresentInPc ? (
           <IconCheck />
         ) : (
-          <Button>
-            <IconDownload />
+          <Button onClick={handleYtdlpDownload} disabled={downloadingYtdlp}>
+            {downloadingYtdlp ? <Spinner /> : <IconDownload />}
           </Button>
         )}
       </div>
@@ -145,6 +164,7 @@ const YtdlpFfmpegConfirmModal = ({ open, onOpenChange }: YtdlpFfmpegConfirmModal
             <ConfirmYtdlp
               isYtdlpConfirmLoading={isYtdlpConfirmLoading}
               isYtdlpPresentInPc={isYtdlpPresentInPc}
+              setIsYtdlpPresentInPc={setIsYtdlpPresentInPc}
             />
             <hr className="w-full m-2 my-4" />
             <ConfirmFfmpeg
