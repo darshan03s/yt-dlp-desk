@@ -3,10 +3,16 @@ import path, { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import log from 'electron-log';
-log.transports.file.level = 'info';
 import logger from '../shared/logger';
 import { init } from './init';
 import { addListeners } from './addListeners';
+
+const logsFolderName = new Date().toISOString().split('T')[0];
+
+log.transports.file.resolvePathFn = () => {
+  return path.join(app.getPath('userData'), 'logs', logsFolderName, 'main.log');
+};
+log.transports.file.level = 'info';
 
 const APP_USER_MODEL_ID = 'com.ytdlpui';
 export const APP_PATH = app.getAppPath();
