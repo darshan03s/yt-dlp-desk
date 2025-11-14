@@ -12,22 +12,22 @@ export type AppSettings = {
 };
 
 export type Api = {
-  rendererInit: () => Promise<AppSettings>;
+  rendererInit: () => Promise<AppSettings | null>;
   confirmYtdlp: () => Promise<{
-    ytdlpPathInPc: string;
-    ytdlpVersionInPc: string;
+    ytdlpPathInPc: string | null;
+    ytdlpVersionInPc: string | null;
   }>;
   confirmFfmpeg: () => Promise<{
-    ffmpegPathInPc: string;
-    ffmpegVersionInPc: string;
+    ffmpegPathInPc: string | null;
+    ffmpegVersionInPc: string | null;
   }>;
   downloadYtdlp: () => Promise<{
-    ytdlpPathInPc: string;
-    ytdlpVersionInPc: string;
+    ytdlpPathInPc: string | null;
+    ytdlpVersionInPc: string | null;
   }>;
   downloadFfmpeg: () => Promise<{
-    ffmpegPathInPc: string;
-    ffmpegVersionInPc: string;
+    ffmpegPathInPc: string | null;
+    ffmpegVersionInPc: string | null;
   }>;
   checkUrl: (url: string) => Promise<{
     source: string;

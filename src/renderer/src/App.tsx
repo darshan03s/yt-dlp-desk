@@ -8,6 +8,8 @@ import Home from './pages/Home';
 import { Toaster } from './components/ui/sonner';
 import Titlebar from './components/titlebar';
 import DisplayMediaInfo from './pages/DisplayMediaInfo';
+import logger from '@shared/logger';
+import { toast } from 'sonner';
 
 const App = () => {
   const [loadingFromSettings, setLoadingFromSettings] = useState(true);
@@ -15,15 +17,20 @@ const App = () => {
   const setSettings = useSettingsStore((state) => state.setSettings);
 
   useEffect(() => {
-    window.api.rendererInit().then((settings: AppSettings) => {
+    window.api.rendererInit().then((settings: AppSettings | null) => {
       setLoadingFromSettings(false);
-      setSettings(settings);
 
-      const isYtdlpMissing = !settings.ytdlpPath || !settings.ytdlpVersion;
-      const isFfmpegMissing = !settings.ffmpegPath || !settings.ffmpegVersion;
+      if (settings) {
+        setSettings(settings);
+        const isYtdlpMissing = !settings.ytdlpPath || !settings.ytdlpVersion;
+        const isFfmpegMissing = !settings.ffmpegPath || !settings.ffmpegVersion;
 
-      if (isYtdlpMissing || isFfmpegMissing) {
-        setIsYtdlpFfmpegConfirmModalVisible(true);
+        if (isYtdlpMissing || isFfmpegMissing) {
+          setIsYtdlpFfmpegConfirmModalVisible(true);
+        }
+      } else {
+        logger.error('Could not get settings');
+        toast.error('Could not get settings');
       }
     });
   }, [setSettings]);

@@ -2,6 +2,7 @@ import { getStoreManager } from '../store';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import logger from '../../shared/logger';
+import { Api, AppSettings } from '../../shared/types';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {
@@ -26,9 +27,9 @@ export async function getFfmpegFromSettings() {
   };
 }
 
-export async function getSettings() {
+export async function getSettings(): Promise<AppSettings> {
   const store = await getStoreManager();
-  return store.get('settings');
+  return store.get('settings') as AppSettings;
 }
 
 async function getAppPath(appName: string) {
@@ -66,7 +67,7 @@ export async function getFfmpegVersionFromPc(ffmpegPath: string = 'ffmpeg') {
   return version;
 }
 
-export async function getYtdlpFromPc() {
+export async function getYtdlpFromPc(): ReturnType<Api['confirmYtdlp']> {
   if (await appExistsInPc('yt-dlp')) {
     return {
       ytdlpPathInPc: (await getAppPath('yt-dlp')).path,
@@ -75,12 +76,12 @@ export async function getYtdlpFromPc() {
   } else {
     return {
       ytdlpPathInPc: null,
-      ytdlpVersionhInPc: null
+      ytdlpVersionInPc: null
     };
   }
 }
 
-export async function getFfmpegFromPc() {
+export async function getFfmpegFromPc(): ReturnType<Api['confirmFfmpeg']> {
   if (await appExistsInPc('ffmpeg')) {
     return {
       ffmpegPathInPc: (await getAppPath('ffmpeg')).path,
@@ -89,7 +90,7 @@ export async function getFfmpegFromPc() {
   } else {
     return {
       ffmpegPathInPc: null,
-      ffmpegVersionhInPc: null
+      ffmpegVersionInPc: null
     };
   }
 }

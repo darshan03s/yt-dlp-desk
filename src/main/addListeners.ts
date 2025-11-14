@@ -25,7 +25,7 @@ export async function addListeners() {
 
   const store = await getStoreManager();
 
-  ipcMain.handle('renderer:init', async () => {
+  ipcMain.handle('renderer:init', async (): ReturnType<Api['rendererInit']> => {
     try {
       logger.info('Renderer initialized');
 
@@ -34,11 +34,11 @@ export async function addListeners() {
       return settings;
     } catch (err) {
       logger.error('Failed to initialize renderer:', err);
-      return { ytdlpPath: null, ytdlpVersion: null, ffmpegPath: null, ffmpegVersion: null };
+      return null;
     }
   });
 
-  ipcMain.handle('yt-dlp:confirm', async () => {
+  ipcMain.handle('yt-dlp:confirm', async (): ReturnType<Api['confirmYtdlp']> => {
     try {
       logger.info('Checking yt-dlp in PC...');
 
@@ -60,7 +60,7 @@ export async function addListeners() {
     }
   });
 
-  ipcMain.handle('ffmpeg:confirm', async () => {
+  ipcMain.handle('ffmpeg:confirm', async (): ReturnType<Api['confirmFfmpeg']> => {
     try {
       logger.info('Checking ffmpeg in PC...');
 
@@ -83,7 +83,7 @@ export async function addListeners() {
     }
   });
 
-  ipcMain.handle('yt-dlp:download', async () => {
+  ipcMain.handle('yt-dlp:download', async (): ReturnType<Api['downloadYtdlp']> => {
     try {
       logger.info('Downloading yt-dlp...');
 
@@ -105,7 +105,7 @@ export async function addListeners() {
     }
   });
 
-  ipcMain.handle('ffmpeg:download', async () => {
+  ipcMain.handle('ffmpeg:download', async (): ReturnType<Api['downloadFfmpeg']> => {
     try {
       logger.info('Downloading ffmpeg...');
 
@@ -127,8 +127,8 @@ export async function addListeners() {
 
       return { ffmpegVersionInPc, ffmpegPathInPc: ffmpegBinPath };
     } catch (err) {
-      logger.error('Failed to download yt-dlp:', err);
-      return { ytdlpVersionInPc: null, ytdlpPathInPc: null };
+      logger.error('Failed to download ffmpeg:', err);
+      return { ffmpegVersionInPc: null, ffmpegPathInPc: null };
     }
   });
 
