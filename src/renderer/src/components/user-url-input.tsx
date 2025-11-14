@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import logger from '@shared/logger';
 
 type UserUrlInputProps = {
   showRefetch: boolean;
@@ -22,9 +23,8 @@ const UserUrlInput = ({ showRefetch }: UserUrlInputProps) => {
   }
 
   async function handleFetchMediaInfo() {
-    console.log(userEnteredUrl);
     const { source, url, isMediaDisplayAvailable } = await window.api.checkUrl(userEnteredUrl);
-    console.log({ source, url, isMediaDisplayAvailable });
+    logger.info({ source, url, isMediaDisplayAvailable });
     if (isMediaDisplayAvailable) {
       useMediaInfoStore.setState({ source: source, url: url });
       navigate('/display-media-info');

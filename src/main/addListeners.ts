@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { getStoreManager } from './store';
-import log from 'electron-log';
+import logger from '../shared/logger';
 import {
   getFfmpegFromPc,
   getFfmpegVersionFromPc,
@@ -27,20 +27,20 @@ export async function addListeners() {
 
   ipcMain.handle('renderer:init', async () => {
     try {
-      log.info('Renderer initialized');
+      logger.info('Renderer initialized');
 
       const settings = await getSettings();
 
       return settings;
     } catch (err) {
-      log.error('Failed to initialize renderer:', err);
+      logger.error('Failed to initialize renderer:', err);
       return { ytdlpPath: null, ytdlpVersion: null, ffmpegPath: null, ffmpegVersion: null };
     }
   });
 
   ipcMain.handle('yt-dlp:confirm', async () => {
     try {
-      log.info('Checking yt-dlp in PC...');
+      logger.info('Checking yt-dlp in PC...');
 
       const { ytdlpVersionInPc, ytdlpPathInPc } = await getYtdlpFromPc();
 
@@ -50,19 +50,19 @@ export async function addListeners() {
         store.set('settings.ytdlpVersion', ytdlpVersionInPc);
       }
 
-      log.info(`yt-dlp path in PC: ${ytdlpPathInPc}`);
-      log.info(`yt-dlp version in PC: ${ytdlpVersionInPc}`);
+      logger.info(`yt-dlp path in PC: ${ytdlpPathInPc}`);
+      logger.info(`yt-dlp version in PC: ${ytdlpVersionInPc}`);
 
       return { ytdlpVersionInPc, ytdlpPathInPc };
     } catch (err) {
-      log.error(err);
+      logger.error(err);
       return { ytdlpPathInPc: null, ytdlpVersionInPc: null };
     }
   });
 
   ipcMain.handle('ffmpeg:confirm', async () => {
     try {
-      log.info('Checking ffmpeg in PC...');
+      logger.info('Checking ffmpeg in PC...');
 
       const { ffmpegVersionInPc, ffmpegPathInPc } = await getFfmpegFromPc();
 
@@ -73,44 +73,44 @@ export async function addListeners() {
         store.set('settings.ffmpegVersion', ffmpegVersionInPc);
       }
 
-      log.info(`ffmpeg path in PC: ${ffmpegPathInPc}`);
-      log.info(`ffmpeg version in PC: ${ffmpegVersionInPc}`);
+      logger.info(`ffmpeg path in PC: ${ffmpegPathInPc}`);
+      logger.info(`ffmpeg version in PC: ${ffmpegVersionInPc}`);
 
       return { ffmpegVersionInPc, ffmpegPathInPc };
     } catch (err) {
-      log.error(err);
+      logger.error(err);
       return { ffmpegPathInPc: null, ffmpegVersionInPc: null };
     }
   });
 
   ipcMain.handle('yt-dlp:download', async () => {
     try {
-      log.info('Downloading yt-dlp...');
+      logger.info('Downloading yt-dlp...');
 
       const outputPath = await downloadYtDlpLatestRelease(YTDLP_FOLDER_PATH);
-      log.info('Downloaded yt-dlp latest release');
+      logger.info('Downloaded yt-dlp latest release');
 
       const ytdlpVersionInPc = await getYtdlpVersionFromPc(outputPath);
 
       store.set('settings.ytdlpPath', outputPath);
       store.set('settings.ytdlpVersion', ytdlpVersionInPc);
 
-      log.info(`yt-dlp downloaded: ${outputPath}`);
-      log.info(`yt-dlp downloaded version: ${ytdlpVersionInPc}`);
+      logger.info(`yt-dlp downloaded: ${outputPath}`);
+      logger.info(`yt-dlp downloaded version: ${ytdlpVersionInPc}`);
 
       return { ytdlpVersionInPc, ytdlpPathInPc: outputPath };
     } catch (err) {
-      log.error('Failed to download yt-dlp:', err);
+      logger.error('Failed to download yt-dlp:', err);
       return { ytdlpVersionInPc: null, ytdlpPathInPc: null };
     }
   });
 
   ipcMain.handle('ffmpeg:download', async () => {
     try {
-      log.info('Downloading ffmpeg...');
+      logger.info('Downloading ffmpeg...');
 
       const output7zPath = await downloadFfmpeg(DATA_DIR);
-      log.info('Downloaded ffmpeg');
+      logger.info('Downloaded ffmpeg');
 
       await SevenZip.unpack(output7zPath, DATA_DIR);
 
@@ -122,12 +122,12 @@ export async function addListeners() {
       store.set('settings.ffmpegPath', ffmpegBinPath);
       store.set('settings.ffmpegVersion', ffmpegVersionInPc);
 
-      log.info(`ffmpeg downloaded: ${ffmpegBinPath}`);
-      log.info(`ffmpeg downloaded version: ${ffmpegVersionInPc}`);
+      logger.info(`ffmpeg downloaded: ${ffmpegBinPath}`);
+      logger.info(`ffmpeg downloaded version: ${ffmpegVersionInPc}`);
 
       return { ffmpegVersionInPc, ffmpegPathInPc: ffmpegBinPath };
     } catch (err) {
-      log.error('Failed to download yt-dlp:', err);
+      logger.error('Failed to download yt-dlp:', err);
       return { ytdlpVersionInPc: null, ytdlpPathInPc: null };
     }
   });

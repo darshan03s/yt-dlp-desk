@@ -3,43 +3,43 @@ import { initDatabase, runMigrations } from './db';
 import { getDefaultAppSettings } from './defaultSettings';
 import { initStoreManager } from './store';
 import { makeDirs, pathExistsSync } from './utils/fsUtils';
-import log from 'electron-log';
+import logger from '../shared/logger';
 
 export async function init() {
   if (!pathExistsSync(DATA_DIR)) {
     makeDirs(DATA_DIR);
-    log.info('Created DATA_DIR');
+    logger.info('Created DATA_DIR');
   } else {
-    log.info('DATA_DIR exists');
+    logger.info('DATA_DIR exists');
   }
 
   if (!pathExistsSync(MEDIA_DATA_FOLDER_PATH)) {
     makeDirs(MEDIA_DATA_FOLDER_PATH);
-    log.info('Created MEDIA_DATA_FOLDER');
+    logger.info('Created MEDIA_DATA_FOLDER');
   } else {
-    log.info('MEDIA_DATA_FOLDER exists');
+    logger.info('MEDIA_DATA_FOLDER exists');
   }
 
   const store = await initStoreManager();
 
   if (!pathExistsSync(SETTINGS_PATH)) {
     store.set('settings', getDefaultAppSettings());
-    log.info('Created settings.json');
+    logger.info('Created settings.json');
   } else {
-    log.info('settings.json exists');
+    logger.info('settings.json exists');
   }
 
   if (!pathExistsSync(DB_PATH)) {
     initDatabase();
-    log.info('Created app.db');
+    logger.info('Created app.db');
     try {
       runMigrations();
-      log.info('Migrations applied');
+      logger.info('Migrations applied');
     } catch (error) {
-      log.error('Migrations failed: ' + error);
+      logger.error('Migrations failed: ' + error);
     }
   } else {
-    log.info('app.db exists');
+    logger.info('app.db exists');
     initDatabase();
   }
 }

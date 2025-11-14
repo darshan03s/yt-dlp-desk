@@ -3,10 +3,10 @@ import path, { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import log from 'electron-log';
+log.transports.file.level = 'info';
+import logger from '../shared/logger';
 import { init } from './init';
 import { addListeners } from './addListeners';
-
-log.transports.file.level = 'info';
 
 const APP_USER_MODEL_ID = 'com.ytdlpui';
 export const APP_PATH = app.getAppPath();
@@ -23,11 +23,11 @@ export const YTDLP_FOLDER_PATH = path.join(DATA_DIR, 'yt-dlp');
 export const YTDLP_EXE_PATH = path.join(DATA_DIR, 'yt-dlp', 'yt-dlp.exe');
 export const FFMPEG_FOLDER_PATH = path.join(DATA_DIR, 'ffmpeg');
 
-log.info(`is.dev: ${is.dev}`);
-log.info(`APP_DATA_PATH: ${APP_DATA_PATH}`);
-log.info(`DATA_DIR: ${DATA_DIR}`);
-log.info(`DB_PATH: ${DB_PATH}`);
-log.info(`SETTINGS_PATH: ${SETTINGS_PATH}`);
+logger.info(`is.dev: ${is.dev}`);
+logger.info(`APP_DATA_PATH: ${APP_DATA_PATH}`);
+logger.info(`DATA_DIR: ${DATA_DIR}`);
+logger.info(`DB_PATH: ${DB_PATH}`);
+logger.info(`SETTINGS_PATH: ${SETTINGS_PATH}`);
 
 export let mainWindow: BrowserWindow;
 

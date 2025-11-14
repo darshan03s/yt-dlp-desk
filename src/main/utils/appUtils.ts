@@ -1,7 +1,7 @@
 import { getStoreManager } from '../store';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import log from 'electron-log';
+import logger from '../../shared/logger';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {
@@ -44,7 +44,7 @@ async function getAppPath(appName: string) {
       return { found: true, path: stdout.trim() };
     }
   } catch (error) {
-    log.error(error);
+    logger.error(error);
     return { found: false, path: null };
   }
 }
