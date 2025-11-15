@@ -11,6 +11,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
     "start": "electron-vite preview",
+    "start:win-unpack": "bash -c ./dist/win-unpacked/ytdlp-ui.exe",
     "dev": "electron-vite dev",
     "dev:nopath": "bash ./shell-scripts/dev-nopath.sh",
     "dev:clean": "pnpm rm:app-data && pnpm dev",

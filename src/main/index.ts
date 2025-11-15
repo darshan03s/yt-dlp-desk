@@ -34,6 +34,9 @@ logger.info(`APP_DATA_PATH: ${APP_DATA_PATH}`);
 logger.info(`DATA_DIR: ${DATA_DIR}`);
 logger.info(`DB_PATH: ${DB_PATH}`);
 logger.info(`SETTINGS_PATH: ${SETTINGS_PATH}`);
+logger.info(
+  `ELECTRON_RENDERER_URL: ${is.dev ? process.env['ELECTRON_RENDERER_URL'] : join(__dirname, '../renderer/index.html')}`
+);
 
 export let mainWindow: BrowserWindow;
 
