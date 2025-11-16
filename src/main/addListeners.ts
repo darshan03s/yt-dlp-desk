@@ -20,6 +20,7 @@ import { Source, type Api } from '../shared/types';
 import { allowedSources } from '../shared/data';
 import { getInfoJson } from './utils/ytdlpUtils';
 import { YoutubeVideo } from '../shared/types/info-json/youtube-video';
+import { urlHistoryOperations } from './utils/dbUtils';
 
 export async function addListeners() {
   ipcMain.on('win:min', () => mainWindow.minimize());
@@ -153,6 +154,16 @@ export async function addListeners() {
       const infoJson = (await getInfoJson(url, 'youtube-video' as Source)) as YoutubeVideo | null;
       if (infoJson) {
         logger.info(`Fetched info json for ${url}`);
+        try {
+          await urlHistoryOperations.upsertByUrl(url, {
+            url,
+            thumbnail: infoJson.thumbnail,
+            title: infoJson.fulltitle
+          });
+          logger.info('Updated url history');
+        } catch {
+          logger.error('Could not update url history');
+        }
         return infoJson;
       } else {
         logger.error(`Could not fetch info json for ${url}`);

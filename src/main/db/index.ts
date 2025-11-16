@@ -4,7 +4,7 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { DB_PATH, MIGRATIONS_FOLDER } from '..';
 import * as schema from './schema';
 
-let db: ReturnType<typeof drizzle> | null = null;
+export let db: ReturnType<typeof drizzle> | null = null;
 
 export function initDatabase() {
   const sqlite = new Database(DB_PATH);
