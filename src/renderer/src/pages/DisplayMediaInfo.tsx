@@ -8,12 +8,14 @@ const DisplayMediaInfo = () => {
   const source = useMediaInfoStore((state) => state.source) as Source;
 
   return (
-    <div>
-      <header className="bg-secondary text-secondary-foreground font-inter p-3">
-        <UserUrlInput showRefetch={true} url={url} />
-      </header>
+    <div className="h-full overflow-y-scroll">
+      <div className="sticky left-0 top-0">
+        <header className="bg-secondary text-secondary-foreground font-inter p-3">
+          <UserUrlInput showRefetch={true} url={url} />
+        </header>
+      </div>
 
-      {source === 'youtube-video' && <YoutubeVideoInfo url={url} />}
+      <div>{source === 'youtube-video' && <YoutubeVideoInfo url={url} />}</div>
     </div>
   );
 };
