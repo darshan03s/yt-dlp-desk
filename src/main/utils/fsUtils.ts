@@ -1,4 +1,4 @@
-import { access, mkdir, cp, copyFile } from 'node:fs/promises';
+import { access, mkdir, cp, copyFile, readFile, writeFile } from 'node:fs/promises';
 import { accessSync, constants, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
@@ -49,4 +49,14 @@ export async function copyFolder(srcDir: string, destDir: string) {
   } catch (err) {
     console.error('Error copying folder:', err);
   }
+}
+
+export async function readJson<T = unknown>(path: string): Promise<T> {
+  const raw = await readFile(path, 'utf-8');
+  return JSON.parse(raw) as T;
+}
+
+export async function writeJson(path: string, data: unknown): Promise<void> {
+  const formatted = JSON.stringify(data, null, 2);
+  await writeFile(path, formatted, 'utf-8');
 }

@@ -1,8 +1,9 @@
+import { Source } from '@/shared/types';
 import { create } from 'zustand';
 
 interface MediaInfoStore {
   url: string;
-  source: string;
+  source: Source | string;
   mediaInfo: object;
 }
 

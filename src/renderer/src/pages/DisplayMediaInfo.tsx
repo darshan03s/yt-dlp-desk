@@ -1,10 +1,11 @@
 import UserUrlInput from '@renderer/components/user-url-input';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import YoutubeVideoInfo from './components/youtube/YoutubeVideoInfo';
+import { Source } from '@/shared/types';
 
 const DisplayMediaInfo = () => {
   const url = useMediaInfoStore((state) => state.url);
-  const source = useMediaInfoStore((state) => state.source);
+  const source = useMediaInfoStore((state) => state.source) as Source;
 
   return (
     <div>
@@ -12,7 +13,7 @@ const DisplayMediaInfo = () => {
         <UserUrlInput showRefetch={true} url={url} />
       </header>
 
-      {source === 'youtube' && <YoutubeVideoInfo url={url} />}
+      {source === 'youtube-video' && <YoutubeVideoInfo url={url} />}
     </div>
   );
 };

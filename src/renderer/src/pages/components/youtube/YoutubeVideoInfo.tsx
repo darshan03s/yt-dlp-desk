@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { YoutubeVideo } from '@/shared/types/info-json/youtube-video';
 import { toast } from 'sonner';
+import { Spinner } from '@renderer/components/ui/spinner';
 
 const Preview = ({ previewUrl }: { previewUrl: string }) => {
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-60 bg-black flex items-center justify-center">
       <img src={previewUrl} alt="Preview" width={420} className="aspect-video" />
     </div>
   );
@@ -20,7 +21,7 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
   const [infoJson, setInfoJson] = useState<YoutubeVideo | null>(null);
 
   useEffect(() => {
-    window.api.getYoutubeInfoJson(url).then((data: YoutubeVideo | null) => {
+    window.api.getYoutubeVideoInfoJson(url).then((data: YoutubeVideo | null) => {
       setInfoJson(data);
       if (!data) {
         toast.error('Could not fetch info for this url');
@@ -28,10 +29,14 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
     });
   }, []);
 
+  const Details = () => {
+    return <div className="text-sm">{infoJson?.fulltitle}</div>;
+  };
+
   return (
-    <div className="h-60 bg-black flex justify-center items-center">
+    <div className="flex flex-col">
       <Preview previewUrl={hqDefaultThumbnailUrl} />
-      {JSON.stringify(infoJson)}
+      <div className="p-2">{infoJson ? <Details /> : <Spinner />}</div>
     </div>
   );
 };

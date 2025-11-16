@@ -16,8 +16,10 @@ import path from 'node:path';
 import { downloadYtDlpLatestRelease } from './utils/downloadYtdlp';
 import { downloadFfmpeg } from './utils/downloadFfmpeg';
 import SevenZip from '7zip-min';
-import { type Api } from '../shared/types';
-import { allowedSources } from './data';
+import { Source, type Api } from '../shared/types';
+import { allowedSources } from '../shared/data';
+import { getInfoJson } from './utils/ytdlpUtils';
+import { YoutubeVideo } from '../shared/types/info-json/youtube-video';
 
 export async function addListeners() {
   ipcMain.on('win:min', () => mainWindow.minimize());
@@ -135,9 +137,9 @@ export async function addListeners() {
   ipcMain.handle('check-url', async (_event, url): ReturnType<Api['checkUrl']> => {
     const source = getSourceFromUrl(url);
     if (!source) {
-      return { source: source, url: url, isMediaDisplayAvailable: false };
+      return { source: '', url: url, isMediaDisplayAvailable: false };
     }
-    if (allowedSources.includes(source)) {
+    if (allowedSources.includes(source as Source)) {
       const normalizedUrl = getNormalizedUrl(source, url);
       return { source: source, url: normalizedUrl, isMediaDisplayAvailable: true };
     }
@@ -145,10 +147,16 @@ export async function addListeners() {
   });
 
   ipcMain.handle(
-    'yt-dlp:get-info-json',
-    async (_event, url): ReturnType<Api['getYoutubeInfoJson']> => {
+    'yt-dlp:get-youtube-video-info-json',
+    async (_event, url): Promise<YoutubeVideo | null> => {
       logger.info(`Fetching info json for ${url}`);
-      // TODO
+      const infoJson = (await getInfoJson(url, 'youtube-video' as Source)) as YoutubeVideo | null;
+      if (infoJson) {
+        logger.info(`Fetched info json for ${url}`);
+        return infoJson;
+      } else {
+        logger.error(`Could not fetch info json for ${url}`);
+      }
       return null;
     }
   );

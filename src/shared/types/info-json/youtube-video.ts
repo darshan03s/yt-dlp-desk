@@ -59,6 +59,7 @@ export interface YoutubeVideo {
   abr: number;
   asr: number;
   audio_channels: number;
+  expire_time: string;
 }
 
 interface YoutubeFormat {

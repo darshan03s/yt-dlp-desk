@@ -2,7 +2,7 @@ import { getStoreManager } from '../store';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import logger from '../../shared/logger';
-import { Api, AppSettings } from '../../shared/types';
+import { Api, AppSettings, Source } from '../../shared/types';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {
@@ -95,11 +95,13 @@ export async function getFfmpegFromPc(): ReturnType<Api['confirmFfmpeg']> {
   }
 }
 
-export function getSourceFromUrl(url: string): string {
-  if (url.includes('youtube') || url.includes('youtu.be')) {
-    return 'youtube';
+export function getSourceFromUrl(url: string): Source | null {
+  if (url.includes('youtube') || (url.includes('youtu.be') && !url.includes('playlist'))) {
+    return 'youtube-video';
+  } else if (url.includes('youtube') || (url.includes('youtu.be') && url.includes('playlist'))) {
+    return 'youtube-playlist';
   }
-  return '';
+  return null;
 }
 
 function getYouTubeVideoId(url: string): string | null {
@@ -117,8 +119,8 @@ function getYouTubeVideoId(url: string): string | null {
   }
 }
 
-export function getNormalizedUrl(source: string, url: string) {
-  if (source === 'youtube') {
+export function getNormalizedUrl(source: Source, url: string) {
+  if (source === 'youtube-video') {
     const videoId = getYouTubeVideoId(url);
     return `https://www.youtube.com/watch?v=${videoId}`;
   }

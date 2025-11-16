@@ -1,3 +1,4 @@
+import { allowedSources } from '../data';
 import { YoutubeVideo } from './info-json/youtube-video';
 
 export type AppSettings = {
@@ -12,6 +13,8 @@ export type AppSettings = {
   userDownloadsFolder: string;
   defaultFormat: string;
 };
+
+export type Source = (typeof allowedSources)[number];
 
 export type Api = {
   rendererInit: () => Promise<AppSettings | null>;
@@ -32,9 +35,9 @@ export type Api = {
     ffmpegVersionInPc: string | null;
   }>;
   checkUrl: (url: string) => Promise<{
-    source: string;
+    source: Source | string;
     url: string;
     isMediaDisplayAvailable: boolean;
   }>;
-  getYoutubeInfoJson: (url: string) => Promise<YoutubeVideo | null>;
+  getYoutubeVideoInfoJson: (url: string) => Promise<YoutubeVideo | null>;
 };
