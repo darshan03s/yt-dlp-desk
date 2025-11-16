@@ -37,22 +37,31 @@ export const urlHistoryOperations = {
     return db?.delete(urlHistory).where(eq(urlHistory.url, url));
   },
 
-  updateById: async (id: string, data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url'>) => {
+  updateById: async (
+    id: string,
+    data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url' | 'source'>
+  ) => {
     return db?.update(urlHistory).set(data).where(eq(urlHistory.id, id));
   },
 
-  updateByUrl: async (url: string, data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url'>) => {
+  updateByUrl: async (
+    url: string,
+    data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url' | 'source'>
+  ) => {
     return db?.update(urlHistory).set(data).where(eq(urlHistory.url, url));
   },
 
-  addNew: async (data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url'>) => {
+  addNew: async (data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url' | 'source'>) => {
     const completeData: NewUrlHistoryItem = {
       ...data,
       id: randomUUID()
     };
     return db?.insert(urlHistory).values(completeData);
   },
-  upsertByUrl: async (url: string, data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url'>) => {
+  upsertByUrl: async (
+    url: string,
+    data: Pick<UrlHistoryItem, 'thumbnail' | 'title' | 'url' | 'source'>
+  ) => {
     const existing = await db?.select().from(urlHistory).where(eq(urlHistory.url, url));
 
     if (existing && existing.length > 0) {

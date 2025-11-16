@@ -41,5 +41,6 @@ export async function init() {
   } else {
     logger.info('app.db exists');
     initDatabase();
+    runMigrations();
   }
 }

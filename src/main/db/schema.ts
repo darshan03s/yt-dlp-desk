@@ -6,6 +6,7 @@ export const downloadStatusEnum = ['pending', 'downloading', 'completed', 'faile
 export const urlHistory = sqliteTable('url_history', {
   id: text('id').primaryKey().notNull(),
   url: text('url').notNull(),
+  source: text('source').notNull(),
   thumbnail: text('thumbnail').notNull(),
   title: text('title').notNull(),
   addedAt: text('added_at')

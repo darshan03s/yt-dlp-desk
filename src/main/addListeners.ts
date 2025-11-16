@@ -158,7 +158,8 @@ export async function addListeners() {
           await urlHistoryOperations.upsertByUrl(url, {
             url,
             thumbnail: infoJson.thumbnail,
-            title: infoJson.fulltitle
+            title: infoJson.fulltitle,
+            source: 'youtube-video' as Source
           });
           logger.info('Updated url history');
         } catch {
