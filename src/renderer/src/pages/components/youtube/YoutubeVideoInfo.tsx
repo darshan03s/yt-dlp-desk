@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { YoutubeVideo } from '@/shared/types/info-json/youtube-video';
 import { toast } from 'sonner';
 import { Spinner } from '@renderer/components/ui/spinner';
+import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 
 const Preview = ({ previewUrl }: { previewUrl: string }) => {
   return (
@@ -18,14 +19,15 @@ type YoutubeVideoInfoProps = {
 const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
   const videoId = new URL(url).searchParams.get('v');
   const hqDefaultThumbnailUrl = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
-  const [infoJson, setInfoJson] = useState<YoutubeVideo | null>(null);
+  const infoJson = useMediaInfoStore((state) => state.mediaInfo) as YoutubeVideo;
 
   useEffect(() => {
+    if (Object.keys(infoJson).length !== 0) return;
     window.api.getYoutubeVideoInfoJson(url).then((data: YoutubeVideo | null) => {
-      setInfoJson(data);
       if (!data) {
         toast.error('Could not fetch info for this url');
       }
+      useMediaInfoStore.setState({ mediaInfo: data as YoutubeVideo });
     });
   }, []);
 
@@ -36,7 +38,7 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
   return (
     <div className="flex flex-col">
       <Preview previewUrl={hqDefaultThumbnailUrl} />
-      <div className="p-2">{infoJson ? <Details /> : <Spinner />}</div>
+      <div className="p-2">{Object.keys(infoJson).length !== 0 ? <Details /> : <Spinner />}</div>
     </div>
   );
 };

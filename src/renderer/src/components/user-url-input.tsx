@@ -37,7 +37,7 @@ const UserUrlInput = ({ showRefetch, url = '' }: UserUrlInputProps) => {
     const { source, url, isMediaDisplayAvailable } = await window.api.checkUrl(userEnteredUrl);
     logger.info({ source, url, isMediaDisplayAvailable });
     if (isMediaDisplayAvailable) {
-      useMediaInfoStore.setState({ source: source, url: url });
+      useMediaInfoStore.setState({ source: source, url: url, mediaInfo: {} });
       navigate('/display-media-info');
     } else {
       toast.error('This url is currently not supported for displaying info');
