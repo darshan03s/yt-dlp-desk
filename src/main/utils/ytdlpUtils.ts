@@ -64,8 +64,11 @@ export async function getInfoJson(
     if (await pathExists(infoJsonPath)) {
       const expireTime = await getExpireTime(infoJsonPath);
       if (new Date().toISOString() > expireTime) {
+        logger.info(`Video Links expired for ${url} on ${new Date(expireTime)}`);
+        logger.info(`Re-creating info-json for ${url}`);
         return (await createInfoJson(url, source, infoJsonPath)) as YoutubeVideoInfoJson;
       } else {
+        logger.info(`Video Links for ${url} expire at ${new Date(expireTime)}`);
         return await readJson<YoutubeVideoInfoJson>(infoJsonPath);
       }
     } else {
