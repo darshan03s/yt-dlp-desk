@@ -1,7 +1,7 @@
+import { db } from '@main/db';
+import { urlHistory } from '@main/db/schema';
+import { NewUrlHistoryItem, UrlHistoryItem } from '@main/types/db';
 import { eq, desc, asc } from 'drizzle-orm';
-import { db } from '../db';
-import { urlHistory } from '../db/schema';
-import type { NewUrlHistoryItem, UrlHistoryItem } from '../types/db';
 import { randomUUID } from 'node:crypto';
 
 export const urlHistoryOperations = {

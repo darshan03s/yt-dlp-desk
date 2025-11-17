@@ -1,8 +1,8 @@
-import { getStoreManager } from '../store';
+import { getStoreManager } from '@main/store';
+import logger from '@shared/logger';
+import { Api, AppSettings, Source } from '@shared/types';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import logger from '../../shared/logger';
-import { Api, AppSettings, Source } from '../../shared/types';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {

@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import logger from '../shared/logger';
-import { type Api } from '../shared/types';
+import logger from '@shared/logger';
+import { type Api } from '@shared/types';
 
 // Custom APIs for renderer
 const api: Api = {

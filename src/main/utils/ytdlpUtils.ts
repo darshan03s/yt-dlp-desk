@@ -3,10 +3,10 @@ import { MEDIA_DATA_FOLDER_PATH } from '..';
 import path from 'node:path';
 import { URL } from 'node:url';
 import { pathExists, readJson, writeJson } from './fsUtils';
-import { YoutubeVideoInfoJson } from '../../shared/types/info-json/youtube-video';
-import { Source } from '../../shared/types';
-import { YoutubePlaylistInfoJson } from '../../shared/types/info-json/youtube-playlist';
-import logger from '../../shared/logger';
+import { YoutubeVideoInfoJson } from '@shared/types/info-json/youtube-video';
+import { Source } from '@shared/types';
+import { YoutubePlaylistInfoJson } from '@shared/types/info-json/youtube-playlist';
+import logger from '@shared/logger';
 
 async function addExpireTime(infoJsonPath: string) {
   const json = await readJson<YoutubeVideoInfoJson>(infoJsonPath);

@@ -1,5 +1,5 @@
 import { InferSelectModel, InferInsertModel } from 'drizzle-orm';
-import { urlHistory, downloadsHistory, extraCommandsHistory } from '../db/schema';
+import { downloadsHistory, extraCommandsHistory, urlHistory } from '@main/db/schema';
 
 export type UrlHistoryItem = InferSelectModel<typeof urlHistory>;
 export type NewUrlHistoryItem = InferInsertModel<typeof urlHistory>;

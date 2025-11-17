@@ -3,7 +3,7 @@ import { initDatabase, runMigrations } from './db';
 import { getDefaultAppSettings } from './defaultSettings';
 import { initStoreManager } from './store';
 import { makeDirs, pathExistsSync } from './utils/fsUtils';
-import logger from '../shared/logger';
+import logger from '@shared/logger';
 
 export async function init() {
   if (!pathExistsSync(DATA_DIR)) {

@@ -5,10 +5,22 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@main': resolve('src/main'),
+        '@shared': resolve('src/shared')
+      }
+    }
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [externalizeDepsPlugin()],
+    resolve: {
+      alias: {
+        '@preload': resolve('src/preload'),
+        '@shared': resolve('src/shared')
+      }
+    }
   },
   renderer: {
     resolve: {
