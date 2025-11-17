@@ -1,4 +1,4 @@
-import { access, mkdir, cp, copyFile, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, cp, copyFile, readFile, writeFile, stat, unlink } from 'node:fs/promises';
 import { accessSync, constants, createWriteStream, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fetch } from 'undici';
@@ -112,5 +112,25 @@ export function filePathToFileUrl(inputPath: string): string {
     return fileUrl;
   } catch (error) {
     throw new Error(`Failed to convert file path to file URL: ${(error as Error).message}`);
+  }
+}
+
+export async function deleteFile(filePath: string): Promise<void> {
+  try {
+    if (!filePath || typeof filePath !== 'string') {
+      throw new Error('Invalid file path');
+    }
+
+    const normalized = path.normalize(filePath);
+
+    await stat(normalized);
+
+    await unlink(normalized);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return;
+    }
+
+    throw new Error(`Failed to remove file "${filePath}": ${(error as Error).message}`);
   }
 }

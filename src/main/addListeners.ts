@@ -24,6 +24,7 @@ import {
   downloadFile,
   filePathToFileUrl,
   pathExists,
+  deleteFile,
   sanitizeFileName
 } from './utils/fsUtils';
 import path from 'node:path';
@@ -131,6 +132,8 @@ export async function addListeners() {
       logger.info('Downloaded ffmpeg');
 
       await SevenZip.unpack(output7zPath, DATA_DIR);
+
+      await deleteFile(output7zPath);
 
       const ffmpegExePath = path.join(DATA_DIR, 'ffmpeg-8.0-full_build', 'bin', 'ffmpeg.exe');
       const ffmpegBinPath = path.join(DATA_DIR, 'ffmpeg-8.0-full_build', 'bin');
