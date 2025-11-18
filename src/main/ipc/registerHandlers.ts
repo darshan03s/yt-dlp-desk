@@ -10,7 +10,7 @@ import {
 } from './handlers';
 import { mainWindow } from '..';
 
-export async function addListeners() {
+async function registerHanlders() {
   ipcMain.on('win:min', () => mainWindow.minimize());
   ipcMain.on('win:close', () => mainWindow.close());
 
@@ -28,3 +28,5 @@ export async function addListeners() {
 
   ipcMain.handle('yt-dlp:get-youtube-video-info-json', getYoutubeVideoInfoJson);
 }
+
+export default registerHanlders;

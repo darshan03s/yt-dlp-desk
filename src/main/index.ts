@@ -5,7 +5,7 @@ import icon from '../../resources/icon.png?asset';
 import log from 'electron-log';
 import logger from '@shared/logger';
 import { init } from './init';
-import { addListeners } from './ipc/registerHandlers';
+import registerHanlders from './ipc/registerHandlers';
 
 const logsFolderName = new Date().toISOString().split('T')[0];
 
@@ -86,7 +86,7 @@ app.whenReady().then(async () => {
 
   await init();
 
-  await addListeners();
+  await registerHanlders();
 
   createWindow();
 
