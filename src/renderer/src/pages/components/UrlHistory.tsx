@@ -12,7 +12,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useHistoryStore } from '@renderer/stores/history-store';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useNavigate } from 'react-router-dom';
-import { IconTrash } from '@tabler/icons-react';
+import { IconInfoSquareRounded, IconTrash } from '@tabler/icons-react';
 import { Button } from '@renderer/components/ui/button';
 import { Logo } from '@renderer/data/logo';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip';
@@ -33,7 +33,56 @@ export function updateUrlHistoryInStore() {
   });
 }
 
+const MoreInfo = ({
+  open,
+  setOpen,
+  item
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  item: UrlHistoryItem;
+}) => {
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Info</DialogTitle>
+          <DialogDescription>More info of url</DialogDescription>
+        </DialogHeader>
+        <div className="w-full font-mono flex flex-col gap-2 text-xs">
+          <div>
+            <span className="font-semibold">Title</span>: <span>{item.title}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Source</span>: <span>{item.source}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Uploader</span>: <span>{item.uploader}</span>
+          </div>
+          <div>
+            <span className="font-semibold">URL</span>:{' '}
+            <a href={item.url} target="_blank" rel="noreferrer" className="underline">
+              {item.url}
+            </a>
+          </div>
+          <div>
+            <span className="font-semibold">Thumbnail</span>:{' '}
+            <a href={item.thumbnail} target="_blank" rel="noreferrer" className="underline">
+              {item.thumbnail}
+            </a>
+          </div>
+          <div>
+            <span className="font-semibold">Last Fetched</span>:{' '}
+            <span>{new Date(item.addedAt).toLocaleString()}</span>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
+  const [isMoreInfoModalOpen, setIsMoreInfoModalOpen] = useState(false);
   const navigate = useNavigate();
 
   function handleNavigateToDisplayInfo() {
@@ -48,52 +97,71 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
   }
 
   return (
-    <Item size={'sm'} variant={'outline'} className="hover:bg-muted">
-      <ItemMedia className="aspect-video w-32 cursor-pointer" onClick={handleNavigateToDisplayInfo}>
-        <img
-          src={
-            item.thumbnail_local.length === 0 ? item.thumbnail : `media:///${item.thumbnail_local}`
-          }
-          alt={item.title}
-          className="aspect-video rounded-sm"
-        />
-      </ItemMedia>
-      <ItemContent className="flex flex-col gap-3">
-        <ItemTitle className="text-xs">{item.title}</ItemTitle>
-        <ItemDescription className="flex gap-2 items-center text-xs">
-          <Badge variant={'outline'} className="text-[10px]">
-            {item.uploader}
-          </Badge>
-        </ItemDescription>
-      </ItemContent>
-      <ItemFooter className="url-history-item-footer w-full">
-        <div className="url-history-item-footer-left">
-          <Tooltip>
-            <TooltipTrigger>
-              <Button variant={'outline'} size={'icon-sm'}>
-                <img src={Logo(item.source)} alt={item.source} className="size-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Source: {item.source}</TooltipContent>
-          </Tooltip>
-        </div>
-        <div className="url-history-item-footer-right">
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                onClick={() => handleUrlHistoryItemDelete(item.id)}
-                variant={'outline'}
-                size={'icon-sm'}
-                className="text-destructive hover:text-destructive/70"
-              >
-                <IconTrash />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Delete from history</TooltipContent>
-          </Tooltip>
-        </div>
-      </ItemFooter>
-    </Item>
+    <>
+      <Item size={'sm'} variant={'outline'} className="hover:bg-muted">
+        <ItemMedia
+          className="aspect-video w-32 cursor-pointer"
+          onClick={handleNavigateToDisplayInfo}
+        >
+          <img
+            src={
+              item.thumbnail_local.length === 0
+                ? item.thumbnail
+                : `media:///${item.thumbnail_local}`
+            }
+            alt={item.title}
+            className="aspect-video rounded-sm"
+          />
+        </ItemMedia>
+        <ItemContent className="flex flex-col gap-3">
+          <ItemTitle className="text-xs">{item.title}</ItemTitle>
+          <ItemDescription className="flex gap-2 items-center text-xs">
+            <Badge variant={'outline'} className="text-[10px]">
+              {item.uploader}
+            </Badge>
+          </ItemDescription>
+        </ItemContent>
+        <ItemFooter className="url-history-item-footer w-full">
+          <div className="url-history-item-footer-left flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant={'outline'} size={'icon-sm'}>
+                  <img src={Logo(item.source)} alt={item.source} className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Source: {item.source}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  onClick={() => setIsMoreInfoModalOpen(true)}
+                  variant={'outline'}
+                  size={'icon-sm'}
+                >
+                  <IconInfoSquareRounded />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>More info</TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="url-history-item-footer-right">
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  onClick={() => handleUrlHistoryItemDelete(item.id)}
+                  variant={'destructive'}
+                  size={'icon-sm'}
+                >
+                  <IconTrash />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete from history</TooltipContent>
+            </Tooltip>
+          </div>
+        </ItemFooter>
+      </Item>
+      <MoreInfo open={isMoreInfoModalOpen} setOpen={setIsMoreInfoModalOpen} item={item} />
+    </>
   );
 };
 
@@ -159,7 +227,7 @@ const UrlHistory = () => {
               <IconTrash />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Delete all history</TooltipContent>
+          <TooltipContent>Delete url history</TooltipContent>
         </Tooltip>
       </div>
       <div className="p-2 flex flex-col gap-2">
