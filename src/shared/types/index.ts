@@ -1,4 +1,5 @@
 import { allowedSources } from '../data';
+import { UrlHistoryList } from './history';
 import { YoutubeVideoInfoJson } from './info-json/youtube-video';
 
 export type AppSettings = {
@@ -39,5 +40,9 @@ export type Api = {
     url: string;
     isMediaDisplayAvailable: boolean;
   }>;
-  getYoutubeVideoInfoJson: (url: string) => Promise<YoutubeVideoInfoJson | null>;
+  getYoutubeVideoInfoJson: (
+    url: string,
+    updateUrlHistory: boolean
+  ) => Promise<YoutubeVideoInfoJson | null>;
+  getUrlHistory: () => Promise<UrlHistoryList>;
 };

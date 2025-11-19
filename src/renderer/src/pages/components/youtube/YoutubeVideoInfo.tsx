@@ -3,6 +3,9 @@ import { YoutubeVideoInfoJson } from '@/shared/types/info-json/youtube-video';
 import { toast } from 'sonner';
 import { Spinner } from '@renderer/components/ui/spinner';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
+import { useHistoryStore } from '@renderer/stores/history-store';
+import { useSearchParams } from 'react-router-dom';
+import { UrlHistoryList } from '@shared/types/history';
 
 const Preview = ({ previewUrl, isLoading }: { previewUrl: string; isLoading: boolean }) => {
   return (
@@ -21,6 +24,8 @@ type YoutubeVideoInfoProps = {
 };
 
 const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
+  const [searchParams] = useSearchParams();
+  const updateUrlHistory = searchParams.get('updateUrlHistory') === '0' ? false : true;
   const videoId = new URL(url).searchParams.get('v');
   const [thumbnailUrl, setThumbnailUrl] = useState<string>(
     `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
@@ -29,20 +34,31 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
   const [isLoadingInfoJson, setIsLoadingInfoJson] = useState<boolean>(true);
 
   useEffect(() => {
-    if (Object.keys(infoJson).length !== 0) return;
-    setIsLoadingInfoJson(true);
-    window.api.getYoutubeVideoInfoJson(url).then((data: YoutubeVideoInfoJson | null) => {
-      if (!data) {
-        toast.error('Could not fetch info for this url');
-        setIsLoadingInfoJson(false);
-        return;
-      }
-      useMediaInfoStore.setState({ mediaInfo: data as YoutubeVideoInfoJson });
-      if (data.thumbnail_local) {
-        setThumbnailUrl(`media:///${data.thumbnail_local}`);
-      }
+    if (Object.keys(infoJson).length !== 0) {
+      setThumbnailUrl(`media:///${infoJson.thumbnail_local}`);
       setIsLoadingInfoJson(false);
-    });
+      return;
+    }
+    setIsLoadingInfoJson(true);
+    window.api
+      .getYoutubeVideoInfoJson(url, updateUrlHistory)
+      .then((data: YoutubeVideoInfoJson | null) => {
+        if (!data) {
+          toast.error('Could not fetch info for this url');
+          setIsLoadingInfoJson(false);
+          return;
+        }
+        useMediaInfoStore.setState({ mediaInfo: data as YoutubeVideoInfoJson });
+        if (data.thumbnail_local) {
+          setThumbnailUrl(`media:///${data.thumbnail_local}`);
+        }
+        setIsLoadingInfoJson(false);
+
+        // problem
+        window.api.getUrlHistory().then((urlHistory: UrlHistoryList) => {
+          useHistoryStore.setState({ urlHistory: urlHistory ?? [] });
+        });
+      });
   }, []);
 
   const Details = () => {

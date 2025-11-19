@@ -156,7 +156,8 @@ export async function checkUrl(
 
 export async function getYoutubeVideoInfoJson(
   _event: IpcMainInvokeEvent,
-  url: string
+  url: string,
+  updateUrlHistory: boolean
 ): Promise<YoutubeVideoInfoJson | null> {
   logger.info(`Fetching info json for ${url}`);
   // get info json
@@ -166,21 +167,27 @@ export async function getYoutubeVideoInfoJson(
   )) as YoutubeVideoInfoJson | null;
   if (infoJson) {
     logger.info(`Fetched info json for ${url}`);
-    try {
-      await urlHistoryOperations.upsertByUrl(url, {
-        url,
-        thumbnail: infoJson.thumbnail,
-        title: infoJson.fulltitle,
-        source: 'youtube-video' as Source,
-        thumbnail_local: infoJson.thumbnail_local ?? ''
-      });
-      logger.info('Updated url history');
-    } catch {
-      logger.error('Could not update url history');
+    if (updateUrlHistory) {
+      try {
+        await urlHistoryOperations.upsertByUrl(url, {
+          url,
+          thumbnail: infoJson.thumbnail,
+          title: infoJson.fulltitle,
+          source: 'youtube-video' as Source,
+          thumbnail_local: infoJson.thumbnail_local ?? ''
+        });
+        logger.info('Updated url history');
+      } catch {
+        logger.error('Could not update url history');
+      }
     }
     return infoJson;
   } else {
     logger.error(`Could not fetch info json for ${url}`);
   }
   return null;
+}
+
+export async function getUrlHistory() {
+  return urlHistoryOperations.getAllByAddedAtDesc();
 }
