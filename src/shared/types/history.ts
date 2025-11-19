@@ -6,6 +6,7 @@ export type UrlHistoryItem = {
   source: Source;
   thumbnail: string;
   thumbnail_local: string;
+  uploader: string;
   title: string;
   addedAt: string;
 };

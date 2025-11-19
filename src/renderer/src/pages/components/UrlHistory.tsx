@@ -35,7 +35,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
         <ItemTitle className="text-xs">{item.title}</ItemTitle>
         <ItemDescription className="flex gap-2 items-center text-xs">
           <Badge variant={'outline'} className="text-[10px]">
-            {item.source}
+            {item.uploader}
           </Badge>
         </ItemDescription>
       </ItemContent>
