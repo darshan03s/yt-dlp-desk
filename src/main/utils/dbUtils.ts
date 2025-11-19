@@ -52,7 +52,8 @@ export const urlHistoryOperations = {
   addNew: async (data: Omit<UrlHistoryItem, 'id' | 'addedAt'>) => {
     const completeData: NewUrlHistoryItem = {
       ...data,
-      id: randomUUID()
+      id: randomUUID(),
+      addedAt: new Date().toISOString()
     };
     return db?.insert(urlHistory).values(completeData);
   },
