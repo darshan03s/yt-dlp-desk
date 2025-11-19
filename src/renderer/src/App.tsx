@@ -42,7 +42,7 @@ const App = () => {
   if (loadingFromSettings) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
-        <Spinner className="size-8" />
+        <Spinner className="size-4" />
       </div>
     );
   }
