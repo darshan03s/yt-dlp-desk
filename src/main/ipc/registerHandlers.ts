@@ -3,6 +3,7 @@ import {
   checkUrl,
   confirmFfmpeg,
   confirmYtdlp,
+  deleteOneFromUrlHistory,
   downloadFfmpeg,
   downloadYtdlp,
   getUrlHistory,
@@ -30,6 +31,7 @@ async function registerHanlders() {
   ipcMain.handle('yt-dlp:get-youtube-video-info-json', getYoutubeVideoInfoJson);
 
   ipcMain.handle('url-history:get-all', getUrlHistory);
+  ipcMain.handle('url-history:delete-one', deleteOneFromUrlHistory);
 }
 
 export default registerHanlders;

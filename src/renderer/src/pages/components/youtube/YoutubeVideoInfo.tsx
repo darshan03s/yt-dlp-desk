@@ -3,9 +3,8 @@ import { YoutubeVideoInfoJson } from '@/shared/types/info-json/youtube-video';
 import { toast } from 'sonner';
 import { Spinner } from '@renderer/components/ui/spinner';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
-import { useHistoryStore } from '@renderer/stores/history-store';
 import { useSearchParams } from 'react-router-dom';
-import { UrlHistoryList } from '@shared/types/history';
+import { updateUrlHistoryInStore } from '../UrlHistory';
 
 const Preview = ({ previewUrl, isLoading }: { previewUrl: string; isLoading: boolean }) => {
   return (
@@ -54,10 +53,7 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
         }
         setIsLoadingInfoJson(false);
 
-        // problem
-        window.api.getUrlHistory().then((urlHistory: UrlHistoryList) => {
-          useHistoryStore.setState({ urlHistory: urlHistory ?? [] });
-        });
+        updateUrlHistoryInStore();
       });
   }, []);
 

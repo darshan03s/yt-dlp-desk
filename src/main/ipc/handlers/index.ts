@@ -192,3 +192,11 @@ export async function getYoutubeVideoInfoJson(
 export async function getUrlHistory() {
   return urlHistoryOperations.getAllByAddedAtDesc();
 }
+
+export async function deleteOneFromUrlHistory(_event: IpcMainInvokeEvent, id: string) {
+  try {
+    urlHistoryOperations.deleteById(id);
+  } catch (e) {
+    logger.error(`Could not delete from url history for id -> ${id}\n${e}`);
+  }
+}

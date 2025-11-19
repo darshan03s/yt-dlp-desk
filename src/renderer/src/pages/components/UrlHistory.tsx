@@ -17,12 +17,24 @@ import { Button } from '@renderer/components/ui/button';
 import { Logo } from '@renderer/data/logo';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@renderer/components/ui/tooltip';
 
+export function updateUrlHistoryInStore() {
+  window.api.getUrlHistory().then((urlHistory: UrlHistoryList) => {
+    useHistoryStore.setState({ urlHistory: urlHistory ?? [] });
+  });
+}
+
 const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
   const navigate = useNavigate();
 
   function handleNavigateToDisplayInfo() {
     useMediaInfoStore.setState({ url: item.url, source: item.source, mediaInfo: {} });
     navigate('/display-media-info?updateUrlHistory=0');
+  }
+
+  function handleUrlHistoryItemDelete(id: string) {
+    window.api.deleteFromUrlHistory(id).then(() => {
+      updateUrlHistoryInStore();
+    });
   }
 
   return (
@@ -59,6 +71,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
           <Tooltip>
             <TooltipTrigger>
               <Button
+                onClick={() => handleUrlHistoryItemDelete(item.id)}
                 variant={'outline'}
                 size={'icon-sm'}
                 className="text-destructive hover:text-destructive/70"
@@ -78,10 +91,7 @@ const UrlHistory = () => {
   const urlHistory = useHistoryStore((state) => state.urlHistory);
   useEffect(() => {
     if (urlHistory && urlHistory.length > 0) return;
-
-    window.api.getUrlHistory().then((urlHistory: UrlHistoryList) => {
-      useHistoryStore.setState({ urlHistory: urlHistory ?? [] });
-    });
+    updateUrlHistoryInStore();
   }, []);
   return (
     <div className="p-2 flex flex-col gap-2">

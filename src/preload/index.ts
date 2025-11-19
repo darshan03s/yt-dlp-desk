@@ -13,7 +13,8 @@ const api: Api = {
   checkUrl: (url: string) => ipcRenderer.invoke('check-url', url),
   getYoutubeVideoInfoJson: (url: string, updateUrlHistory: boolean) =>
     ipcRenderer.invoke('yt-dlp:get-youtube-video-info-json', url, updateUrlHistory),
-  getUrlHistory: () => ipcRenderer.invoke('url-history:get-all')
+  getUrlHistory: () => ipcRenderer.invoke('url-history:get-all'),
+  deleteFromUrlHistory: (id: string) => ipcRenderer.invoke('url-history:delete-one', id)
 };
 
 if (process.contextIsolated) {
