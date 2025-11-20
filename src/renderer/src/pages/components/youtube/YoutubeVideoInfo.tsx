@@ -99,7 +99,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
           </div>
           <div>
             <span className="font-semibold">Duration</span>:{' '}
-            <span>{infoJson.duration_string.length === 0 ? 'N/A' : infoJson.duration_string}</span>
+            <span>{infoJson.duration_string?.length === 0 ? 'N/A' : infoJson.duration_string}</span>
           </div>
           <div>
             <span className="font-semibold">Uploader</span>: <span>{infoJson.uploader}</span>
