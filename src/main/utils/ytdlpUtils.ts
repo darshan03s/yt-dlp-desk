@@ -91,7 +91,9 @@ async function getExpireTime(infoJsonPath: string) {
 
 async function downloadThumbnail(infoJson: YoutubeVideoInfoJson) {
   const safeTitle = sanitizeFileName(infoJson.fulltitle);
-  const thumbnailUrl = `https://i.ytimg.com/vi/${infoJson.id}/maxresdefault.jpg`;
+  const thumbnailUrl = new URL(infoJson.thumbnail);
+  thumbnailUrl.search = '';
+  const thumbnailUrlCleaned = thumbnailUrl.toString();
   const thumbnailLocalPath = path.join(
     MEDIA_DATA_FOLDER_PATH,
     'youtube-video',
@@ -99,7 +101,7 @@ async function downloadThumbnail(infoJson: YoutubeVideoInfoJson) {
     safeTitle + '.jpg'
   );
   try {
-    await downloadFile({ url: thumbnailUrl, destinationPath: thumbnailLocalPath });
+    await downloadFile({ url: thumbnailUrlCleaned, destinationPath: thumbnailLocalPath });
     logger.info(`Downloaded thumbnail for ${infoJson.fulltitle} to ${thumbnailLocalPath}`);
   } catch (error) {
     logger.error(error);
