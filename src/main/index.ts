@@ -44,7 +44,7 @@ export let mainWindow: BrowserWindow;
 function createWindow(): void {
   mainWindow = new BrowserWindow({
     minWidth: 500,
-    width: 500,
+    width: 700,
     maxWidth: 700,
     height: 670,
     minHeight: 670,
