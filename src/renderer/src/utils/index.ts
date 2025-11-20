@@ -21,3 +21,20 @@ export function formatDate(input: string): string {
   const month = months[monthNum - 1];
   return `${year} ${month} ${day}`;
 }
+
+export function formatFileSize(bytes: number): string {
+  if (bytes < 0 || Number.isNaN(bytes)) {
+    throw new Error('Invalid file size');
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let value = bytes;
+  let index = 0;
+
+  while (value >= 1024 && index < units.length - 1) {
+    value /= 1024;
+    index++;
+  }
+
+  return `${value.toFixed(2)} ${units[index]}`;
+}

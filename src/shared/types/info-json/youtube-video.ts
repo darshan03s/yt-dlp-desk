@@ -67,7 +67,7 @@ export interface YoutubeVideoInfoJson extends Extra {
   audio_channels: number;
 }
 
-interface YoutubeFormat {
+export interface YoutubeFormat {
   format: string;
   format_id: string;
   format_note: string;
@@ -97,7 +97,7 @@ interface YoutubeFormat {
   protocol: string;
 }
 
-interface YoutubeThumbnail {
+export interface YoutubeThumbnail {
   id: string;
   url: string;
   width: number;
@@ -105,22 +105,22 @@ interface YoutubeThumbnail {
   resolution: string;
 }
 
-interface YoutubeAutomaticCaption {
+export interface YoutubeAutomaticCaption {
   ext: string;
   url: string;
   name: string;
 }
 
-interface YoutubeSubtitle {
+export interface YoutubeSubtitle {
   ext: string;
   url: string;
   name: string;
 }
 
-interface YoutubeAutomaticCaptions {
+export interface YoutubeAutomaticCaptions {
   [key: string]: YoutubeAutomaticCaption[];
 }
 
-interface YoutubeSubtitles {
+export interface YoutubeSubtitles {
   [key: string]: YoutubeSubtitle[];
 }
