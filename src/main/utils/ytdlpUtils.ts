@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { MEDIA_DATA_FOLDER_PATH } from '..';
+import { MEDIA_DATA_FOLDER_PATH, YTDLP_EXE_PATH } from '..';
 import path from 'node:path';
 import { URL } from 'node:url';
 import { downloadFile, pathExists, readJson, sanitizeFileName, writeJson } from './fsUtils';
@@ -39,7 +39,7 @@ export async function createInfoJson(
   infoJsonPath: string
 ): Promise<YoutubeVideoInfoJson | YoutubePlaylistInfoJson | null> {
   return await new Promise((resolve, reject) => {
-    const child = spawn('yt-dlp', [
+    const child = spawn(YTDLP_EXE_PATH, [
       '--skip-download',
       '--write-info-json',
       '-o',
