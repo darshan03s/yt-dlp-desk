@@ -51,65 +51,6 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
     } else return null;
   };
 
-  const Formats = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
-    const [isAllFormatsModalOpen, setIsAllFormatsModalOpen] = useState(false);
-    const setSelectedFormat = useSelectedOptionsStore((state) => state.setSelectedFormat);
-    const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
-    const defaultFormat: SelectedFormat = {
-      vcodec: infoJson.vcodec,
-      acodec: infoJson.acodec,
-      ext: infoJson.ext,
-      filesize_approx: infoJson.filesize_approx,
-      fps: infoJson.fps,
-      format: infoJson.format,
-      format_id: infoJson.format_id,
-      format_note: infoJson.format_note,
-      height: infoJson.height,
-      width: infoJson.width,
-      resolution: infoJson.resolution
-    };
-    useEffect(() => {
-      setSelectedFormat(defaultFormat);
-    }, []);
-
-    return (
-      <>
-        <div
-          onClick={() => setIsAllFormatsModalOpen(true)}
-          className="selected-format relative border p-1 rounded-md w-full bg-secondary flex items-center gap-2 cursor-pointer"
-        >
-          <div className="selected-format-left p-1 flex items-center">
-            <span className="bg-primary text-primary-foreground text-xs p-2 rounded-md">
-              {selectedFormat.ext || defaultFormat.ext}
-            </span>
-          </div>
-          <div className="selected-format-right flex flex-col">
-            <span>{selectedFormat.resolution || defaultFormat.resolution}</span>
-            <span className="text-[10px]">{selectedFormat.format || defaultFormat.format}</span>
-            <div className="text-[10px] flex items-center gap-2">
-              <span>fps: {selectedFormat.fps || defaultFormat.fps}</span>
-              <span>vcodec: {selectedFormat.vcodec || defaultFormat.vcodec}</span>
-              <span>acodec: {selectedFormat.acodec || defaultFormat.acodec}</span>
-              <span>
-                Filesize≈{' '}
-                {formatFileSize(selectedFormat.filesize_approx! || defaultFormat.filesize_approx!)}
-              </span>
-            </div>
-          </div>
-          <span className="absolute right-0 top-0 text-[10px] bg-primary/30 px-2 py-0.5 rounded-tr-md rounded-bl-md">
-            Selected Format
-          </span>
-        </div>
-        <AllFormatsModal
-          open={isAllFormatsModalOpen}
-          setOpen={setIsAllFormatsModalOpen}
-          formats={infoJson.formats}
-          defaultFormat={defaultFormat}
-        />
-      </>
-    );
-  };
-
   return (
     <>
       <div className="flex flex-col gap-2">
@@ -158,6 +99,65 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
   );
 };
 
+const Formats = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
+  const [isAllFormatsModalOpen, setIsAllFormatsModalOpen] = useState(false);
+  const setSelectedFormat = useSelectedOptionsStore((state) => state.setSelectedFormat);
+  const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
+  const defaultFormat: SelectedFormat = {
+    vcodec: infoJson.vcodec,
+    acodec: infoJson.acodec,
+    ext: infoJson.ext,
+    filesize_approx: infoJson.filesize_approx,
+    fps: infoJson.fps,
+    format: infoJson.format,
+    format_id: infoJson.format_id,
+    format_note: infoJson.format_note,
+    height: infoJson.height,
+    width: infoJson.width,
+    resolution: infoJson.resolution
+  };
+  useEffect(() => {
+    setSelectedFormat(defaultFormat);
+  }, []);
+
+  return (
+    <>
+      <div
+        onClick={() => setIsAllFormatsModalOpen(true)}
+        className="selected-format relative border p-1 rounded-md w-full bg-secondary flex items-center gap-2 cursor-pointer"
+      >
+        <div className="selected-format-left p-1 flex items-center">
+          <span className="bg-primary text-primary-foreground text-xs p-2 rounded-md">
+            {selectedFormat.ext || defaultFormat.ext}
+          </span>
+        </div>
+        <div className="selected-format-right flex flex-col">
+          <span>{selectedFormat.resolution || defaultFormat.resolution}</span>
+          <span className="text-[10px]">{selectedFormat.format || defaultFormat.format}</span>
+          <div className="text-[10px] flex items-center gap-2">
+            <span>fps: {selectedFormat.fps || defaultFormat.fps}</span>
+            <span>vcodec: {selectedFormat.vcodec || defaultFormat.vcodec}</span>
+            <span>acodec: {selectedFormat.acodec || defaultFormat.acodec}</span>
+            <span>
+              Filesize≈{' '}
+              {formatFileSize(selectedFormat.filesize_approx! || defaultFormat.filesize_approx!)}
+            </span>
+          </div>
+        </div>
+        <span className="absolute right-0 top-0 text-[10px] bg-primary/30 px-2 py-0.5 rounded-tr-md rounded-bl-md">
+          Selected Format
+        </span>
+      </div>
+      <AllFormatsModal
+        open={isAllFormatsModalOpen}
+        setOpen={setIsAllFormatsModalOpen}
+        formats={infoJson.formats}
+        defaultFormat={defaultFormat}
+      />
+    </>
+  );
+};
+
 interface AllFormatsModalProps {
   formats: YoutubeVideoInfoJson['formats'];
   defaultFormat: SelectedFormat;
@@ -192,6 +192,33 @@ const AllFormatsModal = ({ formats, defaultFormat, open, setOpen }: AllFormatsMo
         resolution: format.resolution
       });
     }
+
+    function vcodec(codec: string | undefined): string {
+      if (codec === undefined) {
+        return '';
+      }
+      if (codec.includes('av01')) {
+        return 'av01';
+      }
+      if (codec.includes('avc1')) {
+        return 'avc1';
+      }
+      return codec || '';
+    }
+
+    function acodec(codec: string | undefined): string {
+      if (codec === undefined) {
+        return '';
+      }
+      if (codec.includes('m4a')) {
+        return 'm4a';
+      }
+      if (codec.includes('mp4a')) {
+        return 'mp4a';
+      }
+      return codec || '';
+    }
+
     return (
       <div
         onClick={handleFormatSelect}
@@ -207,8 +234,8 @@ const AllFormatsModal = ({ formats, defaultFormat, open, setOpen }: AllFormatsMo
           <span className="text-[10px]">{format.format}</span>
           <div className="text-[10px] flex items-center gap-2">
             <span>fps: {format.fps}</span>
-            <span>vcodec: {format.vcodec}</span>
-            <span>acodec: {format.acodec}</span>
+            <span>vcodec: {vcodec(format.vcodec)}</span>
+            <span>acodec: {acodec(format.acodec)}</span>
             <span>
               Filesize≈ {format.filesize_approx ? formatFileSize(format.filesize_approx) : ''}
             </span>
