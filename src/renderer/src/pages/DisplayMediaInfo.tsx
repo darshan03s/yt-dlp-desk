@@ -9,13 +9,15 @@ const DisplayMediaInfo = () => {
 
   return (
     <div className="h-full overflow-y-scroll">
-      <div className="sticky left-0 top-0">
+      <div className="sticky left-0 top-0 z-50 bg-secondary">
         <header className="bg-secondary text-secondary-foreground font-inter p-3">
           <UserUrlInput showRefetch={true} url={url} />
         </header>
       </div>
 
-      <div>{source === 'youtube-video' && <YoutubeVideoInfo url={url} />}</div>
+      <div className="relative z-0">
+        {source === 'youtube-video' && <YoutubeVideoInfo url={url} />}
+      </div>
     </div>
   );
 };
