@@ -6,7 +6,7 @@ import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useSearchParams } from 'react-router-dom';
 import { updateUrlHistoryInStore } from '../UrlHistory';
 import { IconArrowDown, IconCircleCheckFilled, IconClockHour3Filled } from '@tabler/icons-react';
-import { formatDate, formatFileSize } from '@renderer/utils';
+import { acodec, formatDate, formatFileSize, vcodec } from '@renderer/utils';
 import {
   Dialog,
   DialogContent,
@@ -136,8 +136,8 @@ const Formats = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
           <span className="text-[10px]">{selectedFormat.format || defaultFormat.format}</span>
           <div className="text-[10px] flex items-center gap-2">
             <span>fps: {selectedFormat.fps || defaultFormat.fps}</span>
-            <span>vcodec: {selectedFormat.vcodec || defaultFormat.vcodec}</span>
-            <span>acodec: {selectedFormat.acodec || defaultFormat.acodec}</span>
+            <span>vcodec: {vcodec(selectedFormat.vcodec || defaultFormat.vcodec)}</span>
+            <span>acodec: {acodec(selectedFormat.acodec || defaultFormat.acodec)}</span>
             <span>
               Filesize≈{' '}
               {formatFileSize(selectedFormat.filesize_approx! || defaultFormat.filesize_approx!)}
@@ -191,32 +191,6 @@ const AllFormatsModal = ({ formats, defaultFormat, open, setOpen }: AllFormatsMo
         width: format.width,
         resolution: format.resolution
       });
-    }
-
-    function vcodec(codec: string | undefined): string {
-      if (codec === undefined) {
-        return '';
-      }
-      if (codec.includes('av01')) {
-        return 'av01';
-      }
-      if (codec.includes('avc1')) {
-        return 'avc1';
-      }
-      return codec || '';
-    }
-
-    function acodec(codec: string | undefined): string {
-      if (codec === undefined) {
-        return '';
-      }
-      if (codec.includes('m4a')) {
-        return 'm4a';
-      }
-      if (codec.includes('mp4a')) {
-        return 'mp4a';
-      }
-      return codec || '';
     }
 
     return (

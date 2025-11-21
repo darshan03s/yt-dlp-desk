@@ -38,3 +38,29 @@ export function formatFileSize(bytes: number): string {
 
   return `${value.toFixed(2)} ${units[index]}`;
 }
+
+export function vcodec(codec: string | undefined): string {
+  if (codec === undefined) {
+    return '';
+  }
+  if (codec.includes('av01')) {
+    return 'av01';
+  }
+  if (codec.includes('avc1')) {
+    return 'avc1';
+  }
+  return codec || '';
+}
+
+export function acodec(codec: string | undefined): string {
+  if (codec === undefined) {
+    return '';
+  }
+  if (codec.includes('m4a')) {
+    return 'm4a';
+  }
+  if (codec.includes('mp4a')) {
+    return 'mp4a';
+  }
+  return codec || '';
+}
