@@ -14,6 +14,7 @@ export function getDefaultAppSettings(): AppSettings {
     platform: process.platform,
     userDownloadsFolder: app.getPath('downloads'),
     ytdlpPath: '',
-    ytdlpVersion: ''
+    ytdlpVersion: '',
+    jsRuntime: ''
   };
 }

@@ -3,11 +3,11 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fetch } from 'undici';
 
-export async function downloadYtDlpLatestRelease(targetDir: string): Promise<string> {
+export async function downloadQuickJS(targetDir: string): Promise<string> {
   await mkdir(targetDir, { recursive: true });
-  const outputPath = path.join(targetDir, 'yt-dlp.exe');
+  const outputPath = path.join(targetDir, 'quickjs.7z');
 
-  const res = await fetch(LINKS.ytdlpLatestRelease);
+  const res = await fetch(LINKS.quickJs);
   if (!res.ok) throw new Error(`Failed to download: ${res.status}`);
 
   const buffer = Buffer.from(await res.arrayBuffer());

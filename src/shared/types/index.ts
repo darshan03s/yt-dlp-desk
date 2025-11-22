@@ -13,6 +13,7 @@ export type AppSettings = {
   downloadsFolder: string;
   userDownloadsFolder: string;
   defaultFormat: string;
+  jsRuntime: string;
 };
 
 export type Source = (typeof allowedSources)[number];

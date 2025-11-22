@@ -12,6 +12,7 @@
     "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
     "start": "electron-vite preview",
     "start:win-unpack": "bash -c ./dist/win-unpacked/ytdlp-ui.exe",
+    "start:win-unpack:nopath": "bash ./shell-scripts/start-win-unpack-nopath.sh",
     "dev": "electron-vite dev",
     "dev:nopath": "bash ./shell-scripts/dev-nopath.sh",
     "dev:clean": "pnpm rm:app-data && pnpm dev",
@@ -24,8 +25,7 @@
     "build:linux": "electron-vite build && electron-builder --linux",
     "prepare": "husky",
     "rm:app-data": "rm -rf ./app-data",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:generate": "drizzle-kit generate"
   },
   "lint-staged": {
     "*.{html,css,js,ts,jsx,tsx,json,mjs}": [
@@ -44,7 +44,6 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tabler/icons-react": "^3.35.0",
     "@tailwindcss/vite": "^4.1.15",
-    "@types/mime-types": "^3.0.1",
     "better-sqlite3": "^12.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -71,6 +70,7 @@
     "@types/node": "^22.18.6",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
+    "@types/mime-types": "^3.0.1",
     "@vitejs/plugin-react": "^5.0.3",
     "drizzle-kit": "^0.31.6",
     "electron": "^38.1.2",

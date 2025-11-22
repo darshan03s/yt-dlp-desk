@@ -21,6 +21,8 @@ import { YoutubeVideoInfoJson } from '@shared/types/info-json/youtube-video';
 import SevenZip from '7zip-min';
 import path from 'node:path';
 import { IpcMainInvokeEvent } from 'electron';
+import { downloadQuickJS } from '@main/utils/downloadJsRuntime';
+import { is } from '@electron-toolkit/utils';
 
 export async function rendererInit(): ReturnType<Api['rendererInit']> {
   try {
@@ -33,6 +35,34 @@ export async function rendererInit(): ReturnType<Api['rendererInit']> {
     logger.error('Failed to initialize renderer:', err);
     return null;
   }
+}
+
+async function addJsRuntime() {
+  const store = await getStoreManager();
+  const outputJsRuntimeZipPath = await downloadQuickJS(path.join(DATA_DIR, 'quickjs'));
+  logger.info('Downloaded JS Runtime');
+
+  if (!is.dev) {
+    const sevenZipPath = path.join(
+      process.resourcesPath,
+      'app.asar.unpacked',
+      'node_modules',
+      '7zip-bin',
+      'win',
+      'x64',
+      '7za.exe'
+    );
+
+    SevenZip.config({
+      binaryPath: sevenZipPath
+    });
+  }
+
+  await SevenZip.unpack(outputJsRuntimeZipPath, path.join(DATA_DIR, 'quickjs'));
+
+  await deleteFile(outputJsRuntimeZipPath);
+
+  store.set('settings.jsRuntimePath', path.join(DATA_DIR, 'quickjs', 'qjs.exe'));
 }
 
 export async function confirmYtdlp(): ReturnType<Api['confirmYtdlp']> {
@@ -51,6 +81,8 @@ export async function confirmYtdlp(): ReturnType<Api['confirmYtdlp']> {
 
     logger.info(`yt-dlp path in PC: ${ytdlpPathInPc}`);
     logger.info(`yt-dlp version in PC: ${ytdlpVersionInPc}`);
+
+    await addJsRuntime();
 
     return { ytdlpVersionInPc, ytdlpPathInPc };
   } catch (err) {
@@ -101,6 +133,8 @@ export async function downloadYtdlp(): ReturnType<Api['downloadYtdlp']> {
     logger.info(`yt-dlp downloaded: ${outputPath}`);
     logger.info(`yt-dlp downloaded version: ${ytdlpVersionInPc}`);
 
+    await addJsRuntime();
+
     return { ytdlpVersionInPc, ytdlpPathInPc: outputPath };
   } catch (err) {
     logger.error('Failed to download yt-dlp:', err);
@@ -116,6 +150,22 @@ export async function downloadFfmpeg(): ReturnType<Api['downloadFfmpeg']> {
 
     const output7zPath = await downloadFfmpeg7z(DATA_DIR);
     logger.info('Downloaded ffmpeg');
+
+    if (!is.dev) {
+      const sevenZipPath = path.join(
+        process.resourcesPath,
+        'app.asar.unpacked',
+        'node_modules',
+        '7zip-bin',
+        'win',
+        'x64',
+        '7za.exe'
+      );
+
+      SevenZip.config({
+        binaryPath: sevenZipPath
+      });
+    }
 
     await SevenZip.unpack(output7zPath, DATA_DIR);
 
