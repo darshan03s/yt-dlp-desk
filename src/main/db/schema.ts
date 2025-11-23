@@ -14,7 +14,7 @@ export const urlHistory = sqliteTable('url_history', {
   created_at: text('created_at').notNull(),
   duration: text('duration'),
   title: text('title').notNull(),
-  addedAt: text('added_at')
+  added_at: text('added_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull()
 });
@@ -24,12 +24,12 @@ export const downloadsHistory = sqliteTable('downloads_history', {
   thumbnail: text('thumbnail').notNull(),
   title: text('title').notNull(),
   format: text('format').notNull(),
-  downloadProgress: text('download_progress').notNull(),
-  downloadProgressString: text('download_progress_string').notNull(),
-  downloadedAt: text('downloaded_at')
+  download_progress: text('download_progress').notNull(),
+  download_progress_string: text('download_progress_string').notNull(),
+  downloaded_at: text('downloaded_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  downloadStatus: text('download_status', {
+  download_status: text('download_status', {
     enum: downloadStatusEnum
   }).notNull(),
   command: text('command').notNull()
@@ -38,7 +38,7 @@ export const downloadsHistory = sqliteTable('downloads_history', {
 export const extraCommandsHistory = sqliteTable('extra_commands_history', {
   id: text('id').primaryKey().notNull(),
   command: text('command').notNull(),
-  createdAt: text('created_at')
+  created_at: text('created_at')
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull()
 });

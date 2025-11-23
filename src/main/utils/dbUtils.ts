@@ -22,11 +22,11 @@ export const urlHistoryOperations = {
   },
 
   getAllByAddedAtDesc: async () => {
-    return db?.select().from(urlHistory).orderBy(desc(urlHistory.addedAt));
+    return db?.select().from(urlHistory).orderBy(desc(urlHistory.added_at));
   },
 
   getAllByAddedAtAsc: async () => {
-    return db?.select().from(urlHistory).orderBy(asc(urlHistory.addedAt));
+    return db?.select().from(urlHistory).orderBy(asc(urlHistory.added_at));
   },
 
   deleteById: async (id: string) => {
@@ -41,23 +41,23 @@ export const urlHistoryOperations = {
     return db?.delete(urlHistory);
   },
 
-  updateById: async (id: string, data: Omit<UrlHistoryItem, 'id' | 'addedAt'>) => {
+  updateById: async (id: string, data: Omit<UrlHistoryItem, 'id' | 'added_at'>) => {
     return db?.update(urlHistory).set(data).where(eq(urlHistory.id, id));
   },
 
-  updateByUrl: async (url: string, data: Omit<UrlHistoryItem, 'id' | 'addedAt'>) => {
+  updateByUrl: async (url: string, data: Omit<UrlHistoryItem, 'id' | 'added_at'>) => {
     return db?.update(urlHistory).set(data).where(eq(urlHistory.url, url));
   },
 
-  addNew: async (data: Omit<UrlHistoryItem, 'id' | 'addedAt'>) => {
+  addNew: async (data: Omit<UrlHistoryItem, 'id' | 'added_at'>) => {
     const completeData: NewUrlHistoryItem = {
       ...data,
       id: randomUUID(),
-      addedAt: new Date().toISOString()
+      added_at: new Date().toISOString()
     };
     return db?.insert(urlHistory).values(completeData);
   },
-  upsertByUrl: async (url: string, data: Omit<UrlHistoryItem, 'id' | 'addedAt'>) => {
+  upsertByUrl: async (url: string, data: Omit<UrlHistoryItem, 'id' | 'added_at'>) => {
     const existing = await db?.select().from(urlHistory).where(eq(urlHistory.url, url));
 
     if (existing && existing.length > 0) {

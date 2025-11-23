@@ -11,7 +11,7 @@ export type UrlHistoryItem = {
   created_at: string;
   duration: string;
   title: string;
-  addedAt: string;
+  added_at: string;
 };
 
 export type UrlHistoryList = UrlHistoryItem[] | undefined;
