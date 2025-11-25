@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Spinner } from '@renderer/components/ui/spinner';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useSearchParams } from 'react-router-dom';
-import { updateUrlHistoryInStore } from '../UrlHistory';
+import { updateUrlHistoryInStore } from '../url-history';
 import { IconArrowDown, IconCircleCheckFilled, IconClockHour3Filled } from '@tabler/icons-react';
 import { acodec, formatDate, formatFileSize, vcodec } from '@renderer/utils';
 import {

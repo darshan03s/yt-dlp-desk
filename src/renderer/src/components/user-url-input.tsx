@@ -57,7 +57,7 @@ const UserUrlInput = ({ showRefetch, url = '' }: UserUrlInputProps) => {
     <ButtonGroup className="w-full">
       <Input
         placeholder="Enter a URL"
-        className="placeholder:text-xs text-xs font-mono select-text"
+        className="placeholder:text-xs text-xs font-mono select-text h-8"
         type="url"
         onChange={handleUrlInput}
         onKeyDown={handleUrlInputEnter}
@@ -66,13 +66,13 @@ const UserUrlInput = ({ showRefetch, url = '' }: UserUrlInputProps) => {
       />
       {showRefetch ? (
         <TooltipWrapper message="Refetch" side="bottom">
-          <Button onClick={handleRefetchMediaInfo}>
+          <Button onClick={handleRefetchMediaInfo} variant={'default'} className="h-8">
             <IconReload />
           </Button>
         </TooltipWrapper>
       ) : (
         <TooltipWrapper message="Fetch" side="bottom">
-          <Button onClick={handleFetchMediaInfo}>
+          <Button onClick={handleFetchMediaInfo} variant={'default'} className="h-8">
             <IconCloudDown />
           </Button>
         </TooltipWrapper>

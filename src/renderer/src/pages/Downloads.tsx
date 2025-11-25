@@ -6,7 +6,6 @@ import {
   RunningDownloadsList
 } from '@/shared/types/history';
 import { Badge } from '@renderer/components/ui/badge';
-import { Button } from '@renderer/components/ui/button';
 import {
   Item,
   ItemContent,
@@ -18,6 +17,7 @@ import {
 import { TooltipWrapper } from '@renderer/components/wrappers';
 import { Logo } from '@renderer/data/logo';
 import { useEffect, useState } from 'react';
+import { ProgressBar } from './components/progress-bar';
 
 const Downloads = () => {
   const [runningDownloads, setRunningDownloads] = useState<RunningDownloadsList>([]);
@@ -48,10 +48,10 @@ const Downloads = () => {
 
   return (
     <div className="w-full flex flex-col gap-2">
-      <div className="px-2 py-2 h-8 flex items-center justify-between sticky top-0 left-0 bg-background text-foreground z-999">
-        Downloads
+      <div className="px-2 py-2 h-10 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-999">
+        History ({downloadsHistory?.length})
       </div>
-      <div className="px-2 py-2 pb-4">
+      <div className="px-2 py-1 pb-2">
         {runningDownloads && runningDownloads.length > 0 && (
           <RunningDownloads runningDownloads={runningDownloads} />
         )}
@@ -71,8 +71,8 @@ const DownloadCard = ({
   progressDetails?: ProgressDetails;
 }) => {
   return (
-    <Item size={'sm'} variant={'outline'} className="hover:bg-muted">
-      <ItemMedia className="aspect-video w-32 cursor-pointer">
+    <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
+      <ItemMedia className="aspect-video w-34">
         <img
           src={
             downloadItem.thumbnail_local.length === 0
@@ -80,7 +80,7 @@ const DownloadCard = ({
               : `media:///${downloadItem.thumbnail_local}`
           }
           alt={downloadItem.title}
-          className="aspect-video rounded-sm"
+          className="aspect-video rounded-sm outline-1"
         />
       </ItemMedia>
       <ItemContent className="flex flex-col gap-2">
@@ -91,19 +91,22 @@ const DownloadCard = ({
               {downloadItem.uploader}
             </Badge>
           </div>
-          <div>
-            <p className="line-clamp-1">
+          <div className="space-y-2">
+            <p className="line-clamp-1 text-[10px]">
               {progressDetails?.progressString ?? downloadItem.download_progress_string}
             </p>
+            <ProgressBar
+              value={progressDetails?.progressPercentage ?? downloadItem.download_progress}
+            />
           </div>
         </ItemDescription>
       </ItemContent>
       <ItemFooter className="url-history-item-footer w-full">
         <div className="url-history-item-footer-left flex items-center gap-2">
           <TooltipWrapper message={`Source: ${downloadItem.source}`}>
-            <Button variant="outline" size="icon-sm">
+            <span>
               <img src={Logo(downloadItem.source)} alt={downloadItem.source} className="size-4" />
-            </Button>
+            </span>
           </TooltipWrapper>
         </div>
         <div className="url-history-item-footer-right"></div>
@@ -114,7 +117,8 @@ const DownloadCard = ({
 
 const RunningDownloadItemComp = ({ downloadItem }: { downloadItem: RunningDownloadItem }) => {
   const [progressDetails, setProgressDetails] = useState<ProgressDetails>({
-    progressString: downloadItem.download_progress_string
+    progressString: downloadItem.download_progress_string,
+    progressPercentage: downloadItem.download_progress
   });
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import UserUrlInput from '@renderer/components/user-url-input';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
-import YoutubeVideoInfo from './components/youtube/YoutubeVideoInfo';
+import YoutubeVideoInfo from './components/youtube/youtube-video-info';
 import { Source } from '@/shared/types';
 
 const DisplayMediaInfo = () => {
@@ -9,8 +9,8 @@ const DisplayMediaInfo = () => {
 
   return (
     <div className="h-full overflow-y-scroll">
-      <div className="sticky left-0 top-0 z-50 bg-secondary">
-        <header className="bg-secondary text-secondary-foreground font-inter p-3">
+      <div className="sticky left-0 top-0 z-50">
+        <header className="p-3">
           <UserUrlInput showRefetch={true} url={url} />
         </header>
       </div>

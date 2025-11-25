@@ -49,6 +49,8 @@ export class DownloadManager {
 
     const { downloadingItem } = runningDownload;
 
+    downloadingItem.download_progress_string = 'Downloading...';
+
     child.stdout.on('data', (data) => {
       const text = data.toString();
       console.log(`stdout: ${text}`);

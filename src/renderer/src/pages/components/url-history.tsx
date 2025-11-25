@@ -102,7 +102,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
 
   return (
     <>
-      <Item size={'sm'} variant={'outline'} className="hover:bg-muted">
+      <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
         <ItemMedia
           className="aspect-video w-32 cursor-pointer"
           onClick={handleNavigateToDisplayInfo}
@@ -114,7 +114,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
                 : `media:///${item.thumbnail_local}`
             }
             alt={item.title}
-            className="aspect-video rounded-sm"
+            className="aspect-video rounded-sm outline-1"
           />
         </ItemMedia>
         <ItemContent className="flex flex-col gap-3">
@@ -126,30 +126,27 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
           </ItemDescription>
         </ItemContent>
         <ItemFooter className="url-history-item-footer w-full">
-          <div className="url-history-item-footer-left flex items-center gap-2">
+          <div className="url-history-item-footer-left flex items-center gap-3">
             <TooltipWrapper message={`Source: ${item.source}`}>
-              <Button variant="outline" size="icon-sm">
+              <span>
                 <img src={Logo(item.source)} alt={item.source} className="size-4" />
-              </Button>
+              </span>
             </TooltipWrapper>
             <TooltipWrapper message={`More Info`}>
-              <Button
-                onClick={() => setIsMoreInfoModalOpen(true)}
-                variant={'outline'}
-                size={'icon-sm'}
-              >
-                <IconInfoSquareRounded />
-              </Button>
+              <span onClick={() => setIsMoreInfoModalOpen(true)} className="cursor-pointer">
+                <IconInfoSquareRounded className="size-4" />
+              </span>
             </TooltipWrapper>
           </div>
           <div className="url-history-item-footer-right">
             <TooltipWrapper message={`Delete from history`}>
               <Button
                 onClick={() => handleUrlHistoryItemDelete(item.id)}
-                variant={'destructive'}
+                variant={'ghost'}
                 size={'icon-sm'}
+                className="size-6 hover:bg-red-500/20 dark:hover:bg-red-500/20"
               >
-                <IconTrash />
+                <IconTrash className="size-4 text-red-500" />
               </Button>
             </TooltipWrapper>
           </div>
@@ -209,16 +206,17 @@ const UrlHistory = () => {
 
   return (
     <>
-      <div className="w-full p-2 flex items-center justify-between border-b">
-        <span className="text-sm">History ({urlHistory?.length})</span>
+      <div className="w-full px-3 flex items-center justify-between h-10">
+        <span className="text-xs">History ({urlHistory?.length})</span>
         <TooltipWrapper message={`Delete url history`}>
           <Button
             disabled={urlHistory?.length === 0}
             onClick={() => handleUrlHistoryDelete()}
             variant={'destructive'}
             size={'icon-sm'}
+            className="size-6"
           >
-            <IconTrash />
+            <IconTrash className="size-4" />
           </Button>
         </TooltipWrapper>
       </div>
