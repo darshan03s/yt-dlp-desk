@@ -279,7 +279,7 @@ export async function getRunningDownloads() {
 }
 
 export async function getDownloadsHistory() {
-  return downloadsHistoryOperations.getAllByAddedAtDesc();
+  return downloadsHistoryOperations.getAllByCompletedAtDesc();
 }
 
 export async function selectFolder() {

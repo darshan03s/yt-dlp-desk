@@ -98,6 +98,17 @@ export const downloadsHistoryOperations = {
     return db?.select().from(downloadsHistory).orderBy(asc(downloadsHistory.added_at));
   },
 
+  getAllByCompletedAtDesc: async () => {
+    return db
+      ?.select()
+      .from(downloadsHistory)
+      .orderBy(desc(downloadsHistory.download_completed_at));
+  },
+
+  getAllByCompletedAtAsc: async () => {
+    return db?.select().from(downloadsHistory).orderBy(asc(downloadsHistory.download_completed_at));
+  },
+
   deleteById: async (id: string) => {
     return db?.delete(downloadsHistory).where(eq(downloadsHistory.id, id));
   },
