@@ -99,8 +99,8 @@ export async function downloadFile(params: {
   }
 }
 
-export function sanitizeFileName(name: string): string {
-  return name.replace(/[<>:"/\\|?*]/g, '').trim();
+export function sanitizeFileName(name: string, replace: string = ''): string {
+  return name.replace(/[<>:"/\\|?*]/g, replace).trim();
 }
 
 export function filePathToFileUrl(inputPath: string): string {

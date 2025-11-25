@@ -173,14 +173,13 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
   const store = await getStoreManager();
 
   if (downloadOptions.source === ('youtube-video' as Source)) {
-    const { url, source, selectedFormat } = downloadOptions;
-    console.log({ url, source, selectedFormat });
+    const { url, source, selectedFormat, downloadSections } = downloadOptions;
+    console.log({ url, source, selectedFormat, downloadSections });
     const mediaInfo = downloadOptions.mediaInfo as YoutubeVideoInfoJson;
     const infoJsonPath = getInfoJsonPath(url, source);
     const formatId = selectedFormat.format_id!;
-    const targetDownloadFileName = `${mediaInfo.fulltitle} [${selectedFormat.resolution}] [${selectedFormat.format_id}].%(ext)s`;
+    let targetDownloadFileName = `${mediaInfo.fulltitle} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
 
-    const targetDownloadFilePath = path.join(store.get('downloadsFolder'), targetDownloadFileName);
     const jsRuntimePath = `quickjs:${store.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
     const downloadCommandArgs = [
@@ -190,10 +189,41 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       infoJsonPath,
       '-f',
       formatId.includes('+') ? formatId : formatId.concat('+ba'),
-      '--newline',
-      '-o',
-      targetDownloadFilePath
+      '--newline'
     ];
+
+    // force-keyframes-at-cuts
+    if (downloadSections.forceKeyframesAtCuts) {
+      downloadCommandArgs.push('--force-keyframes-at-cuts');
+    }
+
+    // start + end
+    if (downloadSections.startTime && downloadSections.endTime) {
+      downloadCommandArgs.push(
+        '--download-sections',
+        `*${downloadSections.startTime}-${downloadSections.endTime}`
+      );
+      targetDownloadFileName =
+        targetDownloadFileName + `[${downloadSections.startTime} - ${downloadSections.endTime}]`;
+    }
+
+    // only start
+    if (downloadSections.startTime && !downloadSections.endTime) {
+      downloadCommandArgs.push('--download-sections', `*${downloadSections.startTime}`);
+      targetDownloadFileName = targetDownloadFileName + `[${downloadSections.startTime} - ]`;
+    }
+
+    // only end
+    if (!downloadSections.startTime && downloadSections.endTime) {
+      downloadCommandArgs.push('--download-sections', `*00:00:00-${downloadSections.endTime}`);
+      targetDownloadFileName = targetDownloadFileName + `[00:00:00 - ${downloadSections.endTime}]`;
+    }
+
+    // output filename
+    targetDownloadFileName = targetDownloadFileName + '.%(ext)s';
+    targetDownloadFileName = sanitizeFileName(targetDownloadFileName, '_');
+    const targetDownloadFilePath = path.join(store.get('downloadsFolder'), targetDownloadFileName);
+    downloadCommandArgs.push('-o', targetDownloadFilePath);
     const completeCommand = downloadCommandBase.concat(' ').concat(downloadCommandArgs.join(' '));
     logger.info(`Starting download for ${downloadOptions.url}\nCommand: ${completeCommand}`);
 

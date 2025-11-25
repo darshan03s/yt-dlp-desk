@@ -72,7 +72,7 @@ const DownloadCard = ({
 }) => {
   return (
     <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
-      <ItemMedia className="aspect-video w-34">
+      <ItemMedia className="aspect-video w-34 flex-shrink-0">
         <img
           src={
             downloadItem.thumbnail_local.length === 0
@@ -83,7 +83,7 @@ const DownloadCard = ({
           className="aspect-video rounded-sm outline-1"
         />
       </ItemMedia>
-      <ItemContent className="flex flex-col gap-2">
+      <ItemContent className="flex flex-col gap-2 min-w-0">
         <ItemTitle className="text-xs">{downloadItem.title}</ItemTitle>
         <ItemDescription className="flex flex-col gap-1 text-xs">
           <div>

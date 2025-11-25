@@ -5,7 +5,12 @@ import { Spinner } from '@renderer/components/ui/spinner';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useSearchParams } from 'react-router-dom';
 import { updateUrlHistoryInStore } from '../url-history';
-import { IconArrowDown, IconCircleCheckFilled, IconClockHour3Filled } from '@tabler/icons-react';
+import {
+  IconArrowDown,
+  IconCircleCheckFilled,
+  IconClockHour3Filled,
+  IconKeyframes
+} from '@tabler/icons-react';
 import { acodec, formatDate, formatFileSize, vcodec } from '@renderer/utils';
 import {
   Dialog,
@@ -18,14 +23,31 @@ import { Anchor } from '@renderer/components/wrappers';
 import { Button } from '@renderer/components/ui/button';
 import { SelectedFormat, useSelectedOptionsStore } from '@renderer/stores/selected-options-store';
 import { DownloadOptions } from '@/shared/types/download';
+import { Input } from '@renderer/components/ui/input';
+import { Toggle } from '@renderer/components/ui/toggle';
 
-const Preview = ({ previewUrl, isLoading }: { previewUrl: string; isLoading: boolean }) => {
+const Preview = ({
+  previewUrl,
+  isLoading,
+  duration
+}: {
+  previewUrl: string;
+  isLoading: boolean;
+  duration?: string;
+}) => {
   return (
     <div className="w-full h-60 bg-black flex items-center justify-center">
       {isLoading ? (
         <Spinner className="text-white" />
       ) : (
-        <img src={previewUrl} alt="Preview" width={420} className="aspect-video" />
+        <div className="relative">
+          <img src={previewUrl} alt="Preview" width={420} className="aspect-video" />
+          {duration && (
+            <span className="absolute right-1 bottom-1 text-xs p-1 px-2 bg-black text-white rounded-md">
+              {duration}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );
@@ -33,6 +55,7 @@ const Preview = ({ previewUrl, isLoading }: { previewUrl: string; isLoading: boo
 
 const DownloadButton = () => {
   const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
+  const downloadSections = useSelectedOptionsStore((state) => state.downloadSections);
   const url = useMediaInfoStore.getState().url;
   const source = useMediaInfoStore.getState().source;
   const mediaInfo = useMediaInfoStore((state) => state.mediaInfo);
@@ -43,7 +66,8 @@ const DownloadButton = () => {
       selectedFormat: selectedFormat,
       url: url,
       source: source,
-      mediaInfo: mediaInfo
+      mediaInfo: mediaInfo,
+      downloadSections: downloadSections
     };
     window.api.download(downloadOptions);
     const unsubscribe = window.api.on('download-begin', () => {
@@ -114,6 +138,10 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
         <div className="formats-display">
           <Formats infoJson={infoJson} />
         </div>
+
+        <div className="download-sections">
+          <DownloadSections />
+        </div>
       </div>
 
       <MoreDetailsModal
@@ -122,6 +150,59 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
         infoJson={infoJson}
       />
     </>
+  );
+};
+
+const DownloadSections = () => {
+  const downloadSections = useSelectedOptionsStore((state) => state.downloadSections);
+  const setDownloadSections = useSelectedOptionsStore((state) => state.setDownloadSections);
+
+  useEffect(() => {
+    setDownloadSections({ startTime: '', endTime: '', forceKeyframesAtCuts: false });
+  }, []);
+
+  function handleStarttime(e: React.ChangeEvent<HTMLInputElement>) {
+    setDownloadSections({ startTime: e.currentTarget.value });
+  }
+
+  function handleEndtime(e: React.ChangeEvent<HTMLInputElement>) {
+    setDownloadSections({ endTime: e.currentTarget.value });
+  }
+
+  function handleToggle(pressed: boolean) {
+    setDownloadSections({ forceKeyframesAtCuts: pressed });
+  }
+
+  console.log({ downloadSections });
+
+  return (
+    <div className="flex items-center gap-2">
+      <Input
+        type="text"
+        placeholder="Start Time"
+        value={downloadSections.startTime}
+        onChange={handleStarttime}
+        className="text-xs h-8"
+      />
+      <Input
+        type="text"
+        placeholder="End Time"
+        value={downloadSections.endTime}
+        onChange={handleEndtime}
+        className="text-xs h-8"
+      />
+      <Toggle
+        title="Force keyframes at cuts"
+        pressed={downloadSections.forceKeyframesAtCuts}
+        onPressedChange={handleToggle}
+        aria-label="Toggle bookmark"
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconKeyframes />
+      </Toggle>
+    </div>
   );
 };
 
@@ -441,7 +522,11 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
   }, []);
   return (
     <div className="flex flex-col">
-      <Preview previewUrl={thumbnailUrl} isLoading={isLoadingInfoJson} />
+      <Preview
+        previewUrl={thumbnailUrl}
+        isLoading={isLoadingInfoJson}
+        duration={infoJson.duration_string}
+      />
       <div className="p-2">
         {Object.keys(infoJson).length !== 0 ? <Details infoJson={infoJson} /> : <Spinner />}
       </div>

@@ -3,9 +3,17 @@ import { create } from 'zustand';
 
 export interface SelectedFormat extends Partial<YoutubeFormat> {}
 
+export interface DownloadSections {
+  startTime: string;
+  endTime: string;
+  forceKeyframesAtCuts: boolean;
+}
+
 interface SelectedOptionsStore {
   selectedFormat: SelectedFormat;
+  downloadSections: DownloadSections;
   setSelectedFormat: (data: SelectedFormat) => void;
+  setDownloadSections: (data: Partial<DownloadSections>) => void;
 }
 
 export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
@@ -23,8 +31,22 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
     height: 0
   },
 
+  downloadSections: {
+    startTime: '',
+    endTime: '',
+    forceKeyframesAtCuts: false
+  },
+
   setSelectedFormat: (data) =>
     set({
       selectedFormat: data
-    })
+    }),
+
+  setDownloadSections: (data) =>
+    set((state) => ({
+      downloadSections: {
+        ...state.downloadSections,
+        ...data
+      }
+    }))
 }));
