@@ -72,7 +72,7 @@ const DownloadCard = ({
 }) => {
   return (
     <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
-      <ItemMedia className="aspect-video w-34 flex-shrink-0">
+      <ItemMedia className="aspect-video w-34 shrink-0">
         <img
           src={
             downloadItem.thumbnail_local.length === 0
@@ -84,7 +84,7 @@ const DownloadCard = ({
         />
       </ItemMedia>
       <ItemContent className="flex flex-col gap-2 min-w-0">
-        <ItemTitle className="text-xs">{downloadItem.title}</ItemTitle>
+        <ItemTitle className="text-xs line-clamp-1">{downloadItem.title}</ItemTitle>
         <ItemDescription className="flex flex-col gap-1 text-xs">
           <div>
             <Badge variant={'outline'} className="text-[10px]">

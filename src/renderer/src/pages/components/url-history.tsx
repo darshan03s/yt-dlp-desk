@@ -118,7 +118,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
           />
         </ItemMedia>
         <ItemContent className="flex flex-col gap-3">
-          <ItemTitle className="text-xs">{item.title}</ItemTitle>
+          <ItemTitle className="text-xs line-clamp-1">{item.title}</ItemTitle>
           <ItemDescription className="flex gap-2 items-center text-xs">
             <Badge variant={'outline'} className="text-[10px]">
               {item.uploader}
