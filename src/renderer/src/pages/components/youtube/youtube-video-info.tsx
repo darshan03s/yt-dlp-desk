@@ -62,16 +62,14 @@ const DownloadButton = () => {
 const LiveStatus = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
   if (infoJson.was_live) {
     return (
-      <span className="text-[10px]">
-        <span className="text-red-500">Was Live</span>
-        {' || '}
+      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
+        Was Live
       </span>
     );
   } else if (infoJson.is_live) {
     return (
-      <span className="text-[10px]">
-        <span className="text-red-500">Live Now</span>
-        {' || '}
+      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
+        Live Now
       </span>
     );
   } else return null;
@@ -88,10 +86,7 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
           className="text-xs border bg-secondary text-secondary-foreground p-2 rounded-md cursor-pointer flex flex-col gap-1"
         >
           <div className="">
-            <p className="text-xs leading-5">
-              <LiveStatus infoJson={infoJson} />
-              {infoJson.fulltitle}
-            </p>
+            <p className="text-xs leading-5">{infoJson.fulltitle}</p>
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -104,6 +99,10 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
             <span className="text-xs inline-flex items-center gap-1">
               <IconClockHour3Filled className="size-3" />
               {formatDate(infoJson.upload_date)}
+            </span>
+            {' | '}
+            <span className="text-xs inline-flex items-center gap-1">
+              <LiveStatus infoJson={infoJson} />
             </span>
           </div>
 
