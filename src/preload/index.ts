@@ -16,7 +16,10 @@ const api: Api = {
     ipcRenderer.send('yt-dlp:get-youtube-video-info-json', url, updateUrlHistory),
   getUrlHistory: () => ipcRenderer.invoke('url-history:get-all'),
   deleteFromUrlHistory: (id: string) => ipcRenderer.invoke('url-history:delete-one', id),
+  deleteFromDownloadsHistory: (id: string) =>
+    ipcRenderer.invoke('downloads-history:delete-one', id),
   deleteAllUrlHistory: () => ipcRenderer.invoke('url-history:delete-all'),
+  deleteAllDownloadsHistory: () => ipcRenderer.invoke('downloads-history:delete-all'),
   download: (downloadOptions: DownloadOptions) => ipcRenderer.send('download', downloadOptions),
   on: (channel: string, listener: (...args: unknown[]) => void) => {
     const wrapped = (_: unknown, ...args: unknown[]) => listener(...args);

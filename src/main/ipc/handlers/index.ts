@@ -271,9 +271,25 @@ export async function deleteOneFromUrlHistory(_event: IpcMainInvokeEvent, id: st
   }
 }
 
+export async function deleteOneFromDownloadsHistory(_event: IpcMainInvokeEvent, id: string) {
+  try {
+    downloadsHistoryOperations.deleteById(id);
+  } catch (e) {
+    logger.error(`Could not delete from url history for id -> ${id}\n${e}`);
+  }
+}
+
 export async function deleteAllFromUrlHistory() {
   try {
     urlHistoryOperations.deleteAll();
+  } catch (e) {
+    logger.error(`Could not delete all url history \n${e}`);
+  }
+}
+
+export async function deleteAllFromDownloadsHistory() {
+  try {
+    downloadsHistoryOperations.deleteAll();
   } catch (e) {
     logger.error(`Could not delete all url history \n${e}`);
   }

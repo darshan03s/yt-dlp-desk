@@ -13,7 +13,9 @@ import {
   downloadMedia,
   getRunningDownloads,
   getDownloadsHistory,
-  selectFolder
+  selectFolder,
+  deleteOneFromDownloadsHistory,
+  deleteAllFromDownloadsHistory
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -39,7 +41,11 @@ async function registerHanlders() {
 
   ipcMain.handle('url-history:delete-one', deleteOneFromUrlHistory);
 
+  ipcMain.handle('downloads-history:delete-one', deleteOneFromDownloadsHistory);
+
   ipcMain.handle('url-history:delete-all', deleteAllFromUrlHistory);
+
+  ipcMain.handle('downloads-history:delete-all', deleteAllFromDownloadsHistory);
 
   ipcMain.on('download', downloadMedia);
 

@@ -45,7 +45,9 @@ export type Api = {
   getYoutubeVideoInfoJson: (url: string, updateUrlHistory: boolean) => void;
   getUrlHistory: () => Promise<UrlHistoryList>;
   deleteFromUrlHistory: (id: string) => Promise<void>;
+  deleteFromDownloadsHistory: (id: string) => Promise<void>;
   deleteAllUrlHistory: () => Promise<void>;
+  deleteAllDownloadsHistory: () => Promise<void>;
   download: (downloadOptions: DownloadOptions) => void;
   on: (channel: string, listener: (...args: unknown[]) => void) => () => Electron.IpcRenderer;
   off: (channel: string, listener: (...args: unknown[]) => void) => void;

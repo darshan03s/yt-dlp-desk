@@ -18,28 +18,39 @@ import { Anchor, TooltipWrapper } from '@renderer/components/wrappers';
 import { Logo } from '@renderer/data/logo';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ProgressBar } from './components/progress-bar';
-import { IconExternalLink, IconPhoto, IconTerminal2 } from '@tabler/icons-react';
+import { IconExternalLink, IconPhoto, IconTerminal2, IconTrash } from '@tabler/icons-react';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@renderer/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { AutoScrollTextarea } from './components/auto-scroll-textarea';
+import { useHistoryStore } from '@renderer/stores/history-store';
+import { Button } from '@renderer/components/ui/button';
+
+function updateDownloadsHistoryInStore() {
+  window.api.getDownloadsHistory().then((downloadsHistory: DownloadsHistoryList) => {
+    useHistoryStore.setState({ downloadHistory: downloadsHistory ?? [] });
+  });
+}
 
 const Downloads = () => {
+  const downloadsHistory = useHistoryStore((state) => state.downloadHistory);
   const [runningDownloads, setRunningDownloads] = useState<RunningDownloadsList>([]);
-  const [downloadsHistory, setDownloadsHistory] = useState<DownloadsHistoryList>([]);
+  const [isConfirmDeleteAllModalOpen, setIsConfirmDeleteAllModalOpen] = useState(false);
 
   function updateDownloads() {
     window.api.getRunningDownloads().then((data) => {
       setRunningDownloads(data);
     });
     window.api.getDownloadsHistory().then((data) => {
-      setDownloadsHistory(data);
+      useHistoryStore.setState({ downloadHistory: data });
     });
   }
 
@@ -57,22 +68,77 @@ const Downloads = () => {
     };
   }, []);
 
+  function handleUrlHistoryDelete() {
+    setIsConfirmDeleteAllModalOpen(true);
+  }
+
   return (
-    <div className="w-full flex flex-col gap-2">
-      <div className="px-2 py-2 h-10 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
-        History ({downloadsHistory?.length})
+    <>
+      <div className="w-full flex flex-col gap-2">
+        <div className="px-3 py-2 h-10 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
+          <span className="text-xs">History ({downloadsHistory?.length})</span>
+          <TooltipWrapper side="bottom" message={`Delete downloads history`}>
+            <Button
+              disabled={downloadsHistory?.length === 0}
+              onClick={() => handleUrlHistoryDelete()}
+              variant={'destructive'}
+              size={'icon-sm'}
+              className="size-6"
+            >
+              <IconTrash className="size-4" />
+            </Button>
+          </TooltipWrapper>
+        </div>
+        <div className="px-2 py-1 pb-2">
+          {runningDownloads && runningDownloads.length > 0 && (
+            <RunningDownloads runningDownloads={runningDownloads} />
+          )}
+          <CompletedDownloads downloadsHistory={downloadsHistory} />
+        </div>
       </div>
-      <div className="px-2 py-1 pb-2">
-        {runningDownloads && runningDownloads.length > 0 && (
-          <RunningDownloads runningDownloads={runningDownloads} />
-        )}
-        <CompletedDownloads downloadsHistory={downloadsHistory} />
-      </div>
-    </div>
+      <ConfirmDeleteAllModal
+        open={isConfirmDeleteAllModalOpen}
+        setOpen={setIsConfirmDeleteAllModalOpen}
+      />
+    </>
   );
 };
 
 export default Downloads;
+
+const ConfirmDeleteAllModal = ({
+  open,
+  setOpen
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
+  function handleConfirmDeleteAll() {
+    window.api.deleteAllDownloadsHistory().then(() => {
+      updateDownloadsHistoryInStore();
+    });
+    setOpen(false);
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete all downloads history?</DialogTitle>
+          <DialogDescription>This action will delete all downloads history</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex ">
+          <DialogClose asChild>
+            <Button variant={'outline'}>Cancel</Button>
+          </DialogClose>
+          <Button onClick={handleConfirmDeleteAll} variant={'destructive'}>
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const DownloadCard = ({
   downloadItem,
@@ -91,6 +157,12 @@ const DownloadCard = ({
       mediaInfo: {}
     });
     navigate('/display-media-info?updateUrlHistory=0');
+  }
+
+  function handleDownloadsHistoryItemDelete(id: string) {
+    window.api.deleteFromDownloadsHistory(id).then(() => {
+      updateDownloadsHistoryInStore();
+    });
   }
 
   return (
@@ -145,8 +217,8 @@ const DownloadCard = ({
             </div>
           </ItemDescription>
         </ItemContent>
-        <ItemFooter className="url-history-item-footer w-full">
-          <div className="url-history-item-footer-left flex items-center gap-3">
+        <ItemFooter className="downloads-history-item-footer w-full">
+          <div className="downloads-history-item-footer-left flex items-center gap-3">
             <TooltipWrapper message={`Source: ${downloadItem.source}`}>
               <span>
                 <img src={Logo(downloadItem.source)} alt={downloadItem.source} className="size-4" />
@@ -172,7 +244,18 @@ const DownloadCard = ({
               </span>
             </TooltipWrapper>
           </div>
-          <div className="url-history-item-footer-right"></div>
+          <div className="downloads-history-item-footer-right">
+            <TooltipWrapper message={`Delete from history`}>
+              <Button
+                onClick={() => handleDownloadsHistoryItemDelete(downloadItem.id)}
+                variant={'ghost'}
+                size={'icon-sm'}
+                className="size-6 hover:bg-red-500/20 dark:hover:bg-red-500/20"
+              >
+                <IconTrash className="size-4 text-red-500" />
+              </Button>
+            </TooltipWrapper>
+          </div>
         </ItemFooter>
       </Item>
       <Command open={isCommandModalOpen} setOpen={setIsCommandModalOpen} data={downloadItem} />
