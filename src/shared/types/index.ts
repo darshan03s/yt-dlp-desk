@@ -1,7 +1,6 @@
 import { allowedSources } from '../data';
 import { DownloadOptions } from './download';
 import { DownloadsHistoryList, RunningDownloadsList, UrlHistoryList } from './history';
-import { YoutubeVideoInfoJson } from './info-json/youtube-video';
 
 export type AppSettings = {
   appVersion: string;
@@ -43,10 +42,7 @@ export type Api = {
     url: string;
     isMediaDisplayAvailable: boolean;
   }>;
-  getYoutubeVideoInfoJson: (
-    url: string,
-    updateUrlHistory: boolean
-  ) => Promise<YoutubeVideoInfoJson | null>;
+  getYoutubeVideoInfoJson: (url: string, updateUrlHistory: boolean) => void;
   getUrlHistory: () => Promise<UrlHistoryList>;
   deleteFromUrlHistory: (id: string) => Promise<void>;
   deleteAllUrlHistory: () => Promise<void>;

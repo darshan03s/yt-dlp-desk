@@ -28,6 +28,67 @@ import { Input } from '@renderer/components/ui/input';
 import { Toggle } from '@renderer/components/ui/toggle';
 import { useSettingsStore } from '@renderer/stores/settings-store';
 
+type YoutubeVideoInfoProps = {
+  url: string;
+};
+
+const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
+  const [searchParams] = useSearchParams();
+  const updateUrlHistory = searchParams.get('updateUrlHistory') === '0' ? false : true;
+  const videoId = new URL(url).searchParams.get('v');
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>(
+    `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
+  );
+  const infoJson = useMediaInfoStore((state) => state.mediaInfo) as YoutubeVideoInfoJson;
+  const [isLoadingInfoJson, setIsLoadingInfoJson] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (Object.keys(infoJson).length !== 0) {
+      setThumbnailUrl(`media:///${infoJson.thumbnail_local}`);
+      setIsLoadingInfoJson(false);
+      return;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (Object.keys(infoJson).length !== 0) return;
+    window.api.getYoutubeVideoInfoJson(url, updateUrlHistory);
+
+    const unsubscribe = window.api.on('yt-dlp:recieve-youtube-video-info-json', (data) => {
+      if (!data) {
+        toast.error('Could not fetch info for this url');
+        setIsLoadingInfoJson(false);
+        return;
+      }
+      const infoJson = data as YoutubeVideoInfoJson;
+      useMediaInfoStore.setState({ mediaInfo: infoJson as YoutubeVideoInfoJson });
+      if (infoJson.thumbnail_local) {
+        setThumbnailUrl(`media:///${infoJson.thumbnail_local}`);
+      }
+      setIsLoadingInfoJson(false);
+
+      updateUrlHistoryInStore();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  return (
+    <div className="flex flex-col">
+      <Preview
+        previewUrl={thumbnailUrl}
+        isLoading={isLoadingInfoJson}
+        duration={infoJson.duration_string}
+      />
+      <div className="p-2">
+        {Object.keys(infoJson).length !== 0 ? <Details infoJson={infoJson} /> : <Spinner />}
+      </div>
+    </div>
+  );
+};
+
 const Preview = ({
   previewUrl,
   isLoading,
@@ -53,54 +114,6 @@ const Preview = ({
       )}
     </div>
   );
-};
-
-const DownloadButton = () => {
-  const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
-  const downloadSections = useSelectedOptionsStore((state) => state.downloadSections);
-  const selectedDownloadFolder = useSelectedOptionsStore((state) => state.selectedDownloadFolder);
-  const url = useMediaInfoStore.getState().url;
-  const source = useMediaInfoStore.getState().source;
-  const mediaInfo = useMediaInfoStore((state) => state.mediaInfo);
-
-  function handleDownload() {
-    const downloadOptions: DownloadOptions = {
-      downloadId: crypto.randomUUID(),
-      selectedFormat: selectedFormat,
-      url: url,
-      source: source,
-      mediaInfo: mediaInfo,
-      downloadSections: downloadSections,
-      selectedDownloadFolder: selectedDownloadFolder
-    };
-    window.api.download(downloadOptions);
-    const unsubscribe = window.api.on('download-begin', () => {
-      toast.info('Download Started');
-      unsubscribe();
-    });
-  }
-
-  return (
-    <Button onClick={handleDownload} className="text-xs h-6 px-1 flex items-center gap-1">
-      <IconArrowDown className="size-4" /> Download
-    </Button>
-  );
-};
-
-const LiveStatus = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
-  if (infoJson.was_live) {
-    return (
-      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
-        Was Live
-      </span>
-    );
-  } else if (infoJson.is_live) {
-    return (
-      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
-        Live Now
-      </span>
-    );
-  } else return null;
 };
 
 const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
@@ -159,6 +172,54 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
       />
     </>
   );
+};
+
+const DownloadButton = () => {
+  const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
+  const downloadSections = useSelectedOptionsStore((state) => state.downloadSections);
+  const selectedDownloadFolder = useSelectedOptionsStore((state) => state.selectedDownloadFolder);
+  const url = useMediaInfoStore.getState().url;
+  const source = useMediaInfoStore.getState().source;
+  const mediaInfo = useMediaInfoStore((state) => state.mediaInfo);
+
+  function handleDownload() {
+    const downloadOptions: DownloadOptions = {
+      downloadId: crypto.randomUUID(),
+      selectedFormat: selectedFormat,
+      url: url,
+      source: source,
+      mediaInfo: mediaInfo,
+      downloadSections: downloadSections,
+      selectedDownloadFolder: selectedDownloadFolder
+    };
+    window.api.download(downloadOptions);
+    const unsubscribe = window.api.on('download-begin', () => {
+      toast.info('Download Started');
+      unsubscribe();
+    });
+  }
+
+  return (
+    <Button onClick={handleDownload} className="text-xs h-6 px-1 flex items-center gap-1">
+      <IconArrowDown className="size-4" /> Download
+    </Button>
+  );
+};
+
+const LiveStatus = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
+  if (infoJson.was_live) {
+    return (
+      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
+        Was Live
+      </span>
+    );
+  } else if (infoJson.is_live) {
+    return (
+      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-md mt-1">
+        Live Now
+      </span>
+    );
+  } else return null;
 };
 
 const DownloadLocation = () => {
@@ -521,58 +582,6 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
         </div>
       </DialogContent>
     </Dialog>
-  );
-};
-
-type YoutubeVideoInfoProps = {
-  url: string;
-};
-
-const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
-  const [searchParams] = useSearchParams();
-  const updateUrlHistory = searchParams.get('updateUrlHistory') === '0' ? false : true;
-  const videoId = new URL(url).searchParams.get('v');
-  const [thumbnailUrl, setThumbnailUrl] = useState<string>(
-    `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`
-  );
-  const infoJson = useMediaInfoStore((state) => state.mediaInfo) as YoutubeVideoInfoJson;
-  const [isLoadingInfoJson, setIsLoadingInfoJson] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (Object.keys(infoJson).length !== 0) {
-      setThumbnailUrl(`media:///${infoJson.thumbnail_local}`);
-      setIsLoadingInfoJson(false);
-      return;
-    }
-    setIsLoadingInfoJson(true);
-    window.api
-      .getYoutubeVideoInfoJson(url, updateUrlHistory)
-      .then((data: YoutubeVideoInfoJson | null) => {
-        if (!data) {
-          toast.error('Could not fetch info for this url');
-          setIsLoadingInfoJson(false);
-          return;
-        }
-        useMediaInfoStore.setState({ mediaInfo: data as YoutubeVideoInfoJson });
-        if (data.thumbnail_local) {
-          setThumbnailUrl(`media:///${data.thumbnail_local}`);
-        }
-        setIsLoadingInfoJson(false);
-
-        updateUrlHistoryInStore();
-      });
-  }, []);
-  return (
-    <div className="flex flex-col">
-      <Preview
-        previewUrl={thumbnailUrl}
-        isLoading={isLoadingInfoJson}
-        duration={infoJson.duration_string}
-      />
-      <div className="p-2">
-        {Object.keys(infoJson).length !== 0 ? <Details infoJson={infoJson} /> : <Spinner />}
-      </div>
-    </div>
   );
 };
 

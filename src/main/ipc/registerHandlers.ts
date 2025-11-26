@@ -33,7 +33,7 @@ async function registerHanlders() {
 
   ipcMain.handle('check-url', checkUrl);
 
-  ipcMain.handle('yt-dlp:get-youtube-video-info-json', getYoutubeVideoInfoJson);
+  ipcMain.on('yt-dlp:get-youtube-video-info-json', getYoutubeVideoInfoJson);
 
   ipcMain.handle('url-history:get-all', getUrlHistory);
 

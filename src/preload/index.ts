@@ -13,7 +13,7 @@ const api: Api = {
   downloadFfmpeg: () => ipcRenderer.invoke('ffmpeg:download'),
   checkUrl: (url: string) => ipcRenderer.invoke('check-url', url),
   getYoutubeVideoInfoJson: (url: string, updateUrlHistory: boolean) =>
-    ipcRenderer.invoke('yt-dlp:get-youtube-video-info-json', url, updateUrlHistory),
+    ipcRenderer.send('yt-dlp:get-youtube-video-info-json', url, updateUrlHistory),
   getUrlHistory: () => ipcRenderer.invoke('url-history:get-all'),
   deleteFromUrlHistory: (id: string) => ipcRenderer.invoke('url-history:delete-one', id),
   deleteAllUrlHistory: () => ipcRenderer.invoke('url-history:delete-all'),

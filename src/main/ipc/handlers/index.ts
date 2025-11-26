@@ -1,4 +1,10 @@
-import { DATA_DIR, FFMPEG_FOLDER_PATH, YTDLP_EXE_PATH, YTDLP_FOLDER_PATH } from '@main/index';
+import {
+  DATA_DIR,
+  FFMPEG_FOLDER_PATH,
+  mainWindow,
+  YTDLP_EXE_PATH,
+  YTDLP_FOLDER_PATH
+} from '@main/index';
 import { getStoreManager } from '@main/store';
 import {
   getFfmpegFromPc,
@@ -20,7 +26,7 @@ import { Api, Source } from '@shared/types';
 import { YoutubeVideoInfoJson } from '@shared/types/info-json/youtube-video';
 import SevenZip from '7zip-min';
 import path from 'node:path';
-import { dialog, IpcMainInvokeEvent } from 'electron';
+import { dialog, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import { downloadQuickJS } from '@main/utils/downloadJsRuntime';
 import { is } from '@electron-toolkit/utils';
 import { DownloadManager } from '@main/downloadManager';
@@ -207,13 +213,19 @@ export async function checkUrl(
   return { source: source, url: url, isMediaDisplayAvailable: false };
 }
 
+let fetchingInfoJsonForUrls: string[] = [];
+
 export async function getYoutubeVideoInfoJson(
-  _event: IpcMainInvokeEvent,
+  _event: IpcMainEvent,
   url: string,
   updateUrlHistory: boolean
-): Promise<YoutubeVideoInfoJson | null> {
+) {
+  if (fetchingInfoJsonForUrls.includes(url)) {
+    return;
+  }
   logger.info(`Fetching info json for ${url}`);
   // get info json
+  fetchingInfoJsonForUrls.push(url);
   const infoJson = (await getInfoJson(
     url,
     'youtube-video' as Source
@@ -238,11 +250,13 @@ export async function getYoutubeVideoInfoJson(
         logger.error('Could not update url history');
       }
     }
-    return infoJson;
+    mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', infoJson);
+    fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
   } else {
     logger.error(`Could not fetch info json for ${url}`);
+    mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', null);
+    fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
   }
-  return null;
 }
 
 export async function getUrlHistory() {
@@ -265,7 +279,7 @@ export async function deleteAllFromUrlHistory() {
   }
 }
 
-export function downloadMedia(_event: IpcMainInvokeEvent, downloadOptions: DownloadOptions) {
+export function downloadMedia(_event: IpcMainEvent, downloadOptions: DownloadOptions) {
   downloadFromYtdlp(downloadOptions);
 }
 
