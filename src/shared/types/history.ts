@@ -27,6 +27,7 @@ export type DownloadsHistoryItem = {
   uploader_url: string;
   start_time: string;
   end_time: string;
+  duration: string;
   format: string;
   command: string;
   download_progress: number;
@@ -49,6 +50,7 @@ export type RunningDownloadItem = {
   uploader_url: string;
   start_time: string;
   end_time: string;
+  duration: string;
   format: string;
   command: string;
   download_progress: number;

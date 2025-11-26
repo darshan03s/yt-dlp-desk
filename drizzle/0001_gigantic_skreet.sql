@@ -1,0 +1,1 @@
+ALTER TABLE `downloads_history` ADD `duration` text NOT NULL;

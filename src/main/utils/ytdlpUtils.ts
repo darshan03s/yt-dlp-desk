@@ -249,6 +249,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       uploader_url: mediaInfo.uploader_url,
       start_time: downloadSections.startTime,
       end_time: downloadSections.endTime,
+      duration: mediaInfo.duration_string,
       download_progress: 0,
       download_progress_string: '',
       command: completeCommand,
