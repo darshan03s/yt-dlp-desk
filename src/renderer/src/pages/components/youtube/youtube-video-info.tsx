@@ -364,7 +364,7 @@ const Formats = ({ infoJson, loading }: { infoJson: YoutubeVideoInfoJson; loadin
   };
   useEffect(() => {
     setSelectedFormat(defaultFormat);
-  }, []);
+  }, [infoJson]);
 
   return (
     <>
