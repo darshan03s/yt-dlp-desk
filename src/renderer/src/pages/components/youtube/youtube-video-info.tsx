@@ -197,9 +197,11 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
   }
 
   function handleDownload() {
-    if (!(validTime(downloadSections.startTime) || validTime(downloadSections.endTime))) {
-      toast.error('Start and End time must be in HH:MM:SS format');
-      return;
+    if (downloadSections.startTime.length > 0 || downloadSections.endTime.length > 0) {
+      if (!(validTime(downloadSections.startTime) || validTime(downloadSections.endTime))) {
+        toast.error('Start and End time must be in HH:MM:SS format');
+        return;
+      }
     }
 
     const downloadOptions: DownloadOptions = {
