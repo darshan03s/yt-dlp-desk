@@ -238,6 +238,11 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       targetDownloadFileName = targetDownloadFileName + `[00:00:00 - ${downloadSections.endTime}]`;
     }
 
+    downloadCommandArgs.push('--no-quiet');
+    downloadCommandArgs.push('--progress');
+    downloadCommandArgs.push('--print');
+    downloadCommandArgs.push('after_move:filepath');
+
     // output filename
     targetDownloadFileName = targetDownloadFileName + '.%(ext)s';
     targetDownloadFileName = sanitizeFileName(targetDownloadFileName, '_');
@@ -265,6 +270,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       download_progress_string: '',
       command: completeCommand,
       complete_output: '',
+      download_path: '',
       download_status: 'downloading',
       download_completed_at: '',
       format: selectedFormat.resolution + ' - ' + selectedFormat.format_id!,

@@ -81,10 +81,18 @@ export class DownloadManager {
         downloadingItem.download_completed_at = new Date().toISOString();
         downloadingItem.download_progress_string = 'Download Completed';
         downloadingItem.download_progress = 100;
+        const lines = downloadingItem.complete_output
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter(Boolean);
+
+        const filepath = lines.at(-1);
+        downloadingItem.download_path = filepath ?? '';
       } else {
         downloadingItem.download_status = 'failed';
         downloadingItem.download_completed_at = 'Not Completed';
         downloadingItem.download_progress_string = 'Download Failed';
+        downloadingItem.download_path = '';
       }
       downloadingItem.complete_output += '\nProcess complete';
       downloadsHistoryOperations.addNew(downloadingItem);

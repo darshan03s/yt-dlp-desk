@@ -1,1 +1,0 @@
-ALTER TABLE `downloads_history` ADD `complete_output` text NOT NULL;

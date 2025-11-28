@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1764097958615,
-      "tag": "0000_lively_screwball",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1764170699351,
-      "tag": "0001_gigantic_skreet",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1764176053834,
-      "tag": "0002_stiff_jazinda",
+      "when": 1764353371284,
+      "tag": "0000_peaceful_shriek",
       "breakpoints": true
     }
   ]
