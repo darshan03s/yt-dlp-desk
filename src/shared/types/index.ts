@@ -12,7 +12,6 @@ export type AppSettings = {
   mediaDataFolder: string;
   downloadsFolder: string;
   userDownloadsFolder: string;
-  defaultFormat: string;
   jsRuntimePath: string;
   downloadTemplate: string;
 };

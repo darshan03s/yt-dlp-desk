@@ -6,7 +6,6 @@ import { AppSettings } from '@shared/types';
 export function getDefaultAppSettings(): AppSettings {
   return {
     appVersion: pkg.version,
-    defaultFormat: 'bv+ba',
     downloadsFolder: app.getPath('downloads'),
     ffmpegPath: '',
     ffmpegVersion: '',
@@ -16,6 +15,6 @@ export function getDefaultAppSettings(): AppSettings {
     ytdlpPath: '',
     ytdlpVersion: '',
     jsRuntimePath: '',
-    downloadTemplate: '%(title)s.%(ext)s'
+    downloadTemplate: ''
   };
 }

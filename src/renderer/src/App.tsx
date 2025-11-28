@@ -11,6 +11,7 @@ import logger from '@shared/logger';
 import { toast } from 'sonner';
 import Sidebar from './pages/components/sidebar';
 import Downloads from './pages/Downloads';
+import Settings from './pages/Settings';
 
 const App = () => {
   const [loadingFromSettings, setLoadingFromSettings] = useState(true);
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/display-media-info" element={<DisplayMediaInfo />} />
             <Route path="/downloads" element={<Downloads />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
         </section>
       </div>
