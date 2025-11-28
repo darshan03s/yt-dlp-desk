@@ -257,7 +257,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       source: source,
       thumbnail_local: mediaInfo.thumbnail_local || '',
       uploader: mediaInfo.uploader,
-      uploader_url: mediaInfo.uploader_url,
+      uploader_url: mediaInfo.uploader_url ?? mediaInfo.channel_url,
       start_time: downloadSections.startTime,
       end_time: downloadSections.endTime,
       duration: mediaInfo.duration_string,

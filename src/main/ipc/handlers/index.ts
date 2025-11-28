@@ -236,20 +236,22 @@ export async function getYoutubeVideoInfoJson(
     logger.info(`Fetched info json for ${url}`);
     if (updateUrlHistory) {
       try {
-        await urlHistoryOperations.upsertByUrl(url, {
+        const newUrlHistoryItem = {
           url,
           thumbnail: infoJson.thumbnail,
           title: infoJson.fulltitle,
           source: 'youtube-video' as Source,
           thumbnail_local: infoJson.thumbnail_local ?? '',
           uploader: infoJson.uploader,
-          uploader_url: infoJson.uploader_url,
+          uploader_url: infoJson.uploader_url ?? infoJson.channel_url,
           created_at: infoJson.upload_date,
           duration: infoJson.duration_string ?? ''
-        });
+        };
+        console.log({ newUrlHistoryItem });
+        await urlHistoryOperations.upsertByUrl(url, newUrlHistoryItem);
         logger.info('Updated url history');
-      } catch {
-        logger.error('Could not update url history');
+      } catch (e) {
+        logger.error(`Could not update url history \n${e}`);
       }
     }
     mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', infoJson);
