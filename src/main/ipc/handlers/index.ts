@@ -250,6 +250,8 @@ export async function getYoutubeVideoInfoJson(
         console.log({ newUrlHistoryItem });
         await urlHistoryOperations.upsertByUrl(url, newUrlHistoryItem);
         logger.info('Updated url history');
+        const updatedUrlHistory = await getUrlHistory();
+        mainWindow.webContents.send('url-history:updated', updatedUrlHistory);
       } catch (e) {
         logger.error(`Could not update url history \n${e}`);
       }

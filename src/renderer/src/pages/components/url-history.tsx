@@ -217,9 +217,10 @@ const UrlHistory = () => {
   const [isConfirmDeleteAllModalOpen, setIsConfirmDeleteAllModalOpen] = useState(false);
 
   const urlHistory = useHistoryStore((state) => state.urlHistory);
+
   useEffect(() => {
     updateUrlHistoryInStore();
-  }, [urlHistory]);
+  }, []);
 
   function handleUrlHistoryDelete() {
     setIsConfirmDeleteAllModalOpen(true);

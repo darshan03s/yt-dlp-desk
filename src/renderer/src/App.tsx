@@ -12,6 +12,8 @@ import { toast } from 'sonner';
 import Sidebar from './pages/components/sidebar';
 import Downloads from './pages/Downloads';
 import Settings from './pages/Settings';
+import { useHistoryStore } from './stores/history-store';
+import { UrlHistoryItem } from '@shared/types/history';
 
 const App = () => {
   const [loadingFromSettings, setLoadingFromSettings] = useState(true);
@@ -22,6 +24,16 @@ const App = () => {
     const unsubscribe = window.api.on('settings:updated', (updatedSettings) => {
       setSettings(updatedSettings as AppSettings);
       logger.info('Settings Updated');
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = window.api.on('url-history:updated', (updatedUrlHistory) => {
+      useHistoryStore.setState({ urlHistory: (updatedUrlHistory as UrlHistoryItem[]) ?? [] });
     });
 
     return () => {
@@ -46,7 +58,7 @@ const App = () => {
         toast.error('Could not get settings');
       }
     });
-  }, [setSettings]);
+  }, []);
 
   const handleCloseModal = () => {
     setIsYtdlpFfmpegConfirmModalVisible(false);
