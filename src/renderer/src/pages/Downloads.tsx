@@ -68,7 +68,7 @@ const Downloads = () => {
   return (
     <>
       <div className="w-full flex flex-col gap-2">
-        <div className="px-3 py-2 h-10 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
+        <div className="px-3 py-2 h-12 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
           <span className="text-xs">History ({downloadsHistory?.length})</span>
           <TooltipWrapper side="bottom" message={`Delete downloads history`}>
             <Button
