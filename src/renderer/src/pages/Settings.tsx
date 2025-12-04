@@ -5,9 +5,7 @@ import { useSettingsStore } from '@renderer/stores/settings-store';
 const Settings = () => {
   const downloadsFolder = useSettingsStore((state) => state.downloadsFolder);
   const ytdlpVersion = useSettingsStore((state) => state.ytdlpVersion);
-  const ytdlpPath = useSettingsStore((state) => state.ytdlpPath);
   const ffmpegVersion = useSettingsStore((state) => state.ffmpegVersion);
-  const ffmpegPath = useSettingsStore((state) => state.ffmpegPath);
 
   return (
     <div className="w-full flex flex-col gap-2">
@@ -18,26 +16,18 @@ const Settings = () => {
         </Button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 [&_.setting-name]:font-semibold">
         <div className="flex items-center justify-between w-full px-18">
-          <span className="text-[12px] text-nowrap">Downloads Folder</span>
+          <span className="setting-name text-[12px] text-nowrap">Downloads Folder</span>
           <Input className="h-8 w-[400px] text-[10px]" value={downloadsFolder} />
         </div>
         <div className="flex items-center justify-between w-full px-18">
-          <span className="text-[12px] text-nowrap">yt-dlp version</span>
+          <span className="setting-name text-[12px] text-nowrap">yt-dlp Version</span>
           <Input disabled className="h-8 w-[400px] text-[10px]" value={ytdlpVersion} />
         </div>
         <div className="flex items-center justify-between w-full px-18">
-          <span className="text-[12px] text-nowrap">yt-dlp path</span>
-          <Input className="h-8 w-[400px] text-[10px]" value={ytdlpPath} />
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
-          <span className="text-[12px] text-nowrap">ffmpeg version</span>
+          <span className="setting-name text-[12px] text-nowrap">ffmpeg Version</span>
           <Input disabled className="h-8 w-[400px] text-[10px]" value={ffmpegVersion} />
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
-          <span className="text-[12px] text-nowrap">ffmpeg path</span>
-          <Input className="h-8 w-[400px] text-[10px]" value={ffmpegPath} />
         </div>
       </div>
     </div>
