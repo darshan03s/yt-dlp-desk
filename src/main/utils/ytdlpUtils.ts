@@ -205,18 +205,16 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       '--newline'
     ];
 
-    // format downloads both video and audio
-    if (selectedFormat.acodec) {
+    const hasAudio = selectedFormat.acodec && selectedFormat.acodec !== 'none';
+
+    if (hasAudio) {
+      // format already has audio
       downloadCommandArgs.push('-f');
       downloadCommandArgs.push(formatId);
-    }
-    // format does not download audio
-    else if (!selectedFormat.acodec && !formatId.includes('+')) {
+    } else {
+      // no audio → append bestaudio
       downloadCommandArgs.push('-f');
       downloadCommandArgs.push(formatId + '+ba');
-    } else {
-      downloadCommandArgs.push('-f');
-      downloadCommandArgs.push(formatId);
     }
 
     // force-keyframes-at-cuts
