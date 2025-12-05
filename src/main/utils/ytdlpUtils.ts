@@ -187,9 +187,9 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
   const store = await getStoreManager();
 
   if (downloadOptions.source === ('youtube-video' as Source)) {
-    const { url, source, selectedFormat, downloadSections, selectedDownloadFolder } =
+    const { url, source, selectedFormat, downloadSections, selectedDownloadFolder, extraOptions } =
       downloadOptions;
-    console.log({ url, source, selectedFormat, downloadSections });
+    console.log({ url, source, selectedFormat, downloadSections, extraOptions });
     const mediaInfo = downloadOptions.mediaInfo as YoutubeVideoInfoJson;
     const infoJsonPath = getInfoJsonPath(url, source);
     const formatId = selectedFormat.format_id!;
@@ -242,6 +242,10 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     if (!downloadSections.startTime && downloadSections.endTime) {
       downloadCommandArgs.push('--download-sections', `*00:00:00-${downloadSections.endTime}`);
       targetDownloadFileName = targetDownloadFileName + `[00:00:00 - ${downloadSections.endTime}]`;
+    }
+
+    if (extraOptions.embedThumbnail) {
+      downloadCommandArgs.push('--embed-thumbnail');
     }
 
     downloadCommandArgs.push('--no-quiet');

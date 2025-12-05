@@ -1,20 +1,17 @@
+import { DownloadSections, ExtraOptions } from '@/shared/types/download';
 import { YoutubeFormat } from '@/shared/types/info-json/youtube-video';
 import { create } from 'zustand';
 
 export interface SelectedFormat extends Partial<YoutubeFormat> {}
 
-export interface DownloadSections {
-  startTime: string;
-  endTime: string;
-  forceKeyframesAtCuts: boolean;
-}
-
 interface SelectedOptionsStore {
   selectedFormat: SelectedFormat;
   downloadSections: DownloadSections;
   selectedDownloadFolder: string;
+  extraOptions: ExtraOptions;
   setSelectedFormat: (data: SelectedFormat) => void;
   setDownloadSections: (data: Partial<DownloadSections>) => void;
+  setExtraOptions: (data: Partial<ExtraOptions>) => void;
 }
 
 export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
@@ -40,6 +37,10 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
 
   selectedDownloadFolder: '',
 
+  extraOptions: {
+    embedThumbnail: false
+  },
+
   setSelectedFormat: (data) =>
     set({
       selectedFormat: data
@@ -49,6 +50,14 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
     set((state) => ({
       downloadSections: {
         ...state.downloadSections,
+        ...data
+      }
+    })),
+
+  setExtraOptions: (data) =>
+    set((state) => ({
+      extraOptions: {
+        ...state.extraOptions,
         ...data
       }
     }))

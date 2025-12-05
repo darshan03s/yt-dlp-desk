@@ -205,6 +205,7 @@ const DownloadCard = ({
                 {progressDetails?.progressString ?? downloadItem.download_progress_string}
               </p>
               <ProgressBar
+                downloadStatus={downloadItem.download_status}
                 value={progressDetails?.progressPercentage ?? downloadItem.download_progress}
               />
             </div>

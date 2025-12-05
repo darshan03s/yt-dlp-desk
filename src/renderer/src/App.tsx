@@ -42,6 +42,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = window.api.on('yt-dlp:download-failed', (message) => {
+      toast.error(message as string);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     window.api.rendererInit().then((settings: AppSettings | null) => {
       setLoadingFromSettings(false);
 

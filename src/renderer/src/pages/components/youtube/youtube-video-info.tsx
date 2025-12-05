@@ -9,7 +9,8 @@ import {
   IconCircleCheckFilled,
   IconClockHour3Filled,
   IconFolder,
-  IconKeyframes
+  IconKeyframes,
+  IconPhotoVideo
 } from '@tabler/icons-react';
 import { acodec, formatDate, formatFileSize, vcodec } from '@renderer/utils';
 import {
@@ -177,6 +178,10 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
         <div className="download-location">
           <DownloadLocation loading={isInfoJsonEmpty} />
         </div>
+
+        <div className="extra-options">
+          <ExtraOptions />
+        </div>
       </div>
 
       {!isInfoJsonEmpty && (
@@ -206,6 +211,7 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
   const selectedFormat = useSelectedOptionsStore((state) => state.selectedFormat);
   const downloadSections = useSelectedOptionsStore((state) => state.downloadSections);
   const selectedDownloadFolder = useSelectedOptionsStore((state) => state.selectedDownloadFolder);
+  const extraOptions = useSelectedOptionsStore((state) => state.extraOptions);
   const url = useMediaInfoStore.getState().url;
   const source = useMediaInfoStore.getState().source;
   const mediaInfo = useMediaInfoStore((state) => state.mediaInfo);
@@ -235,7 +241,8 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
       source,
       mediaInfo,
       downloadSections,
-      selectedDownloadFolder
+      selectedDownloadFolder,
+      extraOptions
     };
 
     window.api.download(downloadOptions);
@@ -518,7 +525,6 @@ const DownloadSections = ({ loading }: { loading: boolean }) => {
         title="Force keyframes at cuts"
         pressed={downloadSections.forceKeyframesAtCuts}
         onPressedChange={handleToggle}
-        aria-label="Toggle bookmark"
         size="sm"
         variant="outline"
         className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-primary data-[state=on]:*:[svg]:stroke-primary"
@@ -555,6 +561,36 @@ const DownloadLocation = ({ loading }: { loading: boolean }) => {
       >
         <IconFolder />
       </Button>
+    </div>
+  );
+};
+
+const ExtraOptions = () => {
+  const extraOptions = useSelectedOptionsStore((state) => state.extraOptions);
+  const setExtraOptions = useSelectedOptionsStore((state) => state.setExtraOptions);
+
+  function handleEmbedThumbnailToggle(pressed: boolean) {
+    setExtraOptions({ embedThumbnail: pressed });
+  }
+
+  const EmbedThumbnail = () => {
+    return (
+      <Toggle
+        title="Embed thumbnail"
+        pressed={extraOptions.embedThumbnail}
+        onPressedChange={handleEmbedThumbnailToggle}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconPhotoVideo />
+      </Toggle>
+    );
+  };
+
+  return (
+    <div>
+      <EmbedThumbnail />
     </div>
   );
 };

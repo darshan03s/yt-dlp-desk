@@ -93,6 +93,10 @@ export class DownloadManager {
         downloadingItem.download_completed_at = 'Not Completed';
         downloadingItem.download_progress_string = 'Download Failed';
         downloadingItem.download_path = '';
+        mainWindow.webContents.send(
+          'yt-dlp:download-failed',
+          `Download failed for ${downloadingItem.title}`
+        );
       }
       downloadingItem.complete_output += '\nProcess complete';
       downloadsHistoryOperations.addNew(downloadingItem);
