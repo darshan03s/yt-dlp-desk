@@ -9,6 +9,7 @@ import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useSearchParams } from 'react-router-dom';
 import { updateUrlHistoryInStore } from '../url-history';
 import {
+  IconArrowBackUp,
   IconArrowDown,
   IconBadgeCc,
   IconCircleCheckFilled,
@@ -234,7 +235,7 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
   const extraOptions = useSelectedOptionsStore((state) => state.extraOptions);
   const url = useMediaInfoStore.getState().url;
   const source = useMediaInfoStore.getState().source;
-  const mediaInfo = useMediaInfoStore((state) => state.mediaInfo);
+  const mediaInfo = useMediaInfoStore((state) => state.mediaInfo) as YoutubeVideoInfoJson;
 
   function validTime(time: string) {
     const pattern = /^\d\d(?::\d\d?){0,2}$/;
@@ -252,6 +253,17 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
     if (endTime.length > 0 && !validTime(endTime)) {
       toast.error('End time must be in HH:MM:SS format');
       return;
+    }
+
+    if (extraOptions.liveFromStart) {
+      const formatId = selectedFormat.format_id;
+      const isFormatInLiveFromStartFormats = mediaInfo.live_from_start_formats.some(
+        (f) => f.format_id === formatId
+      );
+      if (!isFormatInLiveFromStartFormats) {
+        toast.error('Format does not support live from start');
+        return;
+      }
     }
 
     const downloadOptions: DownloadOptions = {
@@ -606,6 +618,7 @@ const ExtraOptions = () => {
   const extraOptions = useSelectedOptionsStore((state) => state.extraOptions);
   const setExtraOptions = useSelectedOptionsStore((state) => state.setExtraOptions);
   const resetExtraOptions = useSelectedOptionsStore((state) => state.resetExtraOptions);
+  const infoJson = useMediaInfoStore((state) => state.mediaInfo) as YoutubeVideoInfoJson;
 
   useEffect(() => {
     resetExtraOptions();
@@ -750,8 +763,31 @@ const ExtraOptions = () => {
     );
   };
 
+  const LiveFromStart = () => {
+    return (
+      <Toggle
+        title="Download live from start"
+        pressed={extraOptions.liveFromStart}
+        onPressedChange={(pressed) => handleOptionToggle('liveFromStart', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
+      >
+        <IconArrowBackUp /> <span>Live from start</span>
+      </Toggle>
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4">
+      {infoJson.is_live && (
+        <div>
+          <h1 className="text-xs border-border border-b mb-2 pb-1">Live options</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <LiveFromStart />
+          </div>
+        </div>
+      )}
       <div>
         <h1 className="text-xs border-border border-b mb-2 pb-1">Embed options</h1>
         <div className="flex items-center gap-2 flex-wrap">

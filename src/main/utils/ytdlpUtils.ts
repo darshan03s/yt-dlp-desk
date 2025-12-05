@@ -285,13 +285,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
 
     const jsRuntimePath = `quickjs:${store.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
-    const downloadCommandArgs = [
-      '--js-runtimes',
-      jsRuntimePath,
-      '--load-info-json',
-      infoJsonPath,
-      '--newline'
-    ];
+    const downloadCommandArgs = ['--js-runtimes', jsRuntimePath, '--newline'];
 
     const hasAudio = selectedFormat.acodec && selectedFormat.acodec !== 'none';
 
@@ -368,10 +362,21 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       downloadCommandArgs.push('--write-auto-subs');
     }
 
+    if (extraOptions.liveFromStart) {
+      downloadCommandArgs.push('--live-from-start');
+    }
+
     downloadCommandArgs.push('--no-quiet');
     downloadCommandArgs.push('--progress');
     downloadCommandArgs.push('--print');
     downloadCommandArgs.push('after_move:filepath');
+
+    if (extraOptions.liveFromStart) {
+      downloadCommandArgs.push(url);
+    } else {
+      downloadCommandArgs.push('--load-info-json');
+      downloadCommandArgs.push(infoJsonPath);
+    }
 
     // output filename
     targetDownloadFileName = targetDownloadFileName + '.%(ext)s';

@@ -19,6 +19,7 @@ export interface ExtraOptions {
   writeThumbnail: boolean;
   writeSubs: boolean;
   writeAutoSubs: boolean;
+  liveFromStart: boolean;
 }
 
 export type DownloadOptions = {

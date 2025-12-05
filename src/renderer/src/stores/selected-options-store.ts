@@ -24,7 +24,8 @@ const initialExtraOptions: ExtraOptions = {
   writeComments: false,
   writeThumbnail: false,
   writeSubs: false,
-  writeAutoSubs: false
+  writeAutoSubs: false,
+  liveFromStart: false
 };
 
 export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
