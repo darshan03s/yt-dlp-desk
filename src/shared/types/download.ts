@@ -11,6 +11,14 @@ export type DownloadSections = {
 
 export interface ExtraOptions {
   embedThumbnail: boolean;
+  embedChapters: boolean;
+  embedSubs: boolean;
+  embedMetadata: boolean;
+  writeDescription: boolean;
+  writeComments: boolean;
+  writeThumbnail: boolean;
+  writeSubs: boolean;
+  writeAutoSubs: boolean;
 }
 
 export type DownloadOptions = {

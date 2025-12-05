@@ -12,7 +12,20 @@ interface SelectedOptionsStore {
   setSelectedFormat: (data: SelectedFormat) => void;
   setDownloadSections: (data: Partial<DownloadSections>) => void;
   setExtraOptions: (data: Partial<ExtraOptions>) => void;
+  resetExtraOptions: () => void;
 }
+
+const initialExtraOptions: ExtraOptions = {
+  embedThumbnail: false,
+  embedChapters: false,
+  embedSubs: false,
+  embedMetadata: false,
+  writeDescription: false,
+  writeComments: false,
+  writeThumbnail: false,
+  writeSubs: false,
+  writeAutoSubs: false
+};
 
 export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
   selectedFormat: {
@@ -37,9 +50,7 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
 
   selectedDownloadFolder: '',
 
-  extraOptions: {
-    embedThumbnail: false
-  },
+  extraOptions: initialExtraOptions,
 
   setSelectedFormat: (data) =>
     set({
@@ -60,5 +71,10 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
         ...state.extraOptions,
         ...data
       }
+    })),
+
+  resetExtraOptions: () =>
+    set(() => ({
+      extraOptions: initialExtraOptions
     }))
 }));

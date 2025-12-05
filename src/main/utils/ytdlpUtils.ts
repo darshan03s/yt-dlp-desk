@@ -248,6 +248,38 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       downloadCommandArgs.push('--embed-thumbnail');
     }
 
+    if (extraOptions.embedChapters) {
+      downloadCommandArgs.push('--embed-chapters');
+    }
+
+    if (extraOptions.embedSubs) {
+      downloadCommandArgs.push('--embed-subs');
+    }
+
+    if (extraOptions.embedMetadata) {
+      downloadCommandArgs.push('--embed-metadata');
+    }
+
+    if (extraOptions.writeDescription) {
+      downloadCommandArgs.push('--write-description');
+    }
+
+    if (extraOptions.writeComments) {
+      downloadCommandArgs.push('--write-comments');
+    }
+
+    if (extraOptions.writeThumbnail) {
+      downloadCommandArgs.push('--write-thumbnail');
+    }
+
+    if (extraOptions.writeSubs) {
+      downloadCommandArgs.push('--write-subs');
+    }
+
+    if (extraOptions.writeAutoSubs) {
+      downloadCommandArgs.push('--write-auto-subs');
+    }
+
     downloadCommandArgs.push('--no-quiet');
     downloadCommandArgs.push('--progress');
     downloadCommandArgs.push('--print');

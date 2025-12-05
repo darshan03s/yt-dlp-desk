@@ -6,11 +6,18 @@ import { useSearchParams } from 'react-router-dom';
 import { updateUrlHistoryInStore } from '../url-history';
 import {
   IconArrowDown,
+  IconBadgeCc,
   IconCircleCheckFilled,
   IconClockHour3Filled,
+  IconExternalLink,
+  IconFileDescription,
+  IconFileStack,
   IconFolder,
   IconKeyframes,
-  IconPhotoVideo
+  IconMessage,
+  IconPhotoEdit,
+  IconPhotoVideo,
+  IconSection
 } from '@tabler/icons-react';
 import { acodec, formatDate, formatFileSize, vcodec } from '@renderer/utils';
 import {
@@ -23,10 +30,11 @@ import {
 import { Anchor } from '@renderer/components/wrappers';
 import { Button } from '@renderer/components/ui/button';
 import { SelectedFormat, useSelectedOptionsStore } from '@renderer/stores/selected-options-store';
-import { DownloadOptions } from '@/shared/types/download';
+import { DownloadOptions, ExtraOptions as ExtraOptionsType } from '@/shared/types/download';
 import { Input } from '@renderer/components/ui/input';
 import { Toggle } from '@renderer/components/ui/toggle';
 import { useSettingsStore } from '@renderer/stores/settings-store';
+import { Captions, FilePen } from 'lucide-react';
 
 type YoutubeVideoInfoProps = {
   url: string;
@@ -80,7 +88,8 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
       <Preview
         previewUrl={thumbnailUrl}
         loading={isLoadingInfoJson}
-        duration={infoJson.duration_string}
+        infoJson={infoJson}
+        url={url}
       />
       <div className="p-2">
         <Details infoJson={infoJson} />
@@ -92,11 +101,13 @@ const YoutubeVideoInfo = ({ url }: YoutubeVideoInfoProps) => {
 const Preview = ({
   previewUrl,
   loading,
-  duration
+  infoJson,
+  url
 }: {
   previewUrl: string;
   loading: boolean;
-  duration?: string;
+  infoJson: YoutubeVideoInfoJson;
+  url: string;
 }) => {
   return (
     <div className="w-full h-60 bg-black flex items-center justify-center">
@@ -105,11 +116,14 @@ const Preview = ({
       ) : (
         <div className="relative">
           <img src={previewUrl} alt="Preview" width={420} className="aspect-video" />
-          {duration && (
+          {infoJson.duration_string && (
             <span className="absolute right-1 bottom-1 text-xs p-1 px-2 bg-black text-white rounded-md">
-              {duration}
+              {infoJson.duration_string}
             </span>
           )}
+          <Anchor href={url} className="absolute top-1 right-1 bg-black p-1 text-white rounded-md">
+            <IconExternalLink className="size-4" />
+          </Anchor>
         </div>
       )}
     </div>
@@ -568,9 +582,14 @@ const DownloadLocation = ({ loading }: { loading: boolean }) => {
 const ExtraOptions = () => {
   const extraOptions = useSelectedOptionsStore((state) => state.extraOptions);
   const setExtraOptions = useSelectedOptionsStore((state) => state.setExtraOptions);
+  const resetExtraOptions = useSelectedOptionsStore((state) => state.resetExtraOptions);
 
-  function handleEmbedThumbnailToggle(pressed: boolean) {
-    setExtraOptions({ embedThumbnail: pressed });
+  useEffect(() => {
+    resetExtraOptions();
+  }, []);
+
+  function handleOptionToggle(option: keyof ExtraOptionsType, pressed: boolean) {
+    setExtraOptions({ [option]: pressed });
   }
 
   const EmbedThumbnail = () => {
@@ -578,7 +597,7 @@ const ExtraOptions = () => {
       <Toggle
         title="Embed thumbnail"
         pressed={extraOptions.embedThumbnail}
-        onPressedChange={handleEmbedThumbnailToggle}
+        onPressedChange={(pressed) => handleOptionToggle('embedThumbnail', pressed)}
         size="sm"
         variant="outline"
         className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
@@ -588,9 +607,137 @@ const ExtraOptions = () => {
     );
   };
 
+  const EmbedChapters = () => {
+    return (
+      <Toggle
+        title="Embed chapters"
+        pressed={extraOptions.embedChapters}
+        onPressedChange={(pressed) => handleOptionToggle('embedChapters', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconSection />
+      </Toggle>
+    );
+  };
+
+  const EmbedSubs = () => {
+    return (
+      <Toggle
+        title="Embed Subtitle"
+        pressed={extraOptions.embedSubs}
+        onPressedChange={(pressed) => handleOptionToggle('embedSubs', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconBadgeCc />
+      </Toggle>
+    );
+  };
+
+  const EmbedMetadata = () => {
+    return (
+      <Toggle
+        title="Embed Metadata"
+        pressed={extraOptions.embedMetadata}
+        onPressedChange={(pressed) => handleOptionToggle('embedMetadata', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconFileStack />
+      </Toggle>
+    );
+  };
+
+  const WriteDescription = () => {
+    return (
+      <Toggle
+        title="Write Description"
+        pressed={extraOptions.writeDescription}
+        onPressedChange={(pressed) => handleOptionToggle('writeDescription', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconFileDescription />
+      </Toggle>
+    );
+  };
+
+  const WriteComments = () => {
+    return (
+      <Toggle
+        title="Write Comments"
+        pressed={extraOptions.writeComments}
+        onPressedChange={(pressed) => handleOptionToggle('writeComments', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconMessage />
+      </Toggle>
+    );
+  };
+
+  const WriteThumbnail = () => {
+    return (
+      <Toggle
+        title="Write Thumbnail"
+        pressed={extraOptions.writeThumbnail}
+        onPressedChange={(pressed) => handleOptionToggle('writeThumbnail', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <IconPhotoEdit />
+      </Toggle>
+    );
+  };
+
+  const WriteSubs = () => {
+    return (
+      <Toggle
+        title="Write Subtitle"
+        pressed={extraOptions.writeSubs}
+        onPressedChange={(pressed) => handleOptionToggle('writeSubs', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <FilePen />
+      </Toggle>
+    );
+  };
+
+  const WriteAutoSubs = () => {
+    return (
+      <Toggle
+        title="Write Auto Subtitle"
+        pressed={extraOptions.writeAutoSubs}
+        onPressedChange={(pressed) => handleOptionToggle('writeAutoSubs', pressed)}
+        size="sm"
+        variant="outline"
+        className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:stroke-primary"
+      >
+        <Captions />
+      </Toggle>
+    );
+  };
+
   return (
-    <div>
+    <div className="flex items-center gap-2">
       <EmbedThumbnail />
+      <EmbedChapters />
+      <EmbedSubs />
+      <EmbedMetadata />
+      <WriteDescription />
+      <WriteComments />
+      <WriteThumbnail />
+      <WriteSubs />
+      <WriteAutoSubs />
     </div>
   );
 };
