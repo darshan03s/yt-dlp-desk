@@ -200,9 +200,11 @@ const Details = ({ infoJson }: { infoJson: YoutubeVideoInfoJson }) => {
           <DownloadLocation loading={isInfoJsonEmpty} />
         </div>
 
-        <div className="extra-options pt-2">
-          <ExtraOptions />
-        </div>
+        {!isInfoJsonEmpty && (
+          <div className="extra-options pt-2">
+            <ExtraOptions />
+          </div>
+        )}
       </div>
 
       {!isInfoJsonEmpty && (
