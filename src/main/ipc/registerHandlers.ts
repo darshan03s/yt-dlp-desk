@@ -16,7 +16,8 @@ import {
   selectFolder,
   deleteOneFromDownloadsHistory,
   deleteAllFromDownloadsHistory,
-  saveSettings
+  saveSettings,
+  urlHistorySearch
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -57,6 +58,8 @@ async function registerHanlders() {
   ipcMain.handle('select-folder', selectFolder);
 
   ipcMain.on('settings:save', saveSettings);
+
+  ipcMain.handle('url-history:search', urlHistorySearch);
 }
 
 export default registerHanlders;

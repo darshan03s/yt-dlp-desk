@@ -337,3 +337,7 @@ export async function saveSettings(_event: IpcMainEvent, changedSettings: AppSet
   const settings = store.getAll();
   mainWindow.webContents.send('settings:updated', settings);
 }
+
+export async function urlHistorySearch(_event: IpcMainInvokeEvent, searchInput: string) {
+  return urlHistoryOperations.search(searchInput);
+}

@@ -60,4 +60,5 @@ export type Api = {
   getDownloadsHistory: () => Promise<DownloadsHistoryList>;
   selectFolder: () => Promise<string | null>;
   saveSettings: (changedSettings: AppSettingsChange) => void;
+  urlHistorySearch: (searchInput: string) => Promise<UrlHistoryList>;
 };

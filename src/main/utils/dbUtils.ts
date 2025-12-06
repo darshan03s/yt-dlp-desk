@@ -6,7 +6,7 @@ import {
   NewUrlHistoryItem,
   UrlHistoryItem
 } from '@main/types/db';
-import { eq, desc, asc } from 'drizzle-orm';
+import { eq, desc, asc, or, like } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 
 export const urlHistoryOperations = {
@@ -70,6 +70,25 @@ export const urlHistoryOperations = {
     }
 
     return urlHistoryOperations.addNew(data);
+  },
+  search: async (input: string) => {
+    const pattern = `%${input}%`;
+
+    const results = await db
+      ?.select()
+      .from(urlHistory)
+      .where(
+        or(
+          like(urlHistory.title, pattern),
+          like(urlHistory.url, pattern),
+          like(urlHistory.source, pattern),
+          like(urlHistory.uploader, pattern),
+          like(urlHistory.uploader_url, pattern)
+        )
+      )
+      .orderBy(desc(urlHistory.added_at));
+
+    return results;
   }
 };
 

@@ -33,7 +33,8 @@ const api: Api = {
   getDownloadsHistory: () => ipcRenderer.invoke('downloads-history:get-all'),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   saveSettings: (changedSettings: AppSettingsChange) =>
-    ipcRenderer.send('settings:save', changedSettings)
+    ipcRenderer.send('settings:save', changedSettings),
+  urlHistorySearch: (searchInput: string) => ipcRenderer.invoke('url-history:search', searchInput)
 };
 
 if (process.contextIsolated) {

@@ -12,7 +12,13 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useHistoryStore } from '@renderer/stores/history-store';
 import { useMediaInfoStore } from '@renderer/stores/media-info-store';
 import { useNavigate } from 'react-router-dom';
-import { IconExternalLink, IconInfoSquareRounded, IconPhoto, IconTrash } from '@tabler/icons-react';
+import {
+  IconExternalLink,
+  IconInfoSquareRounded,
+  IconPhoto,
+  IconSearch,
+  IconTrash
+} from '@tabler/icons-react';
 import { Button } from '@renderer/components/ui/button';
 import { Logo } from '@renderer/data/logo';
 
@@ -27,6 +33,9 @@ import {
 } from '@renderer/components/ui/dialog';
 import { Anchor, TooltipWrapper } from '@renderer/components/wrappers';
 import { formatDate } from '@renderer/utils';
+import { Input } from '@renderer/components/ui/input';
+import { ButtonGroup } from '@renderer/components/ui/button-group';
+import { useSearchStore } from '@renderer/stores/search-store';
 
 export function updateUrlHistoryInStore() {
   window.api.getUrlHistory().then((urlHistory: UrlHistoryList) => {
@@ -213,39 +222,95 @@ const ConfirmDeleteAllModal = ({
   );
 };
 
+const UrlHistorySearch = () => {
+  const searchInput = useSearchStore((state) => state.urlSearchInput);
+
+  function handleSearchInput(input: string) {
+    useSearchStore.setState({ urlSearchInput: input });
+    if (input.length === 0) {
+      useSearchStore.setState({ urlSearchResults: [] });
+    }
+  }
+
+  function handleSearch() {
+    if (searchInput.length === 0) return;
+    window.api.urlHistorySearch(searchInput).then((searchResults) => {
+      useSearchStore.setState({ urlSearchResults: searchResults });
+    });
+  }
+
+  return (
+    <ButtonGroup>
+      <Input
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSearch();
+          }
+        }}
+        onChange={(e) => handleSearchInput(e.target.value)}
+        className="h-7 text-[10px] w-[260px]"
+        type="search"
+        placeholder="Search in url history"
+      />
+      <Button variant={'outline'} className="h-7" onClick={handleSearch}>
+        <IconSearch />
+      </Button>
+    </ButtonGroup>
+  );
+};
+
 const UrlHistory = () => {
   const [isConfirmDeleteAllModalOpen, setIsConfirmDeleteAllModalOpen] = useState(false);
 
   const urlHistory = useHistoryStore((state) => state.urlHistory);
+  const searchResults = useSearchStore((state) => state.urlSearchResults);
 
   useEffect(() => {
     updateUrlHistoryInStore();
+    useSearchStore.setState({ urlSearchResults: [] });
   }, []);
 
   function handleUrlHistoryDelete() {
     setIsConfirmDeleteAllModalOpen(true);
   }
 
+  const UrlHistoryListComp = () => (
+    <>
+      {urlHistory?.map((item) => (
+        <UrlHistoryItem key={item.id} item={item} />
+      ))}
+    </>
+  );
+
+  const UrlHistorySearchResultsComp = () => (
+    <>
+      {searchResults?.map((item) => (
+        <UrlHistoryItem key={item.id} item={item} />
+      ))}
+    </>
+  );
+
   return (
     <>
       <div className="w-full px-3 flex items-center justify-between h-10">
-        <span className="text-xs">History ({urlHistory?.length})</span>
-        <TooltipWrapper message={`Delete url history`}>
-          <Button
-            disabled={urlHistory?.length === 0}
-            onClick={() => handleUrlHistoryDelete()}
-            variant={'destructive'}
-            size={'icon-sm'}
-            className="size-6"
-          >
-            <IconTrash className="size-4" />
-          </Button>
-        </TooltipWrapper>
+        <span className="text-xs">Url History ({urlHistory?.length})</span>
+        <div className="flex items-center gap-4">
+          <UrlHistorySearch />
+          <TooltipWrapper message={`Delete url history`}>
+            <Button
+              disabled={urlHistory?.length === 0}
+              onClick={() => handleUrlHistoryDelete()}
+              variant={'destructive'}
+              size={'icon-sm'}
+              className="size-6"
+            >
+              <IconTrash className="size-4" />
+            </Button>
+          </TooltipWrapper>
+        </div>
       </div>
       <div className="p-2 flex flex-col gap-2">
-        {urlHistory?.map((item) => {
-          return <UrlHistoryItem key={item.id} item={item} />;
-        })}
+        {searchResults!.length > 0 ? <UrlHistorySearchResultsComp /> : <UrlHistoryListComp />}
       </div>
 
       <ConfirmDeleteAllModal
