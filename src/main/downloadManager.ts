@@ -50,7 +50,6 @@ export class DownloadManager {
     const { downloadingItem } = runningDownload;
 
     downloadingItem.download_progress_string = 'Downloading...';
-    downloadingItem.download_progress = 0;
 
     child.stdout.on('data', (data) => {
       const text = data.toString();
@@ -90,14 +89,22 @@ export class DownloadManager {
         const filepath = lines.at(-1);
         downloadingItem.download_path = filepath ?? '';
       } else {
-        downloadingItem.download_status = 'failed';
-        downloadingItem.download_completed_at = 'Not Completed';
-        downloadingItem.download_progress_string = 'Download Failed';
-        downloadingItem.download_path = '';
-        mainWindow.webContents.send(
-          'yt-dlp:download-failed',
-          `Download failed for ${downloadingItem.title}`
-        );
+        if (downloadingItem.download_status === 'paused') {
+          downloadingItem.download_completed_at = new Date().toISOString();
+          downloadingItem.download_progress_string = 'Download Paused';
+          downloadingItem.download_path = '';
+          downloadingItem.complete_output += '\nDownload Paused';
+        } else {
+          downloadingItem.download_status = 'failed';
+          downloadingItem.download_completed_at = new Date().toISOString();
+          downloadingItem.download_progress_string = 'Download Failed';
+          downloadingItem.download_path = '';
+          downloadingItem.complete_output += '\nDownload Failed';
+          mainWindow.webContents.send(
+            'yt-dlp:download-failed',
+            `Download failed for ${downloadingItem.title}`
+          );
+        }
       }
       downloadingItem.complete_output += '\nProcess complete';
       downloadHistoryOperations.addNew(downloadingItem);

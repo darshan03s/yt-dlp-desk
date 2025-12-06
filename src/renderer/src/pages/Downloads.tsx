@@ -14,6 +14,8 @@ import { ProgressBar } from './components/progress-bar';
 import {
   IconExternalLink,
   IconPhoto,
+  IconPlayerPause,
+  IconPlayerPlay,
   IconSearch,
   IconTerminal2,
   IconTrash
@@ -214,6 +216,14 @@ const DownloadCard = ({
     });
   }
 
+  function handlePauseDownload(id: string) {
+    window.api.pauseDownload(id);
+  }
+
+  function handleResumeDownload(id: string) {
+    window.api.resumeDownload(id);
+  }
+
   return (
     <>
       <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
@@ -294,7 +304,31 @@ const DownloadCard = ({
               </span>
             </TooltipWrapper>
           </div>
-          <div className="downloads-history-item-footer-right">
+          <div className="downloads-history-item-footer-right flex items-center gap-2">
+            {downloadItem.download_status === 'downloading' && (
+              <TooltipWrapper message={`Pause download`}>
+                <Button
+                  onClick={() => handlePauseDownload(downloadItem.id)}
+                  variant={'ghost'}
+                  size={'icon-sm'}
+                  className="size-6"
+                >
+                  <IconPlayerPause className="size-4" />
+                </Button>
+              </TooltipWrapper>
+            )}
+            {downloadItem.download_status === 'paused' && (
+              <TooltipWrapper message={`Resume download`}>
+                <Button
+                  onClick={() => handleResumeDownload(downloadItem.id)}
+                  variant={'ghost'}
+                  size={'icon-sm'}
+                  className="size-6"
+                >
+                  <IconPlayerPlay className="size-4" />
+                </Button>
+              </TooltipWrapper>
+            )}
             <TooltipWrapper message={`Delete from history`}>
               <Button
                 disabled={downloadItem.download_status === 'downloading'}

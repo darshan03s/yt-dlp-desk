@@ -417,6 +417,8 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       download_path: '',
       download_status: 'downloading',
       download_completed_at: '',
+      download_command_base: downloadCommandBase,
+      download_command_args: JSON.stringify(downloadCommandArgs),
       format: selectedFormat.resolution + ' - ' + selectedFormat.format_id!,
       added_at: new Date().toISOString()
     };

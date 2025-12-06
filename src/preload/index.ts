@@ -35,7 +35,9 @@ const api: Api = {
     ipcRenderer.send('settings:save', changedSettings),
   urlHistorySearch: (searchInput: string) => ipcRenderer.invoke('url-history:search', searchInput),
   downloadHistorySearch: (searchInput: string) =>
-    ipcRenderer.invoke('download-history:search', searchInput)
+    ipcRenderer.invoke('download-history:search', searchInput),
+  pauseDownload: (id: string) => ipcRenderer.send('yt-dlp:pause-download', id),
+  resumeDownload: (id: string) => ipcRenderer.send('yt-dlp:resume-download', id)
 };
 
 if (process.contextIsolated) {

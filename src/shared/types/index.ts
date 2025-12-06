@@ -62,4 +62,6 @@ export type Api = {
   saveSettings: (changedSettings: AppSettingsChange) => void;
   urlHistorySearch: (searchInput: string) => Promise<UrlHistoryList>;
   downloadHistorySearch: (searchInput: string) => Promise<DownloadHistoryList>;
+  pauseDownload: (id: string) => void;
+  resumeDownload: (id: string) => void;
 };

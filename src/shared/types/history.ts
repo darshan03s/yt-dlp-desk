@@ -1,4 +1,5 @@
 import { Source } from '@/shared/types';
+import { DownloadStatus } from './download';
 
 export type UrlHistoryItem = {
   id: string;
@@ -34,7 +35,7 @@ export type DownloadHistoryItem = {
   download_progress: number;
   download_progress_string: string;
   download_completed_at: string;
-  download_status: 'downloading' | 'completed' | 'failed';
+  download_status: DownloadStatus;
   added_at: string;
 };
 
@@ -58,7 +59,7 @@ export type RunningDownloadItem = {
   download_progress: number;
   download_progress_string: string;
   download_completed_at: string;
-  download_status: 'downloading' | 'completed' | 'failed';
+  download_status: DownloadStatus;
   added_at?: string | undefined;
 };
 

@@ -1,7 +1,7 @@
 import { YoutubePlaylistInfoJson } from './info-json/youtube-playlist';
 import { YoutubeFormat, YoutubeVideoInfoJson } from './info-json/youtube-video';
 
-export type DownloadStatus = 'downloading' | 'completed' | 'failed';
+export type DownloadStatus = 'downloading' | 'completed' | 'failed' | 'paused';
 
 export type DownloadSections = {
   startTime: string;

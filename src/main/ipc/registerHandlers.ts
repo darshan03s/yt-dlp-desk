@@ -18,7 +18,9 @@ import {
   downloadHistorySearch,
   deleteOneFromDownloadHistory,
   deleteAllFromDownloadHistory,
-  getDownloadHistory
+  getDownloadHistory,
+  pauseDownload,
+  resumeDownload
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -63,6 +65,10 @@ async function registerHanlders() {
   ipcMain.handle('url-history:search', urlHistorySearch);
 
   ipcMain.handle('download-history:search', downloadHistorySearch);
+
+  ipcMain.on('yt-dlp:pause-download', pauseDownload);
+
+  ipcMain.on('yt-dlp:resume-download', resumeDownload);
 }
 
 export default registerHanlders;

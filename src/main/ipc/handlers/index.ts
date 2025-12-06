@@ -13,7 +13,8 @@ import {
   getSettings,
   getSourceFromUrl,
   getYtdlpFromPc,
-  getYtdlpVersionFromPc
+  getYtdlpVersionFromPc,
+  terminateProcess
 } from '@main/utils/appUtils';
 import { urlHistoryOperations, downloadHistoryOperations } from '@main/utils/dbUtils';
 import { downloadFfmpeg7z } from '@main/utils/downloadFfmpeg7z';
@@ -344,4 +345,46 @@ export async function urlHistorySearch(_event: IpcMainInvokeEvent, searchInput: 
 
 export async function downloadHistorySearch(_event: IpcMainInvokeEvent, searchInput: string) {
   return downloadHistoryOperations.search(searchInput);
+}
+
+export async function pauseDownload(_event: IpcMainEvent, downloadId: string) {
+  const downloadManager = DownloadManager.getInstance();
+  const currentlyRunningDownloads = downloadManager.currentlyRunningDownloads;
+
+  const downloadToPause = currentlyRunningDownloads.find(
+    (d) => d.downloadingItem.id === downloadId
+  );
+
+  if (!downloadToPause) {
+    logger.error(`Download item to pause not found`);
+    return;
+  }
+
+  const { downloadingItem, downloadProcess } = downloadToPause;
+
+  downloadingItem.download_status = 'paused';
+  terminateProcess(downloadProcess);
+}
+
+export async function resumeDownload(_event: IpcMainEvent, downloadId: string) {
+  const downloadManager = DownloadManager.getInstance();
+
+  const pausedDownload = await downloadHistoryOperations.getById(downloadId);
+
+  if (!pausedDownload) {
+    logger.error(`Download item to resume not found`);
+    return;
+  }
+
+  pausedDownload!.download_status = 'downloading';
+
+  const downloadCommandBase = pausedDownload!.download_command_base;
+
+  const downloadCommandArgs = JSON.parse(pausedDownload!.download_command_args);
+
+  downloadManager.addDownload(pausedDownload!, downloadCommandBase, downloadCommandArgs);
+
+  downloadHistoryOperations.deleteById(downloadId);
+
+  mainWindow.webContents.send('refresh-downloads');
 }

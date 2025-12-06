@@ -18,7 +18,9 @@ CREATE TABLE `download_history` (
 	`download_progress_string` text NOT NULL,
 	`added_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`download_completed_at` text NOT NULL,
-	`download_status` text NOT NULL
+	`download_status` text NOT NULL,
+	`download_command_base` text NOT NULL,
+	`download_command_args` text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `extra_commands_history` (

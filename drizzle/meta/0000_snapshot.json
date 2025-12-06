@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a216c94e-14df-4852-8848-62c7aeb8eb07",
+  "id": "58a46a71-2429-4f97-8c7c-274ad34955fc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "download_history": {
@@ -143,6 +143,20 @@
         },
         "download_status": {
           "name": "download_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "download_command_base": {
+          "name": "download_command_base",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "download_command_args": {
+          "name": "download_command_args",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

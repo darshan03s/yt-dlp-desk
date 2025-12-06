@@ -1,7 +1,7 @@
 import { getStoreManager } from '@main/store';
 import logger from '@shared/logger';
 import { Api, AppSettings, Source } from '@shared/types';
-import { exec } from 'child_process';
+import { ChildProcess, exec } from 'child_process';
 import { promisify } from 'util';
 const execPromise = promisify(exec);
 
@@ -125,4 +125,9 @@ export function getNormalizedUrl(source: Source, url: string) {
     return `https://www.youtube.com/watch?v=${videoId}`;
   }
   return '';
+}
+
+export function terminateProcess(process: ChildProcess) {
+  const pid = process.pid;
+  exec(`taskkill /PID ${pid} /T /F`);
 }
