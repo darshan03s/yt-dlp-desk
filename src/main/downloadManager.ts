@@ -54,7 +54,7 @@ export class DownloadManager {
 
     child.stdout.on('data', (data) => {
       const text = data.toString();
-      console.log(`stdout: ${text}`);
+      console.log(`[${child.pid}] stdout: ${text}`);
       downloadingItem.download_progress_string = text;
       downloadingItem.download_progress =
         getProgressPercent(text) ?? downloadingItem.download_progress;
@@ -67,7 +67,7 @@ export class DownloadManager {
 
     child.stderr.on('data', (data) => {
       const text = data.toString();
-      console.log(`stderr: ${text}`);
+      console.log(`[${child.pid}] stderr: ${text}`);
       downloadingItem.download_progress_string = text;
       downloadingItem.complete_output += text;
       mainWindow.webContents.send(`download-progress:${newDownload.id}`, {
@@ -75,7 +75,8 @@ export class DownloadManager {
       } as ProgressDetails);
     });
 
-    child.on('close', (code) => {
+    child.on('close', (code, signal) => {
+      console.log('Exit -> ', { code, signal });
       if (code === 0) {
         downloadingItem.download_status = 'completed';
         downloadingItem.download_completed_at = new Date().toISOString();
