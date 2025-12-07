@@ -23,7 +23,7 @@ const App = () => {
   useEffect(() => {
     const unsubscribe = window.api.on('settings:updated', (updatedSettings) => {
       setSettings(updatedSettings as AppSettings);
-      logger.info('Settings Updated');
+      toast.info('Settings Updated');
     });
 
     return () => {
