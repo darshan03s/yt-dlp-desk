@@ -226,43 +226,46 @@ export async function getYoutubeVideoInfoJson(
     return;
   }
   logger.info(`Fetching info json for ${url}`);
-  // get info json
   fetchingInfoJsonForUrls.push(url);
-  const infoJson = (await getInfoJson(
-    url,
-    'youtube-video' as Source,
-    refetch
-  )) as YoutubeVideoInfoJson | null;
-  if (infoJson) {
-    logger.info(`Fetched info json for ${url}`);
-    if (updateUrlHistory) {
-      try {
-        const newUrlHistoryItem = {
-          url,
-          thumbnail: infoJson.thumbnail,
-          title: infoJson.fulltitle,
-          source: 'youtube-video' as Source,
-          thumbnail_local: infoJson.thumbnail_local ?? '',
-          uploader: infoJson.uploader,
-          uploader_url: infoJson.uploader_url ?? infoJson.channel_url,
-          created_at: infoJson.upload_date,
-          duration: infoJson.duration_string ?? ''
-        };
-        console.log({ newUrlHistoryItem });
-        await urlHistoryOperations.upsertByUrl(url, newUrlHistoryItem);
-        logger.info('Updated url history');
-        const updatedUrlHistory = await getUrlHistory();
-        mainWindow.webContents.send('url-history:updated', updatedUrlHistory);
-      } catch (e) {
-        logger.error(`Could not update url history \n${e}`);
+  try {
+    const infoJson = (await getInfoJson(
+      url,
+      'youtube-video' as Source,
+      refetch
+    )) as YoutubeVideoInfoJson | null;
+    if (infoJson) {
+      logger.info(`Fetched info json for ${url}`);
+      if (updateUrlHistory) {
+        try {
+          const newUrlHistoryItem = {
+            url,
+            thumbnail: infoJson.thumbnail,
+            title: infoJson.fulltitle,
+            source: 'youtube-video' as Source,
+            thumbnail_local: infoJson.thumbnail_local ?? '',
+            uploader: infoJson.uploader,
+            uploader_url: infoJson.uploader_url ?? infoJson.channel_url,
+            created_at: infoJson.upload_date,
+            duration: infoJson.duration_string ?? ''
+          };
+          console.log({ newUrlHistoryItem });
+          await urlHistoryOperations.upsertByUrl(url, newUrlHistoryItem);
+          logger.info('Updated url history');
+          const updatedUrlHistory = await getUrlHistory();
+          mainWindow.webContents.send('url-history:updated', updatedUrlHistory);
+        } catch (e) {
+          logger.error(`Could not update url history \n${e}`);
+        }
       }
+      mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', infoJson);
+      fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
+    } else {
+      logger.error(`Could not fetch info json for ${url}`);
+      mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', null);
+      fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
     }
-    mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', infoJson);
-    fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
-  } else {
-    logger.error(`Could not fetch info json for ${url}`);
-    mainWindow.webContents.send('yt-dlp:recieve-youtube-video-info-json', null);
-    fetchingInfoJsonForUrls = fetchingInfoJsonForUrls.filter((u) => u != url);
+  } catch (e) {
+    logger.error(e);
   }
 }
 
