@@ -5,6 +5,7 @@ import { promisify } from 'node:util';
 import { downloadHistoryOperations } from './utils/dbUtils';
 import logger from '@shared/logger';
 import mime from 'mime-types';
+import { Source } from '@shared/types';
 
 const statAsync = promisify(stat);
 
@@ -73,6 +74,26 @@ function runServer() {
         createReadStream(filePath).pipe(res);
         return;
       }
+
+      if (parsedUrl.pathname === '/embed') {
+        const urlToEmbed = parsedUrl.searchParams.get('url');
+        const source = parsedUrl.searchParams.get('source') as Source;
+
+        if (!urlToEmbed || !source) {
+          res.writeHead(400);
+          res.end('Missing url or source');
+          return;
+        }
+
+        if (source === 'youtube-video') {
+          const videoId = new URL(urlToEmbed).searchParams.get('v');
+          const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+          const embedHtml = getEmbedHtml(embedUrl);
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(embedHtml);
+          return;
+        }
+      }
       res.writeHead(404);
       res.end('Not found');
       return;
@@ -80,6 +101,37 @@ function runServer() {
   }).listen(SERVER_PORT, () => {
     console.log(`Server running on ${SERVER_PORT}`);
   });
+}
+
+function getEmbedHtml(embedUrl: string) {
+  return `
+  <!DOCTYPE html>
+<html style="margin:0; padding:0; background:black;">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: black;
+      }
+      iframe {
+        aspect-ratio: 16/9;
+        border: black;
+        outline: black;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe
+      src="${embedUrl}"
+      allowfullscreen
+      frameborder="0"
+      scrolling="no"
+    ></iframe>
+  </body>
+</html>
+  `;
 }
 
 export default runServer;

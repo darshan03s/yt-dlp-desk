@@ -73,6 +73,7 @@ const DisplayMediaInfo = () => {
             loading={isLoadingInfoJson}
             infoJson={infoJson}
             url={url}
+            source={source}
           />
           <div className="p-2 pb-8">
             <Details infoJson={infoJson} />
