@@ -28,7 +28,7 @@ function runServer() {
           return;
         }
 
-        if (!/\.(avi|flv|mkv|mov|m4v|webm)$/i.test(filePath)) {
+        if (!/\.(avi|flv|mkv|mov|m4v|webm|mp4)$/i.test(filePath)) {
           res.writeHead(415);
           res.end('Unsupported media type');
           return;

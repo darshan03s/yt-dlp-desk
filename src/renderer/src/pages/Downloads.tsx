@@ -481,6 +481,7 @@ const PlayVideoModal = ({
           <video
             className="w-[500px] aspect-video rounded-md outline-1"
             controls
+            controlsList="nofullscreen"
             autoPlay
             src={`${SERVER_BASE_URL}:${SERVER_PORT}/play-video?path=${encodeURIComponent(data.download_path)}`}
           />
