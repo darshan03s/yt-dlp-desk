@@ -61,6 +61,7 @@ export type RunningDownloadItem = {
   download_progress_string: string;
   download_completed_at: string;
   download_status: DownloadStatus;
+  download_path: string;
   added_at?: string | undefined;
 };
 

@@ -13,11 +13,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ProgressBar } from './components/progress-bar';
 import {
   IconExternalLink,
+  IconInfoSquareRounded,
   IconPhoto,
   IconPlayerPause,
   IconPlayerPlay,
   IconSearch,
-  IconTerminal2,
   IconTrash
 } from '@tabler/icons-react';
 import {
@@ -198,7 +198,7 @@ const DownloadCard = ({
   downloadItem: RunningDownloadItem | DownloadHistoryItem;
   progressDetails?: ProgressDetails;
 }) => {
-  const [isCommandModalOpen, setIsCommandModalOpen] = useState(false);
+  const [isMoreInfoModalOpen, setIsMoreInfoModalOpen] = useState(false);
   const navigate = useNavigate();
 
   function handleNavigateToDisplayInfo() {
@@ -284,6 +284,11 @@ const DownloadCard = ({
                 <img src={Logo(downloadItem.source)} alt={downloadItem.source} className="size-4" />
               </span>
             </TooltipWrapper>
+            <TooltipWrapper message={`More Details`}>
+              <span onClick={() => setIsMoreInfoModalOpen(true)} className="cursor-pointer">
+                <IconInfoSquareRounded className="size-4" />
+              </span>
+            </TooltipWrapper>
             <TooltipWrapper message={`Open in browser`}>
               <span>
                 <Anchor href={downloadItem.url}>
@@ -296,11 +301,6 @@ const DownloadCard = ({
                 <Anchor href={downloadItem.thumbnail}>
                   <IconPhoto className="size-4" />
                 </Anchor>
-              </span>
-            </TooltipWrapper>
-            <TooltipWrapper message={`Command and Output`}>
-              <span onClick={() => setIsCommandModalOpen(true)} className="cursor-pointer">
-                <IconTerminal2 className="size-4" />
               </span>
             </TooltipWrapper>
           </div>
@@ -343,12 +343,12 @@ const DownloadCard = ({
           </div>
         </ItemFooter>
       </Item>
-      <Command open={isCommandModalOpen} setOpen={setIsCommandModalOpen} data={downloadItem} />
+      <MoreInfo open={isMoreInfoModalOpen} setOpen={setIsMoreInfoModalOpen} data={downloadItem} />
     </>
   );
 };
 
-const Command = ({
+const MoreInfo = ({
   open,
   setOpen,
   data
@@ -361,26 +361,75 @@ const Command = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Command and Output</DialogTitle>
-          <DialogDescription>See download command and output</DialogDescription>
+          <DialogTitle>Info</DialogTitle>
+          <DialogDescription>More info of download</DialogDescription>
         </DialogHeader>
-        <div className="w-full flex flex-col gap-3 text-xs">
-          <textarea
-            name="command"
-            className="h-44 outline-2 p-2 cursor-text resize-none rounded-md font-mono leading-4.5 overflow-y-auto"
-            disabled
-          >
-            {data.command}
-          </textarea>
+        <div className="w-full font-mono flex flex-col gap-2 text-xs h-68 overflow-y-auto px-1">
+          <div>
+            <span className="font-semibold">Title</span>: <span>{data.title}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Source</span>: <span>{data.source}</span>
+          </div>
+          <div>
+            <span className="font-semibold">URL</span>: <span>{data.url}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Uploader</span>: <span>{data.uploader}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Uploader URL</span>: <span>{data.uploader_url}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Thumbnail</span>: <span>{data.thumbnail}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Selected Format</span>: <span>{data.format}</span>
+          </div>
+          {data.start_time.length > 0 && (
+            <div>
+              <span className="font-semibold">Start Time</span>: <span>{data.start_time}</span>
+            </div>
+          )}
+          {data.end_time.length > 0 && (
+            <div>
+              <span className="font-semibold">End Time</span>: <span>{data.end_time}</span>
+            </div>
+          )}
+          <div>
+            <span className="font-semibold">Download Status</span>:{' '}
+            <span>{data.download_status}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Added At</span>:{' '}
+            <span>{new Date(data.added_at!).toLocaleString()}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Completed At</span>:{' '}
+            <span>{new Date(data.download_completed_at!).toLocaleString()}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Download Path</span>: <span>{data.download_path}</span>
+          </div>
 
-          {data.download_status !== 'downloading' ? (
-            <AutoScrollTextarea
-              name="output"
-              value={data.complete_output}
-              className="h-44 outline-2 p-2 text-muted-foreground bg-muted resize-none rounded-md font-mono leading-4.5 overflow-y-auto"
+          <div className="w-full flex flex-col gap-3 text-xs">
+            <textarea
+              name="command"
+              className="h-44 outline-2 p-2 cursor-text resize-none rounded-md font-mono leading-4.5 overflow-y-auto"
               disabled
-            />
-          ) : null}
+            >
+              {data.command}
+            </textarea>
+
+            {data.download_status !== 'downloading' ? (
+              <AutoScrollTextarea
+                name="output"
+                value={data.complete_output}
+                className="h-44 outline-2 p-2 text-muted-foreground bg-muted resize-none rounded-md font-mono leading-4.5 overflow-y-auto"
+                disabled
+              />
+            ) : null}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

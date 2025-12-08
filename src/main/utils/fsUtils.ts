@@ -100,7 +100,10 @@ export async function downloadFile(params: {
 }
 
 export function sanitizeFileName(name: string, replace: string = ''): string {
-  return name.replace(/[<>:"/\\|?*]/g, replace).trim();
+  let sanitized = name.normalize('NFKD');
+  sanitized = sanitized.replace(/[\u2010-\u2015\u2212\uFE58\uFE63\uFF0D]/g, '-');
+  sanitized = sanitized.replace(/[<>:"/\\|?*]/g, replace).trim();
+  return sanitized;
 }
 
 export function filePathToFileUrl(inputPath: string): string {
