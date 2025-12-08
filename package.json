@@ -2,7 +2,7 @@
   "name": "yt-dlp-desk",
   "version": "0.9.0",
   "author": "Darshan S",
-  "description": "A Modern desktop UI for yt-dlp",
+  "description": "yt-dlp Desk",
   "main": "./out/main/index.js",
   "scripts": {
     "format": "prettier --write .",
