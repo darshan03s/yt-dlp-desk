@@ -11,7 +11,7 @@ import { getStoreManager } from '@main/store';
 import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
-import { getYouTubeVideoId } from '@shared/utils';
+import { getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
 
 function getInfoJsonPath(url: string, source: Source): string {
   if (source === 'youtube-video') {
@@ -24,6 +24,17 @@ function getInfoJsonPath(url: string, source: Source): string {
     );
     return infoJsonPath;
   }
+
+  if (source === 'youtube-playlist') {
+    const playlistId = getYoutubePlaylistId(url);
+    const infoJsonPath = path.join(
+      MEDIA_DATA_FOLDER_PATH,
+      source,
+      playlistId!,
+      playlistId + '.info.json'
+    );
+    return infoJsonPath;
+  }
   return '';
 }
 
@@ -32,8 +43,8 @@ export async function getInfoJson(
   source: Source,
   refetch?: boolean
 ): Promise<MediaInfoJson | null> {
+  const infoJsonPath = getInfoJsonPath(url, source);
   if (source === 'youtube-video') {
-    const infoJsonPath = getInfoJsonPath(url, source);
     if (refetch) {
       logger.info(`Re-fetching info-json for ${url}`);
       return await createInfoJson(url, source, infoJsonPath);
@@ -48,6 +59,18 @@ export async function getInfoJson(
         logger.info(`Video Links for ${url} expire at ${new Date(expireTime!)}`);
         return await readJson<MediaInfoJson>(infoJsonPath);
       }
+    } else {
+      return await createInfoJson(url, source, infoJsonPath);
+    }
+  }
+
+  if (source === 'youtube-playlist') {
+    if (refetch) {
+      logger.info(`Re-fetching info-json for ${url}`);
+      return await createInfoJson(url, source, infoJsonPath);
+    }
+    if (await pathExists(infoJsonPath)) {
+      return await readJson<MediaInfoJson>(infoJsonPath);
     } else {
       return await createInfoJson(url, source, infoJsonPath);
     }
@@ -75,6 +98,10 @@ export async function createInfoJson(
       url
     ];
 
+    if (source === 'youtube-playlist') {
+      infoJsonCommandArgs.push('--flat-playlist');
+    }
+
     const completeCommand = infoJsonCommandBase.concat(' ').concat(infoJsonCommandArgs.join(' '));
     logger.info(`Creating info-json for ${url}\nCommand: ${completeCommand}`);
     const child = spawn(infoJsonCommandBase, infoJsonCommandArgs);
@@ -90,11 +117,20 @@ export async function createInfoJson(
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await addExpiresAt(infoJson);
-        infoJson = await downloadThumbnail(infoJson);
+        infoJson = await downloadThumbnail(infoJson, source, url);
         infoJson = await writeDescription(infoJson);
         if (infoJson.is_live) {
           infoJson = await addLiveFromStartFormats(url, infoJson);
         }
+
+        await writeJson(infoJsonPath, infoJson);
+
+        return resolve(infoJson);
+      }
+      if (source === 'youtube-playlist') {
+        let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
+        infoJson = await addCreatedAt(infoJson);
+        infoJson = await downloadThumbnail(infoJson, source, url);
 
         await writeJson(infoJsonPath, infoJson);
 
@@ -229,20 +265,32 @@ async function getExpireTime(infoJsonPath: string) {
   return json.expires_at;
 }
 
-async function downloadThumbnail(infoJson: MediaInfoJson) {
-  const safeTitle = sanitizeFileName(infoJson.fulltitle);
-  const thumbnailUrl = new URL(infoJson.thumbnail);
-  thumbnailUrl.search = '';
-  const thumbnailUrlCleaned = thumbnailUrl.toString();
+async function downloadThumbnail(infoJson: MediaInfoJson, source: Source, url: string) {
+  const safeTitle = sanitizeFileName(infoJson.fulltitle ?? infoJson.title);
+  let thumbnailUrl: URL | null = null;
+  if (source === 'youtube-video') {
+    thumbnailUrl = new URL(infoJson.thumbnail);
+  }
+  if (source === 'youtube-playlist') {
+    thumbnailUrl = new URL(infoJson.thumbnails.at(-1)!.url);
+  }
+  if (!thumbnailUrl) {
+    logger.info(`Thumbnail url not available for ${url}`);
+    return infoJson;
+  }
+  thumbnailUrl!.search = '';
+  const thumbnailUrlCleaned = thumbnailUrl!.toString();
   const thumbnailLocalPath = path.join(
     MEDIA_DATA_FOLDER_PATH,
-    'youtube-video',
+    source,
     infoJson.id,
     safeTitle + '.jpg'
   );
   try {
     await downloadFile({ url: thumbnailUrlCleaned, destinationPath: thumbnailLocalPath });
-    logger.info(`Downloaded thumbnail for ${infoJson.fulltitle} to ${thumbnailLocalPath}`);
+    logger.info(
+      `Downloaded thumbnail for ${infoJson.fulltitle ?? infoJson.title} to ${thumbnailLocalPath}`
+    );
   } catch (error) {
     logger.error(error);
   }

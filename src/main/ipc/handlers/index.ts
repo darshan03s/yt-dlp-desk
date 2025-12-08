@@ -236,13 +236,13 @@ export async function getMediaInfoJson(
         try {
           const newUrlHistoryItem = {
             url,
-            thumbnail: infoJson.thumbnail,
-            title: infoJson.fulltitle,
+            thumbnail: infoJson.thumbnail ?? infoJson.thumbnails.at(-1)?.url,
+            title: infoJson.fulltitle ?? infoJson.title,
             source: source,
             thumbnail_local: infoJson.thumbnail_local ?? '',
-            uploader: infoJson.uploader,
-            uploader_url: infoJson.uploader_url ?? infoJson.channel_url,
-            created_at: infoJson.upload_date,
+            uploader: infoJson.uploader ?? infoJson.channel,
+            uploader_url: infoJson.uploader_url ?? infoJson.channel_url ?? '',
+            created_at: infoJson.upload_date ?? infoJson.modified_date,
             duration: infoJson.duration_string ?? ''
           };
           await urlHistoryOperations.upsertByUrl(url, newUrlHistoryItem);

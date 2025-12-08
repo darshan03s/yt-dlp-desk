@@ -13,8 +13,18 @@ export function getYouTubeVideoId(url: string): string | null {
       if (parsed.pathname.includes('shorts') || parsed.pathname.includes('embed'))
         videoId = parsed.pathname.split('/')[2];
     }
-    console.log({ url, videoId });
     return videoId;
+  } catch {
+    return null;
+  }
+}
+
+export function getYoutubePlaylistId(url: string): string | null {
+  let playlistId: string | null = null;
+  try {
+    const parsed = new URL(url);
+    playlistId = parsed.searchParams.get('list');
+    return playlistId;
   } catch {
     return null;
   }

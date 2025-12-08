@@ -1,7 +1,7 @@
 import { getStoreManager } from '@main/store';
 import logger from '@shared/logger';
 import { Api, AppSettings, Source } from '@shared/types';
-import { getYouTubeVideoId } from '@shared/utils';
+import { getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
 import { ChildProcess, exec } from 'child_process';
 import { promisify } from 'util';
 const execPromise = promisify(exec);
@@ -97,10 +97,17 @@ export async function getFfmpegFromPc(): ReturnType<Api['confirmFfmpeg']> {
 }
 
 export function getSourceFromUrl(url: string): Source | null {
-  if (url.includes('youtube') || (url.includes('youtu.be') && !url.includes('playlist'))) {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.hostname.includes('www.youtube.com')) {
+    if (!parsedUrl.searchParams.get('v') && parsedUrl.searchParams.get('list')) {
+      return 'youtube-playlist';
+    }
+    if (parsedUrl.searchParams.get('v')) {
+      return 'youtube-video';
+    }
+  }
+  if (parsedUrl.hostname.includes('youtu.be')) {
     return 'youtube-video';
-  } else if (url.includes('youtube') || (url.includes('youtu.be') && url.includes('playlist'))) {
-    return 'youtube-playlist';
   }
   return null;
 }
@@ -109,6 +116,10 @@ export function getNormalizedUrl(source: Source, url: string) {
   if (source === 'youtube-video') {
     const videoId = getYouTubeVideoId(url);
     return `https://www.youtube.com/watch?v=${videoId}`;
+  }
+  if (source === 'youtube-playlist') {
+    const playlistId = getYoutubePlaylistId(url);
+    return `https://youtube.com/playlist?list=${playlistId}`;
   }
   return '';
 }

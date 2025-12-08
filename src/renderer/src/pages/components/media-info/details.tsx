@@ -1,6 +1,6 @@
 import { MediaInfoJson } from '@/shared/types/info-json';
 import { formatDate } from '@renderer/utils';
-import { IconCircleCheckFilled, IconClockHour3Filled } from '@tabler/icons-react';
+import { IconCircleCheckFilled, IconClockHour3Filled, IconNumber } from '@tabler/icons-react';
 import { useState } from 'react';
 import LiveStatus from './live-status';
 import DownloadButton from './download-button';
@@ -9,10 +9,13 @@ import DownloadSections from './download-sections';
 import DownloadLocation from './download-location';
 import ExtraOptions from './extra-options';
 import MoreDetailsModal from './more-details-modal';
+import { useMediaInfoStore } from '@renderer/stores/media-info-store';
+import { Source } from '@shared/types';
 
 const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
   const [isMoreDetailsModalOpen, setIsMoreDetailsModalOpen] = useState(false);
   const isInfoJsonEmpty = Object.keys(infoJson).length === 0;
+  const source = useMediaInfoStore((state) => state.source) as Source;
 
   return (
     <>
@@ -46,6 +49,18 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
                   {formatDate(infoJson.upload_date || '')}
                 </span>
               )}
+              {infoJson.modified_date && (
+                <span className="text-xs inline-flex items-center gap-1 outline-1 p-1 px-2 rounded-full">
+                  <IconClockHour3Filled className="size-3" />
+                  {formatDate(infoJson.modified_date || '')}
+                </span>
+              )}
+              {source === 'youtube-playlist' && (
+                <span className="text-xs inline-flex items-center gap-1 outline-1 p-1 px-2 rounded-full">
+                  <IconNumber className="size-3" />
+                  Playlist Count: {infoJson.playlist_count}
+                </span>
+              )}
               <span className="text-xs inline-flex items-center gap-1">
                 <LiveStatus infoJson={infoJson} />
               </span>
@@ -54,28 +69,34 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
             <div className="flex-1"></div>
           )}
 
-          <div>
-            <DownloadButton loading={isInfoJsonEmpty} />
+          {source !== 'youtube-playlist' && (
+            <div>
+              <DownloadButton loading={isInfoJsonEmpty} />
+            </div>
+          )}
+        </div>
+
+        {source !== 'youtube-playlist' && (
+          <div className="formats-display">
+            <Formats infoJson={infoJson} loading={isInfoJsonEmpty} />
           </div>
-        </div>
+        )}
 
-        <div className="formats-display">
-          <Formats infoJson={infoJson} loading={isInfoJsonEmpty} />
-        </div>
-
-        {!infoJson.is_live && (
+        {!infoJson.is_live && source !== 'youtube-playlist' && (
           <div className="download-sections pt-2">
             <h1 className="text-xs border-border border-b mb-2 pb-1">Download Sections</h1>
             <DownloadSections loading={isInfoJsonEmpty} />
           </div>
         )}
 
-        <div className="download-location pt-2">
-          <h1 className="text-xs border-border border-b mb-2 pb-1">Download Location</h1>
-          <DownloadLocation loading={isInfoJsonEmpty} />
-        </div>
+        {source !== 'youtube-playlist' && (
+          <div className="download-location pt-2">
+            <h1 className="text-xs border-border border-b mb-2 pb-1">Download Location</h1>
+            <DownloadLocation loading={isInfoJsonEmpty} />
+          </div>
+        )}
 
-        {!isInfoJsonEmpty && (
+        {!isInfoJsonEmpty && source !== 'youtube-playlist' && (
           <div className="extra-options pt-2">
             <ExtraOptions />
           </div>

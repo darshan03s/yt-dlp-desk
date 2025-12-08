@@ -13,6 +13,9 @@ interface Extra {
   expires_at?: string;
   thumbnail_local?: string;
   live_from_start_formats: LiveFromStartFormats[];
+  modified_date: string;
+  playlist_count: number;
+  view_count: number;
 }
 
 export interface MediaInfoJson extends Extra {
