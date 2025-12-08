@@ -120,7 +120,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
             src={
               item.thumbnail_local.length === 0
                 ? item.thumbnail
-                : `media:///${item.thumbnail_local}`
+                : `media:///${encodeURIComponent(item.thumbnail_local)}`
             }
             alt={item.title}
             className="aspect-video rounded-sm outline-1"

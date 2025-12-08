@@ -4,12 +4,14 @@ import mime from 'mime-types';
 
 async function registerProtocolHandlers() {
   protocol.handle('media', async (req) => {
-    const urlPath = req.url.replace('media:///', '');
-    const filePath = decodeURIComponent(urlPath);
+    const parsedUrl = new URL(req.url);
+    const encoded = parsedUrl.pathname.slice(1);
+    const filePath = decodeURIComponent(encoded);
+    const mimeType = mime.lookup(filePath) || 'application/octet-stream';
     const data = await readFile(filePath);
     return new Response(data, {
       headers: {
-        'Content-Type': mime.lookup(filePath) || 'application/octet-stream'
+        'Content-Type': mimeType
       }
     });
   });

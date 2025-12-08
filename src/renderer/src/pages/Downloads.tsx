@@ -235,7 +235,7 @@ const DownloadCard = ({
             src={
               downloadItem.thumbnail_local.length === 0
                 ? downloadItem.thumbnail
-                : `media:///${downloadItem.thumbnail_local}`
+                : `media:///${encodeURIComponent(downloadItem.thumbnail_local)}`
             }
             alt={downloadItem.title}
             className="aspect-video rounded-sm outline-1"
