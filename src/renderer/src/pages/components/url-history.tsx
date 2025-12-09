@@ -59,7 +59,7 @@ const MoreInfo = ({
           <DialogTitle>Info</DialogTitle>
           <DialogDescription>More info of url</DialogDescription>
         </DialogHeader>
-        <div className="w-full font-mono flex flex-col gap-2 text-xs">
+        <div className="w-full font-mono flex flex-col gap-2 text-xs overflow-auto">
           <div>
             <span className="font-semibold">Title</span>: <span>{item.title}</span>
           </div>
@@ -86,7 +86,9 @@ const MoreInfo = ({
           </div>
           <div>
             <span className="font-semibold">Thumbnail</span>:{' '}
-            <Anchor href={item.thumbnail}>{item.thumbnail}</Anchor>
+            <Anchor href={item.thumbnail} className="overflow-auto">
+              {item.thumbnail}
+            </Anchor>
           </div>
         </div>
       </DialogContent>

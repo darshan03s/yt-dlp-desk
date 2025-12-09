@@ -45,7 +45,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               {url || infoJson.webpage_url || 'N/A'}
             </Anchor>
           </div>
-          {source !== 'youtube-playlist' && (
+          {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
             <div>
               <span className="font-semibold">Duration</span>:{' '}
               <span>
@@ -73,7 +73,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               {infoJson.uploader_url || infoJson.channel_url || 'N/A'}
             </Anchor>
           </div>
-          {source === 'youtube-playlist' ? (
+          {source === 'youtube-playlist' || source === 'youtube-music-playlist' ? (
             <div>
               <span className="font-semibold">Modified Date</span>:{' '}
               <span>{formatDate(infoJson.modified_date || '')}</span>
@@ -108,7 +108,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               <span>{numeral(infoJson.like_count).format('0.00a')}</span>
             </div>
           )}
-          {source !== 'youtube-playlist' && (
+          {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
             <div>
               <span className="font-semibold">Live Status</span>:{' '}
               <span>{infoJson.is_live ? 'Live Now' : infoJson.was_live ? 'Was Live' : 'N/A'}</span>
@@ -151,7 +151,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
             <span className="font-semibold">Availablity</span>:{' '}
             <span>{infoJson.availability || 'N/A'}</span>
           </div>
-          {source !== 'youtube-playlist' && (
+          {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
             <div>
               <span className="font-semibold">Age Limit</span>:{' '}
               <span>{infoJson.age_limit ?? 'N/A'}</span>

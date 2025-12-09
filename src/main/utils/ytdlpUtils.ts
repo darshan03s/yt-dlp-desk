@@ -25,7 +25,7 @@ function getInfoJsonPath(url: string, source: Source): string {
     return infoJsonPath;
   }
 
-  if (source === 'youtube-playlist') {
+  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
     const playlistId = getYoutubePlaylistId(url);
     const infoJsonPath = path.join(
       MEDIA_DATA_FOLDER_PATH,
@@ -75,7 +75,7 @@ export async function getInfoJson(
     }
   }
 
-  if (source === 'youtube-playlist') {
+  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
     if (refetch) {
       logger.info(`Re-fetching info-json for ${url}`);
       return await createInfoJson(url, source, infoJsonPath);
@@ -109,7 +109,7 @@ export async function createInfoJson(
       url
     ];
 
-    if (source === 'youtube-playlist') {
+    if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
       infoJsonCommandArgs.push('--flat-playlist');
     }
 
@@ -152,7 +152,7 @@ export async function createInfoJson(
 
         return resolve(infoJson);
       }
-      if (source === 'youtube-playlist') {
+      if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
@@ -296,7 +296,7 @@ async function downloadThumbnail(infoJson: MediaInfoJson, source: Source, url: s
   if (source === 'youtube-video' || source === 'youtube-music') {
     thumbnailUrl = new URL(infoJson.thumbnail);
   }
-  if (source === 'youtube-playlist') {
+  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
     thumbnailUrl = new URL(infoJson.thumbnails.at(-1)!.url);
   }
   if (!thumbnailUrl) {

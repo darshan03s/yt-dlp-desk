@@ -67,7 +67,7 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
                   {formatDate(infoJson.modified_date || '')}
                 </span>
               )}
-              {source === 'youtube-playlist' && (
+              {(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
                 <span className="text-xs inline-flex items-center gap-1 outline-1 p-1 px-2 rounded-full">
                   <IconNumber className="size-3" />
                   Playlist Count: {infoJson.playlist_count}
@@ -93,38 +93,42 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
             <div className="flex-1"></div>
           )}
 
-          {source !== 'youtube-playlist' && (
+          {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
             <div>
               <DownloadButton loading={isInfoJsonEmpty} />
             </div>
           )}
         </div>
 
-        {source !== 'youtube-playlist' && (
+        {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
           <div className="formats-display">
             <Formats infoJson={infoJson} loading={isInfoJsonEmpty} />
           </div>
         )}
 
-        {!infoJson.is_live && source !== 'youtube-playlist' && (
-          <div className="download-sections pt-2">
-            <h1 className="text-xs border-border border-b mb-2 pb-1">Download Sections</h1>
-            <DownloadSections loading={isInfoJsonEmpty} />
-          </div>
-        )}
+        {!infoJson.is_live &&
+          source !== 'youtube-playlist' &&
+          source !== 'youtube-music-playlist' && (
+            <div className="download-sections pt-2">
+              <h1 className="text-xs border-border border-b mb-2 pb-1">Download Sections</h1>
+              <DownloadSections loading={isInfoJsonEmpty} />
+            </div>
+          )}
 
-        {source !== 'youtube-playlist' && (
+        {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
           <div className="download-location pt-2">
             <h1 className="text-xs border-border border-b mb-2 pb-1">Download Location</h1>
             <DownloadLocation loading={isInfoJsonEmpty} />
           </div>
         )}
 
-        {!isInfoJsonEmpty && source !== 'youtube-playlist' && (
-          <div className="extra-options pt-2">
-            <ExtraOptions />
-          </div>
-        )}
+        {!isInfoJsonEmpty &&
+          source !== 'youtube-playlist' &&
+          source !== 'youtube-music-playlist' && (
+            <div className="extra-options pt-2">
+              <ExtraOptions />
+            </div>
+          )}
       </div>
 
       {!isInfoJsonEmpty && (

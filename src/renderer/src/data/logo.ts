@@ -12,5 +12,8 @@ export function Logo(source: Source) {
   if (source === 'youtube-music') {
     return youtubeMusicLogo;
   }
+  if (source === 'youtube-music-playlist') {
+    return youtubeMusicLogo;
+  }
   return '';
 }

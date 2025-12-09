@@ -110,7 +110,12 @@ export function getSourceFromUrl(url: string): Source | null {
     return 'youtube-video';
   }
   if (parsedUrl.hostname.includes('music.youtube.com')) {
-    return 'youtube-music';
+    if (!parsedUrl.searchParams.get('v') && parsedUrl.searchParams.get('list')) {
+      return 'youtube-music-playlist';
+    }
+    if (parsedUrl.searchParams.get('v')) {
+      return 'youtube-music';
+    }
   }
   return null;
 }
@@ -127,6 +132,10 @@ export function getNormalizedUrl(source: Source, url: string) {
   if (source === 'youtube-music') {
     const musicId = getYoutubeMusicId(url);
     return `https://music.youtube.com/watch?v=${musicId}`;
+  }
+  if (source === 'youtube-music-playlist') {
+    const playlistId = getYoutubePlaylistId(url);
+    return `https://music.youtube.com/playlist?list=${playlistId}`;
   }
   return '';
 }
