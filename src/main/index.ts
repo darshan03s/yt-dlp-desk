@@ -30,7 +30,11 @@ export const MIGRATIONS_FOLDER = is.dev
 export const YTDLP_FOLDER_PATH = path.join(DATA_DIR, 'yt-dlp');
 export const YTDLP_EXE_PATH = path.join(DATA_DIR, 'yt-dlp', 'yt-dlp.exe');
 export const FFMPEG_FOLDER_PATH = path.join(DATA_DIR, 'ffmpeg');
+const SPLASH_HTML_PATH = is.dev
+  ? path.join(APP_PATH, 'resources', 'splash.html')
+  : path.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'splash.html');
 
+logger.info(`${app.name}, version ${app.getVersion()}`);
 logger.info(`is.dev: ${is.dev}`);
 logger.info(`APP_DATA_PATH: ${APP_DATA_PATH}`);
 logger.info(`DATA_DIR: ${DATA_DIR}`);
@@ -41,6 +45,20 @@ logger.info(
 );
 
 export let mainWindow: BrowserWindow;
+let splashWindow: BrowserWindow;
+
+export function createSplash() {
+  splashWindow = new BrowserWindow({
+    width: 750,
+    height: 670,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    resizable: false,
+    show: true
+  });
+  splashWindow.loadFile(SPLASH_HTML_PATH);
+}
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -62,6 +80,9 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
+    if (splashWindow) {
+      splashWindow.close();
+    }
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -81,6 +102,8 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId(APP_USER_MODEL_ID);
+
+  createSplash();
 
   await registerProtocolHandlers();
 
