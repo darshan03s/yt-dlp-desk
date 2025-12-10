@@ -5,7 +5,6 @@ import {
   YTDLP_EXE_PATH,
   YTDLP_FOLDER_PATH
 } from '@main/index';
-import { getStoreManager } from '@main/store';
 import {
   getFfmpegFromPc,
   getFfmpegVersionFromPc,
@@ -33,6 +32,7 @@ import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
 import { MediaInfoJson } from '@shared/types/info-json';
+import Settings from '@main/settings';
 
 export async function rendererInit(): ReturnType<Api['rendererInit']> {
   try {
@@ -48,7 +48,7 @@ export async function rendererInit(): ReturnType<Api['rendererInit']> {
 }
 
 async function addJsRuntime() {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
   const outputJsRuntimeZipPath = await downloadQuickJS(path.join(DATA_DIR, 'quickjs'));
   logger.info('Downloaded JS Runtime');
 
@@ -72,11 +72,11 @@ async function addJsRuntime() {
 
   await deleteFile(outputJsRuntimeZipPath);
 
-  store.set('jsRuntimePath', path.join(DATA_DIR, 'quickjs', 'qjs.exe'));
+  settings.set('jsRuntimePath', path.join(DATA_DIR, 'quickjs', 'qjs.exe'));
 }
 
 export async function confirmYtdlp(): ReturnType<Api['confirmYtdlp']> {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
 
   try {
     logger.info('Checking yt-dlp in PC...');
@@ -85,8 +85,8 @@ export async function confirmYtdlp(): ReturnType<Api['confirmYtdlp']> {
 
     if (ytdlpPathInPc && ytdlpVersionInPc) {
       await copyFileToFolder(ytdlpPathInPc, YTDLP_FOLDER_PATH);
-      store.set('ytdlpPath', YTDLP_EXE_PATH);
-      store.set('ytdlpVersion', ytdlpVersionInPc);
+      settings.set('ytdlpPath', YTDLP_EXE_PATH);
+      settings.set('ytdlpVersion', ytdlpVersionInPc);
     }
 
     logger.info(`yt-dlp path in PC: ${ytdlpPathInPc}`);
@@ -102,7 +102,7 @@ export async function confirmYtdlp(): ReturnType<Api['confirmYtdlp']> {
 }
 
 export async function confirmFfmpeg(): ReturnType<Api['confirmFfmpeg']> {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
 
   try {
     logger.info('Checking ffmpeg in PC...');
@@ -112,8 +112,8 @@ export async function confirmFfmpeg(): ReturnType<Api['confirmFfmpeg']> {
     if (ffmpegPathInPc && ffmpegVersionInPc) {
       const ffmpegFolderInPc = path.dirname(ffmpegPathInPc);
       copyFolder(ffmpegFolderInPc, FFMPEG_FOLDER_PATH);
-      store.set('ffmpegPath', FFMPEG_FOLDER_PATH);
-      store.set('ffmpegVersion', ffmpegVersionInPc);
+      settings.set('ffmpegPath', FFMPEG_FOLDER_PATH);
+      settings.set('ffmpegVersion', ffmpegVersionInPc);
     }
 
     logger.info(`ffmpeg path in PC: ${ffmpegPathInPc}`);
@@ -127,7 +127,7 @@ export async function confirmFfmpeg(): ReturnType<Api['confirmFfmpeg']> {
 }
 
 export async function downloadYtdlp(): ReturnType<Api['downloadYtdlp']> {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
 
   try {
     logger.info('Downloading yt-dlp...');
@@ -137,8 +137,8 @@ export async function downloadYtdlp(): ReturnType<Api['downloadYtdlp']> {
 
     const ytdlpVersionInPc = await getYtdlpVersionFromPc(outputPath);
 
-    store.set('ytdlpPath', outputPath);
-    store.set('ytdlpVersion', ytdlpVersionInPc);
+    settings.set('ytdlpPath', outputPath);
+    settings.set('ytdlpVersion', ytdlpVersionInPc);
 
     logger.info(`yt-dlp downloaded: ${outputPath}`);
     logger.info(`yt-dlp downloaded version: ${ytdlpVersionInPc}`);
@@ -153,7 +153,7 @@ export async function downloadYtdlp(): ReturnType<Api['downloadYtdlp']> {
 }
 
 export async function downloadFfmpeg(): ReturnType<Api['downloadFfmpeg']> {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
 
   try {
     logger.info('Downloading ffmpeg...');
@@ -186,8 +186,8 @@ export async function downloadFfmpeg(): ReturnType<Api['downloadFfmpeg']> {
 
     const ffmpegVersionInPc = await getFfmpegVersionFromPc(ffmpegExePath);
 
-    store.set('ffmpegPath', ffmpegBinPath);
-    store.set('ffmpegVersion', ffmpegVersionInPc);
+    settings.set('ffmpegPath', ffmpegBinPath);
+    settings.set('ffmpegVersion', ffmpegVersionInPc);
 
     logger.info(`ffmpeg downloaded: ${ffmpegBinPath}`);
     logger.info(`ffmpeg downloaded version: ${ffmpegVersionInPc}`);
@@ -332,10 +332,10 @@ export async function selectFolder() {
 }
 
 export async function saveSettings(_event: IpcMainEvent, changedSettings: AppSettingsChange) {
-  const store = await getStoreManager();
-  store.update(changedSettings);
-  const settings = store.getAll();
-  mainWindow.webContents.send('settings:updated', settings);
+  const settings = Settings.getInstance();
+  settings.update(changedSettings);
+  const updatedSettings = settings.getAll();
+  mainWindow.webContents.send('settings:updated', updatedSettings);
 }
 
 export async function urlHistorySearch(_event: IpcMainInvokeEvent, searchInput: string) {

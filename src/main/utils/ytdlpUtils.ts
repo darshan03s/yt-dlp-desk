@@ -7,11 +7,11 @@ import { LiveFromStartFormats, MediaInfoJson } from '@shared/types/info-json';
 import { Source } from '@shared/types';
 import logger from '@shared/logger';
 import { writeFile } from 'node:fs/promises';
-import { getStoreManager } from '@main/store';
 import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
 import { getYoutubeMusicId, getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
+import Settings from '@main/settings';
 
 function getInfoJsonPath(url: string, source: Source): string {
   if (source === 'youtube-video') {
@@ -94,10 +94,10 @@ export async function createInfoJson(
   source: Source,
   infoJsonPath: string
 ): Promise<MediaInfoJson | null> {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
 
   return await new Promise((resolve, reject) => {
-    const jsRuntimePath = `quickjs:${store.get('jsRuntimePath')}`;
+    const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const infoJsonCommandBase = YTDLP_EXE_PATH;
     const infoJsonCommandArgs = [
       '--js-runtimes',
@@ -168,8 +168,8 @@ export async function createInfoJson(
 }
 
 async function addLiveFromStartFormats(url: string, infoJson: MediaInfoJson) {
-  const store = await getStoreManager();
-  const jsRuntimePath = `quickjs:${store.get('jsRuntimePath')}`;
+  const settings = Settings.getInstance();
+  const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
   const baseCommand = YTDLP_EXE_PATH;
   const args = ['--js-runtimes', jsRuntimePath, '-F', url, '--live-from-start'];
 
@@ -344,7 +344,7 @@ async function writeDescription(infoJson: MediaInfoJson, source: Source) {
 }
 
 export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
-  const store = await getStoreManager();
+  const settings = Settings.getInstance();
   const { url, source, selectedFormat, downloadSections, selectedDownloadFolder, extraOptions } =
     downloadOptions;
 
@@ -355,7 +355,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     const formatId = selectedFormat.format_id!;
     let targetDownloadFileName = `${mediaInfo.fulltitle} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
 
-    const jsRuntimePath = `quickjs:${store.get('jsRuntimePath')}`;
+    const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
     const downloadCommandArgs = ['--js-runtimes', jsRuntimePath, '--newline'];
 
@@ -457,11 +457,11 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     downloadCommandArgs.push('-o', targetDownloadFilePath);
     const completeCommand = downloadCommandBase.concat(' ').concat(downloadCommandArgs.join(' '));
 
-    if (store.get('rememberPreviousDownloadsFolder')) {
-      const currentDownloadsFolder = store.get('downloadsFolder');
+    if (settings.get('rememberPreviousDownloadsFolder')) {
+      const currentDownloadsFolder = settings.get('downloadsFolder');
       if (currentDownloadsFolder !== selectedDownloadFolder) {
-        store.set('downloadsFolder', selectedDownloadFolder);
-        const updatedSettings = store.getAll();
+        settings.set('downloadsFolder', selectedDownloadFolder);
+        const updatedSettings = settings.getAll();
         mainWindow.webContents.send('settings:updated', updatedSettings);
       }
     }

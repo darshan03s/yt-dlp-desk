@@ -1,4 +1,4 @@
-import { getStoreManager } from '@main/store';
+import Settings from '@main/settings';
 import logger from '@shared/logger';
 import { Api, AppSettings, Source } from '@shared/types';
 import { getYoutubeMusicId, getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
@@ -7,9 +7,9 @@ import { promisify } from 'util';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {
-  const store = await getStoreManager();
-  const ytdlpPath = store.get('ytdlpPath') as string;
-  const ytdlpVersion = store.get('ytdlpVersion') as string;
+  const settings = Settings.getInstance();
+  const ytdlpPath = settings.get('ytdlpPath') as string;
+  const ytdlpVersion = settings.get('ytdlpVersion') as string;
 
   return {
     ytdlpPath,
@@ -18,9 +18,9 @@ export async function getYtdlpFromSettings() {
 }
 
 export async function getFfmpegFromSettings() {
-  const store = await getStoreManager();
-  const ffmpegPath = store.get('ffmpegPath') as string;
-  const ffmpegVersion = store.get('ffmpegVersion') as string;
+  const settings = Settings.getInstance();
+  const ffmpegPath = settings.get('ffmpegPath') as string;
+  const ffmpegVersion = settings.get('ffmpegVersion') as string;
 
   return {
     ffmpegPath,
@@ -29,8 +29,8 @@ export async function getFfmpegFromSettings() {
 }
 
 export async function getSettings(): Promise<AppSettings> {
-  const store = await getStoreManager();
-  return store.getAll();
+  const settings = Settings.getInstance();
+  return settings.getAll();
 }
 
 async function getAppPath(appName: string) {

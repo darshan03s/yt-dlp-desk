@@ -3,9 +3,9 @@ import { DATA_DIR, DB_PATH, MEDIA_DATA_FOLDER_PATH, SETTINGS_PATH } from '.';
 import { initDatabase, runMigrations } from './db';
 import { getDefaultAppSettings } from './defaultSettings';
 import { DownloadManager } from './downloadManager';
-import { initStoreManager } from './store';
 import { makeDirs, pathExistsSync } from './utils/fsUtils';
 import logger from '@shared/logger';
+import Settings from './settings';
 
 async function applyUpdates() {
   runMigrations();
@@ -13,7 +13,7 @@ async function applyUpdates() {
 }
 
 export async function init() {
-  const store = await initStoreManager();
+  const settings = await Settings.initSettings();
   DownloadManager.initDownloadManager();
 
   if (!pathExistsSync(DATA_DIR)) {
@@ -32,14 +32,14 @@ export async function init() {
 
   if (!pathExistsSync(SETTINGS_PATH)) {
     const defaults = getDefaultAppSettings();
-    store.setAll({ ...defaults });
+    settings.setAll({ ...defaults });
     logger.info('Created settings.json');
   } else {
     logger.info('settings.json exists');
   }
 
   logger.info(
-    `App version in settings: ${store.get('appVersion')} | Current version: ${app.getVersion()}`
+    `App version in settings: ${settings.get('appVersion')} | Current version: ${app.getVersion()}`
   );
 
   if (!pathExistsSync(DB_PATH)) {
@@ -54,10 +54,10 @@ export async function init() {
   } else {
     logger.info('app.db exists');
     initDatabase();
-    if (app.getVersion() !== store.get('appVersion')) {
+    if (app.getVersion() !== settings.get('appVersion')) {
       try {
         applyUpdates();
-        store.set('appVersion', app.getVersion());
+        settings.set('appVersion', app.getVersion());
       } catch (e) {
         logger.error('Could not apply updates');
         logger.error(e);
