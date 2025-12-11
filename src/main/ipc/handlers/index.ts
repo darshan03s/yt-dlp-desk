@@ -25,7 +25,7 @@ import logger from '@shared/logger';
 import { Api, AppSettingsChange, Source } from '@shared/types';
 import SevenZip from '7zip-min';
 import path from 'node:path';
-import { dialog, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
+import { dialog, IpcMainEvent, IpcMainInvokeEvent, shell } from 'electron';
 import { downloadQuickJS } from '@main/utils/downloadJsRuntime';
 import { is } from '@electron-toolkit/utils';
 import { DownloadManager } from '@main/downloadManager';
@@ -412,5 +412,12 @@ export async function pauseAllDownloads() {
     });
 
     terminateProcess(downloadProcess);
+  }
+}
+
+export async function play(_event: IpcMainEvent, path: string) {
+  const result = await shell.openPath(path);
+  if (result) {
+    throw new Error(result);
   }
 }

@@ -39,6 +39,7 @@ import { ButtonGroup } from '@renderer/components/ui/button-group';
 import { Input } from '@renderer/components/ui/input';
 import { SERVER_BASE_URL, SERVER_PORT } from '@shared/data';
 import { isAudio } from '@shared/utils';
+import { FilePlay } from 'lucide-react';
 
 function updateDownloadHistoryInStore() {
   window.api.getDownloadHistory().then((downloadsHistory: DownloadHistoryList) => {
@@ -231,6 +232,10 @@ const DownloadCard = ({
     setIsPlayVideoModalOpen(true);
   }
 
+  function handlePlayInDefaultPlayer() {
+    window.api.play(downloadItem.download_path);
+  }
+
   return (
     <>
       <Item size={'sm'} variant={'outline'} className="hover:bg-muted p-2 border-none">
@@ -313,16 +318,28 @@ const DownloadCard = ({
           </div>
           <div className="downloads-history-item-footer-right flex items-center gap-2">
             {downloadItem.download_status === 'completed' && (
-              <TooltipWrapper message={`Play`}>
-                <Button
-                  onClick={() => handlePlay()}
-                  variant={'ghost'}
-                  size={'icon-sm'}
-                  className="size-6"
-                >
-                  <IconPlayerPlay className="size-4" />
-                </Button>
-              </TooltipWrapper>
+              <>
+                <TooltipWrapper message={`Play in default player`}>
+                  <Button
+                    onClick={() => handlePlayInDefaultPlayer()}
+                    variant={'ghost'}
+                    size={'icon-sm'}
+                    className="size-6"
+                  >
+                    <FilePlay className="size-4" />
+                  </Button>
+                </TooltipWrapper>
+                <TooltipWrapper message={`Play`}>
+                  <Button
+                    onClick={() => handlePlay()}
+                    variant={'ghost'}
+                    size={'icon-sm'}
+                    className="size-6"
+                  >
+                    <IconPlayerPlay className="size-4" />
+                  </Button>
+                </TooltipWrapper>
+              </>
             )}
             {downloadItem.download_status === 'downloading' && (
               <TooltipWrapper message={`Pause download`}>

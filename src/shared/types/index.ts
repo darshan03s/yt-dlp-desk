@@ -70,4 +70,5 @@ export type Api = {
   pauseDownload: (id: string) => void;
   resumeDownload: (id: string) => void;
   pauseAllDownloads: () => void;
+  play: (path: string) => void;
 };
