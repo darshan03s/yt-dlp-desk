@@ -106,14 +106,12 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
           </div>
         )}
 
-        {!infoJson.is_live &&
-          source !== 'youtube-playlist' &&
-          source !== 'youtube-music-playlist' && (
-            <div className="download-sections pt-2">
-              <h1 className="text-xs border-border border-b mb-2 pb-1">Download Sections</h1>
-              <DownloadSections loading={isInfoJsonEmpty} />
-            </div>
-          )}
+        {source !== 'youtube-playlist' && source !== 'youtube-music-playlist' && (
+          <div className="download-sections pt-2">
+            <h1 className="text-xs border-border border-b mb-2 pb-1">Download Sections</h1>
+            <DownloadSections loading={isInfoJsonEmpty} />
+          </div>
+        )}
 
         {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
           <div className="download-location pt-2">

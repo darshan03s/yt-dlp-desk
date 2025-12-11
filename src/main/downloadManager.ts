@@ -57,27 +57,33 @@ export class DownloadManager {
 
     child.stdout.on('data', (data) => {
       const text = data.toString();
-      console.log(`[${child.pid}] stdout: ${text}`);
-      downloadingItem.download_progress_string = text;
-      downloadingItem.download_progress =
-        getProgressPercent(text) ?? downloadingItem.download_progress;
-      downloadingItem.complete_output += text;
-      mainWindow.webContents.send(`download-progress:${newDownload.id}`, {
-        progressString: text,
-        progressPercentage: getProgressPercent(text) ?? downloadingItem.download_progress
-      } as ProgressDetails);
+      const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+      for (const line of lines) {
+        console.log(`[${child.pid}] stdout: ${line}`);
+        downloadingItem.download_progress_string = line;
+        downloadingItem.download_progress =
+          getProgressPercent(line) ?? downloadingItem.download_progress;
+        downloadingItem.complete_output += `\n${line}`;
+        mainWindow.webContents.send(`download-progress:${newDownload.id}`, {
+          progressString: line,
+          progressPercentage: getProgressPercent(line) ?? downloadingItem.download_progress
+        } as ProgressDetails);
+      }
     });
 
     child.stderr.on('data', (data) => {
       const text = data.toString();
-      console.log(`[${child.pid}] stderr: ${text}`);
-      downloadingItem.download_progress_string = text;
-      downloadingItem.complete_output += text;
-      mainWindow.webContents.send(`download-progress:${newDownload.id}`, {
-        progressString: text
-      } as ProgressDetails);
-      if (text.includes('ERROR')) {
-        mainWindow.webContents.send('yt-dlp:error', text);
+      const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+      for (const line of lines) {
+        console.log(`[${child.pid}] stderr: ${line}`);
+        downloadingItem.download_progress_string = line;
+        downloadingItem.complete_output += `\n${line}`;
+        mainWindow.webContents.send(`download-progress:${newDownload.id}`, {
+          progressString: line
+        } as ProgressDetails);
+        if (line.includes('ERROR')) {
+          mainWindow.webContents.send('yt-dlp:error', line);
+        }
       }
     });
 
