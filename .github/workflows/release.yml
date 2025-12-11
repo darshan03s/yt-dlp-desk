@@ -16,6 +16,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Cache pnpm + Electron Builder
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            C:/Users/runneradmin/AppData/Local/electron
+            C:/Users/runneradmin/AppData/Local/electron-builder
+            C:/Users/runneradmin/AppData/Local/electron-builder-binaries
+            C:/Users/runneradmin/AppData/Local/app-builder
+            C:/Users/runneradmin/AppData/Local/app-builder-bin
+          key: ${{ runner.os }}-deps-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
+
       - name: Install Node
         uses: actions/setup-node@v4
         with:
@@ -27,6 +41,8 @@ jobs:
           version: 9
 
       - name: Install dependencies
+        env:
+          ELECTRON_MIRROR: 'https://npmmirror.com/mirrors/electron/'
         run: pnpm install --frozen-lockfile
 
       - name: Build Windows artifacts
