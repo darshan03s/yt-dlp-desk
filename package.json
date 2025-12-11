@@ -35,11 +35,6 @@
       "prettier --write"
     ]
   },
-  "build": {
-    "publish": [
-      "github"
-    ]
-  },
   "dependencies": {
     "7zip-min": "^2.1.0",
     "@electron-toolkit/preload": "^3.0.2",
