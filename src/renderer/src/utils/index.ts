@@ -24,6 +24,10 @@ export function formatDate(input: string): string {
 }
 
 export function formatFileSize(bytes: number): string {
+  if (bytes === 0) {
+    return '';
+  }
+
   if (bytes < 0 || Number.isNaN(bytes)) {
     throw new Error('Invalid file size');
   }

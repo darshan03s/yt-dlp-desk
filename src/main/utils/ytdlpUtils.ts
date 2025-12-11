@@ -2,7 +2,14 @@ import { spawn } from 'node:child_process';
 import { mainWindow, MEDIA_DATA_FOLDER_PATH, YTDLP_EXE_PATH } from '..';
 import path from 'node:path';
 import { URL } from 'node:url';
-import { downloadFile, pathExists, readJson, sanitizeFileName, writeJson } from './fsUtils';
+import {
+  downloadFile,
+  pathExists,
+  readJson,
+  removeEmoji,
+  sanitizeFileName,
+  writeJson
+} from './fsUtils';
 import { LiveFromStartFormats, MediaInfoJson } from '@shared/types/info-json';
 import { Source } from '@shared/types';
 import logger from '@shared/logger';
@@ -10,7 +17,12 @@ import { writeFile } from 'node:fs/promises';
 import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
-import { getYoutubeMusicId, getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
+import {
+  getTweetId,
+  getYoutubeMusicId,
+  getYoutubePlaylistId,
+  getYouTubeVideoId
+} from '@shared/utils';
 import Settings from '@main/settings';
 
 function getInfoJsonPath(url: string, source: Source): string {
@@ -46,6 +58,17 @@ function getInfoJsonPath(url: string, source: Source): string {
     );
     return infoJsonPath;
   }
+
+  if (source === 'twitter-video') {
+    const tweetId = getTweetId(url);
+    const infoJsonPath = path.join(
+      MEDIA_DATA_FOLDER_PATH,
+      source,
+      tweetId!,
+      tweetId + '.info.json'
+    );
+    return infoJsonPath;
+  }
   return '';
 }
 
@@ -75,7 +98,11 @@ export async function getInfoJson(
     }
   }
 
-  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
+  if (
+    source === 'youtube-playlist' ||
+    source === 'youtube-music-playlist' ||
+    source === 'twitter-video'
+  ) {
     if (refetch) {
       logger.info(`Re-fetching info-json for ${url}`);
       return await createInfoJson(url, source, infoJsonPath);
@@ -156,6 +183,17 @@ export async function createInfoJson(
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
+
+        await writeJson(infoJsonPath, infoJson);
+
+        return resolve(infoJson);
+      }
+
+      if (source === 'twitter-video') {
+        let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
+        infoJson = await addCreatedAt(infoJson);
+        infoJson = await downloadThumbnail(infoJson, source, url);
+        infoJson = await writeDescription(infoJson, source);
 
         await writeJson(infoJsonPath, infoJson);
 
@@ -293,17 +331,15 @@ async function getExpireTime(infoJsonPath: string) {
 async function downloadThumbnail(infoJson: MediaInfoJson, source: Source, url: string) {
   const safeTitle = sanitizeFileName(infoJson.fulltitle ?? infoJson.title);
   let thumbnailUrl: URL | null = null;
-  if (source === 'youtube-video' || source === 'youtube-music') {
+  if (infoJson.thumbnail) {
     thumbnailUrl = new URL(infoJson.thumbnail);
-  }
-  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
+  } else {
     thumbnailUrl = new URL(infoJson.thumbnails.at(-1)!.url);
   }
   if (!thumbnailUrl) {
     logger.info(`Thumbnail url not available for ${url}`);
     return infoJson;
   }
-  thumbnailUrl!.search = '';
   const thumbnailUrlCleaned = thumbnailUrl!.toString();
   const thumbnailLocalPath = path.join(
     MEDIA_DATA_FOLDER_PATH,
@@ -348,12 +384,12 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
   const { url, source, selectedFormat, downloadSections, selectedDownloadFolder, extraOptions } =
     downloadOptions;
 
-  if (source === 'youtube-video' || source === 'youtube-music') {
+  if (source === 'youtube-video' || source === 'youtube-music' || source === 'twitter-video') {
     console.log({ url, source, selectedFormat, downloadSections, extraOptions });
     const mediaInfo = downloadOptions.mediaInfo as MediaInfoJson;
     const infoJsonPath = getInfoJsonPath(url, source);
     const formatId = selectedFormat.format_id!;
-    let targetDownloadFileName = `${mediaInfo.fulltitle} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
+    let targetDownloadFileName = `${removeEmoji(mediaInfo.fulltitle ?? mediaInfo.title, '_')} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
 
     const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
@@ -388,7 +424,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
 
     // only start
     if (downloadSections.startTime && !downloadSections.endTime) {
-      downloadCommandArgs.push('--download-sections', `*${downloadSections.startTime}`);
+      downloadCommandArgs.push('--download-sections', `*${downloadSections.startTime}-`);
       targetDownloadFileName = targetDownloadFileName + `[${downloadSections.startTime} - ]`;
     }
 

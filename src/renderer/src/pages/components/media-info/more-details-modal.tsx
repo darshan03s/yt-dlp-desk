@@ -108,6 +108,18 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               <span>{numeral(infoJson.like_count).format('0.00a')}</span>
             </div>
           )}
+          {infoJson.repost_count && (
+            <div>
+              <span className="font-semibold">Repost Count</span>:{' '}
+              <span>{numeral(infoJson.repost_count).format('0.00a')}</span>
+            </div>
+          )}
+          {infoJson.concurrent_view_count && (
+            <div>
+              <span className="font-semibold">Concurrent View Count</span>:{' '}
+              <span>{numeral(infoJson.concurrent_view_count).format('0.00a')}</span>
+            </div>
+          )}
           {!(source === 'youtube-playlist' || source === 'youtube-music-playlist') && (
             <div>
               <span className="font-semibold">Live Status</span>:{' '}

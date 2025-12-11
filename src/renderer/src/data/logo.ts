@@ -1,6 +1,7 @@
 import { Source } from '@/shared/types';
 import youtubeLogo from '../assets/youtube-logo.svg';
 import youtubeMusicLogo from '../assets/youtube-music-logo.svg';
+import twitterLogo from '../assets/twitter-logo.svg';
 
 export function Logo(source: Source) {
   if (source === 'youtube-video') {
@@ -14,6 +15,9 @@ export function Logo(source: Source) {
   }
   if (source === 'youtube-music-playlist') {
     return youtubeMusicLogo;
+  }
+  if (source === 'twitter-video') {
+    return twitterLogo;
   }
   return '';
 }

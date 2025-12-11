@@ -23,6 +23,8 @@ interface Extra {
   track: string;
   release_year: number;
   alt_title: string;
+  repost_count: number;
+  concurrent_view_count: number;
 }
 
 export interface MediaInfoJson extends Extra {

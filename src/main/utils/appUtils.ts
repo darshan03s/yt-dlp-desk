@@ -117,6 +117,9 @@ export function getSourceFromUrl(url: string): Source | null {
       return 'youtube-music';
     }
   }
+  if (parsedUrl.hostname.includes('x.com')) {
+    return 'twitter-video';
+  }
   return null;
 }
 
@@ -136,6 +139,11 @@ export function getNormalizedUrl(source: Source, url: string) {
   if (source === 'youtube-music-playlist') {
     const playlistId = getYoutubePlaylistId(url);
     return `https://music.youtube.com/playlist?list=${playlistId}`;
+  }
+  if (source === 'twitter-video') {
+    const parsed = new URL(url);
+    parsed.search = '';
+    return parsed.toString();
   }
   return '';
 }

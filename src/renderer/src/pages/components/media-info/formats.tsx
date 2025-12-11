@@ -46,14 +46,14 @@ const Formats = ({ infoJson, loading }: { infoJson: MediaInfoJson; loading: bool
               <span>{selectedFormat.resolution || defaultFormat.resolution}</span>
               <span className="text-[10px]">{selectedFormat.format || defaultFormat.format}</span>
               <div className="text-[10px] flex items-center gap-2">
-                <span>fps: {selectedFormat.fps || defaultFormat.fps}</span>
+                <span>fps: {selectedFormat.fps || defaultFormat.fps || 'N/A'}</span>
                 <span>vcodec: {vcodec(selectedFormat.vcodec || defaultFormat.vcodec)}</span>
                 <span>acodec: {acodec(selectedFormat.acodec || defaultFormat.acodec)}</span>
                 <span>
                   Filesize≈{' '}
                   {formatFileSize(
                     selectedFormat.filesize_approx! || defaultFormat.filesize_approx!
-                  )}
+                  ) || 'N/A'}
                 </span>
               </div>
             </div>

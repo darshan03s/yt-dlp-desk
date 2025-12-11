@@ -41,6 +41,17 @@ export function getYoutubeMusicId(url: string): string | null {
   }
 }
 
+export function getTweetId(url: string): string | null {
+  let tweetId: string | null = null;
+  try {
+    const parsed = new URL(url);
+    tweetId = parsed.pathname.split('/').at(-1)!;
+    return tweetId;
+  } catch {
+    return null;
+  }
+}
+
 export const AUDIO_EXTS = new Set([
   '.mp3',
   '.m4a',

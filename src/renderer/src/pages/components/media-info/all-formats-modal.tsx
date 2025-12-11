@@ -42,11 +42,11 @@ const AllFormatsModal = ({
     .reverse();
   const mp4Formats = formats.filter((format) => format.ext === 'mp4').reverse();
   const webmFormats = formats.filter((format) => format.ext === 'webm').reverse();
-  const vp9Formats = formats.filter((format) => format.vcodec.includes('vp9')).reverse();
-  const av01Formats = formats.filter((format) => format.vcodec.includes('av01')).reverse();
-  const avc1Formats = formats.filter((format) => format.vcodec.includes('avc1')).reverse();
-  const opusFormats = formats.filter((format) => format.acodec.includes('opus')).reverse();
-  const mp4aFormats = formats.filter((format) => format.acodec.includes('mp4a')).reverse();
+  const vp9Formats = formats.filter((format) => format.vcodec?.includes('vp9')).reverse();
+  const av01Formats = formats.filter((format) => format.vcodec?.includes('av01')).reverse();
+  const avc1Formats = formats.filter((format) => format.vcodec?.includes('avc1')).reverse();
+  const opusFormats = formats.filter((format) => format.acodec?.includes('opus')).reverse();
+  const mp4aFormats = formats.filter((format) => format.acodec?.includes('mp4a')).reverse();
   const reversedLiveFormats = [...liveFromStartFormats].reverse();
 
   const formatFiltersObj = {
@@ -124,9 +124,9 @@ const AllFormatsModal = ({
           <span>{format.resolution ?? 'N/A'}</span>
           <span className="text-[10px]">{format.format ?? 'N/A'}</span>
           <div className="text-[10px] flex items-center gap-2">
-            <span>fps: {format.fps ?? 'N/A'}</span>
-            <span>vcodec: {vcodec(format.vcodec)}</span>
-            <span>acodec: {acodec(format.acodec)}</span>
+            <span>fps: {format.fps || 'N/A'}</span>
+            <span>vcodec: {vcodec(format.vcodec) || 'N/A'}</span>
+            <span>acodec: {acodec(format.acodec) || 'N/A'}</span>
             <span>
               Filesize≈ {format.filesize_approx ? formatFileSize(format.filesize_approx) : 'N/A'}
             </span>

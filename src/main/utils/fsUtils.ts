@@ -108,6 +108,11 @@ export function sanitizeFileName(name: string, replace: string = ''): string {
   return sanitized;
 }
 
+export function removeEmoji(name: string, replace: string = ''): string {
+  const sanitized = name.replace(/\p{Emoji}/gu, replace);
+  return sanitized;
+}
+
 export function filePathToFileUrl(inputPath: string): string {
   try {
     const platformNormalized = path.normalize(inputPath);
