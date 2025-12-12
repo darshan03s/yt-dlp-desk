@@ -27,7 +27,7 @@ const DisplayMediaInfo = () => {
 
   useEffect(() => {
     if (Object.keys(infoJson).length !== 0) {
-      setThumbnailUrl(`media:///${encodeURIComponent(infoJson.thumbnail_local!)}`);
+      setThumbnailUrl(`image:///${encodeURIComponent(infoJson.thumbnail_local!)}`);
       setIsLoadingInfoJson(false);
       return;
     }
@@ -46,7 +46,7 @@ const DisplayMediaInfo = () => {
       const infoJson = data as MediaInfoJson;
       useMediaInfoStore.setState({ mediaInfo: infoJson });
       if (infoJson.thumbnail_local) {
-        setThumbnailUrl(`media:///${encodeURIComponent(infoJson.thumbnail_local)}`);
+        setThumbnailUrl(`image:///${encodeURIComponent(infoJson.thumbnail_local)}`);
       }
       setIsLoadingInfoJson(false);
 

@@ -37,7 +37,6 @@ import { Button } from '@renderer/components/ui/button';
 import { useSearchStore } from '@renderer/stores/search-store';
 import { ButtonGroup } from '@renderer/components/ui/button-group';
 import { Input } from '@renderer/components/ui/input';
-import { SERVER_BASE_URL, SERVER_PORT } from '@shared/data';
 import { isAudio } from '@shared/utils';
 import { FilePlay } from 'lucide-react';
 
@@ -247,7 +246,7 @@ const DownloadCard = ({
             src={
               downloadItem.thumbnail_local.length === 0
                 ? downloadItem.thumbnail
-                : `media:///${encodeURIComponent(downloadItem.thumbnail_local)}`
+                : `image:///${encodeURIComponent(downloadItem.thumbnail_local)}`
             }
             alt={downloadItem.title}
             className="aspect-video rounded-sm outline-1"
@@ -502,7 +501,7 @@ const PlayMediaModal = ({
               controlsList="nofullscreen"
               autoPlay
               className="w-full"
-              src={`${SERVER_BASE_URL}:${SERVER_PORT}/play-media?path=${encodeURIComponent(data.download_path)}`}
+              src={`playmedia://audio/${encodeURIComponent(data.download_path)}`}
             />
           ) : (
             <video
@@ -510,7 +509,7 @@ const PlayMediaModal = ({
               controls
               controlsList="nofullscreen"
               autoPlay
-              src={`${SERVER_BASE_URL}:${SERVER_PORT}/play-media?path=${encodeURIComponent(data.download_path)}`}
+              src={`playmedia://video/${encodeURIComponent(data.download_path)}`}
             />
           )}
           <p className="text-sm">{data.title}</p>
