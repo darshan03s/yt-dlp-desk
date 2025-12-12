@@ -54,6 +54,9 @@ export function vcodec(codec: string | undefined): string {
   if (codec.includes('avc1')) {
     return 'avc1';
   }
+  if (codec.includes('vp09')) {
+    return 'vp09';
+  }
   return codec || '';
 }
 

@@ -19,5 +19,6 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
   jsRuntimePath: '',
   downloadTemplate: '',
   rememberPreviousDownloadsFolder: false,
+  cookiesFilePath: '',
   setSettings: (settings) => set((state) => ({ ...state, ...settings }))
 }));

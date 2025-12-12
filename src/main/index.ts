@@ -56,7 +56,8 @@ export function createSplash() {
     transparent: true,
     alwaysOnTop: true,
     resizable: false,
-    show: true
+    show: true,
+    icon
   });
   splashWindow.loadFile(SPLASH_HTML_PATH);
 }

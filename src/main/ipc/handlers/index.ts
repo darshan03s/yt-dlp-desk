@@ -236,7 +236,7 @@ export async function getMediaInfoJson(
         try {
           const newUrlHistoryItem = {
             url,
-            thumbnail: infoJson.thumbnail ?? infoJson.thumbnails.at(-1)?.url ?? '',
+            thumbnail: infoJson.thumbnail ?? infoJson.thumbnails?.at(-1)?.url ?? '',
             title: infoJson.fulltitle ?? infoJson.title ?? '',
             source: source,
             thumbnail_local: infoJson.thumbnail_local ?? '',

@@ -3,7 +3,8 @@ export const allowedSources = [
   'youtube-playlist',
   'youtube-music',
   'youtube-music-playlist',
-  'twitter-video'
+  'twitter-video',
+  'instagram-video'
 ] as const;
 
 export const SERVER_PORT = 12277;

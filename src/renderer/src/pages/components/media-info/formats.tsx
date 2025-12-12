@@ -63,7 +63,7 @@ const Formats = ({ infoJson, loading }: { infoJson: MediaInfoJson; loading: bool
           </div>
         )
       )}
-      {!loading && infoJson.formats.length > 0 && (
+      {!loading && infoJson.formats && infoJson.formats.length > 0 && (
         <AllFormatsModal
           open={isAllFormatsModalOpen}
           setOpen={setIsAllFormatsModalOpen}

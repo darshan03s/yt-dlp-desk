@@ -82,7 +82,11 @@ export class DownloadManager {
           progressString: line
         } as ProgressDetails);
         if (line.includes('ERROR')) {
-          mainWindow.webContents.send('yt-dlp:error', line);
+          if (data.includes('No video formats found')) {
+            mainWindow.webContents.send('yt-dlp:error', 'No video formats found');
+          } else {
+            mainWindow.webContents.send('yt-dlp:error', data);
+          }
         }
       }
     });

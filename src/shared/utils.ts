@@ -52,6 +52,28 @@ export function getTweetId(url: string): string | null {
   }
 }
 
+export function getInstagramId(url: string): string | null {
+  let instagramId: string | null = null;
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname.startsWith('/p')) {
+      instagramId = parsed.pathname.split('/')[2]!;
+      return instagramId;
+    }
+    if (parsed.pathname.startsWith('/reels') || parsed.pathname.startsWith('/reel')) {
+      instagramId = parsed.pathname.split('/')[2]!;
+      return instagramId;
+    }
+    if (!parsed.pathname.startsWith('/reel') && parsed.pathname.includes('/reel')) {
+      instagramId = parsed.pathname.split('/')[3]!;
+      return instagramId;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export const AUDIO_EXTS = new Set([
   '.mp3',
   '.m4a',

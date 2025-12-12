@@ -19,6 +19,7 @@ import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
 import {
+  getInstagramId,
   getTweetId,
   getYoutubeMusicId,
   getYoutubePlaylistId,
@@ -70,6 +71,16 @@ function getInfoJsonPath(url: string, source: Source): string {
     );
     return infoJsonPath;
   }
+  if (source === 'instagram-video') {
+    const instagramId = getInstagramId(url);
+    const infoJsonPath = path.join(
+      MEDIA_DATA_FOLDER_PATH,
+      source,
+      instagramId!,
+      instagramId + '.info.json'
+    );
+    return infoJsonPath;
+  }
   return '';
 }
 
@@ -79,11 +90,11 @@ export async function getInfoJson(
   refetch?: boolean
 ): Promise<MediaInfoJson | null> {
   const infoJsonPath = getInfoJsonPath(url, source);
-  if (source === 'youtube-video' || source === 'youtube-music') {
-    if (refetch) {
-      logger.info(`Re-fetching info-json for ${url}`);
-      return await createInfoJson(url, source, infoJsonPath);
-    }
+  if (refetch) {
+    logger.info(`Re-fetching info-json for ${url}`);
+    return await createInfoJson(url, source, infoJsonPath);
+  }
+  if (source === 'youtube-video' || source === 'youtube-music' || source === 'instagram-video') {
     if (await pathExists(infoJsonPath)) {
       const expireTime = await getExpireTime(infoJsonPath);
       if (new Date().toISOString() > expireTime!) {
@@ -104,10 +115,6 @@ export async function getInfoJson(
     source === 'youtube-music-playlist' ||
     source === 'twitter-video'
   ) {
-    if (refetch) {
-      logger.info(`Re-fetching info-json for ${url}`);
-      return await createInfoJson(url, source, infoJsonPath);
-    }
     if (await pathExists(infoJsonPath)) {
       return await readJson<MediaInfoJson>(infoJsonPath);
     } else {
@@ -165,7 +172,11 @@ export async function createInfoJson(
     child.stderr.on('data', (data) => {
       console.log(`stderr: ${data}`);
       if (data.includes('ERROR')) {
-        mainWindow.webContents.send('yt-dlp:error', data);
+        if (data.includes('No video formats found')) {
+          mainWindow.webContents.send('yt-dlp:error', 'No video formats found');
+        } else {
+          mainWindow.webContents.send('yt-dlp:error', data);
+        }
       }
     });
 
@@ -177,8 +188,8 @@ export async function createInfoJson(
       if (source === 'youtube-video' || source === 'youtube-music') {
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
-        infoJson = await addExpiresAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
+        infoJson = await addExpiresAt(infoJson);
         infoJson = await writeDescription(infoJson, source);
         if (infoJson.is_live) {
           infoJson = await addLiveFromStartFormats(url, infoJson);
@@ -202,6 +213,18 @@ export async function createInfoJson(
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
+        infoJson = await writeDescription(infoJson, source);
+
+        await writeJson(infoJsonPath, infoJson);
+
+        return resolve(infoJson);
+      }
+
+      if (source === 'instagram-video') {
+        let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
+        infoJson = await addCreatedAt(infoJson);
+        infoJson = await downloadThumbnail(infoJson, source, url);
+        infoJson = await addExpiresAt(infoJson, source);
         infoJson = await writeDescription(infoJson, source);
 
         await writeJson(infoJsonPath, infoJson);
@@ -304,31 +327,40 @@ async function addCreatedAt(infoJson: MediaInfoJson) {
   return infoJson;
 }
 
-async function addExpiresAt(infoJson: MediaInfoJson) {
-  const format = infoJson.formats.find((f) => f.vcodec !== 'none' && f.url);
+async function addExpiresAt(infoJson: MediaInfoJson, source?: Source) {
+  if (source === 'youtube-video') {
+    const format = infoJson.formats.find((f) => f.vcodec !== 'none' && f.url);
 
-  if (!format?.url) {
-    infoJson.expires_at = new Date().toISOString();
+    if (!format?.url) {
+      infoJson.expires_at = new Date().toISOString();
+      return infoJson;
+    }
+
+    const url = format.url;
+
+    // query param: ?expire=1764870570079
+    const queryMatch = url.match(/[?&]expire=(\d+)/)?.[1];
+
+    // path segment: /expire/1764870570079/
+    const pathMatch = url.match(/\/expire\/(\d+)/)?.[1];
+
+    const expireParam = queryMatch ?? pathMatch;
+
+    if (!expireParam) {
+      // default 15 min
+      infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
+      return infoJson;
+    }
+
+    infoJson.expires_at = new Date(Number(expireParam) * 1000).toISOString();
+    return infoJson;
+  } else if (source === 'instagram-video') {
+    // 6 hour
+    infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString();
     return infoJson;
   }
-
-  const url = format.url;
-
-  // query param: ?expire=1764870570079
-  const queryMatch = url.match(/[?&]expire=(\d+)/)?.[1];
-
-  // path segment: /expire/1764870570079/
-  const pathMatch = url.match(/\/expire\/(\d+)/)?.[1];
-
-  const expireParam = queryMatch ?? pathMatch;
-
-  if (!expireParam) {
-    // default 15 min
-    infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
-    return infoJson;
-  }
-
-  infoJson.expires_at = new Date(Number(expireParam) * 1000).toISOString();
+  // 15 min
+  infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
   return infoJson;
 }
 
@@ -393,7 +425,12 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
   const { url, source, selectedFormat, downloadSections, selectedDownloadFolder, extraOptions } =
     downloadOptions;
 
-  if (source === 'youtube-video' || source === 'youtube-music' || source === 'twitter-video') {
+  if (
+    source === 'youtube-video' ||
+    source === 'youtube-music' ||
+    source === 'twitter-video' ||
+    source === 'instagram-video'
+  ) {
     console.log({ url, source, selectedFormat, downloadSections, extraOptions });
     const mediaInfo = downloadOptions.mediaInfo as MediaInfoJson;
     const infoJsonPath = getInfoJsonPath(url, source);

@@ -49,7 +49,9 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
             <div>
               <span className="font-semibold">Duration</span>:{' '}
               <span>
-                {infoJson.duration_string?.length === 0 ? 'N/A' : infoJson.duration_string}
+                {infoJson.duration_string?.length === 0
+                  ? 'N/A'
+                  : (infoJson.duration_string ?? 'N/A')}
               </span>
             </div>
           )}
@@ -86,8 +88,8 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
           )}
           <div>
             <span className="font-semibold">Thumbnail</span>:{' '}
-            <Anchor href={infoJson.thumbnail ?? infoJson.thumbnails.at(-1)?.url ?? ''}>
-              {infoJson.thumbnail ?? infoJson.thumbnails.at(-1)?.url ?? 'N/A'}
+            <Anchor href={infoJson.thumbnail ?? infoJson.thumbnails?.at(-1)?.url ?? ''}>
+              {infoJson.thumbnail ?? infoJson.thumbnails?.at(-1)?.url ?? 'N/A'}
             </Anchor>
           </div>
           {infoJson.view_count && (

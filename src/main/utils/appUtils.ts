@@ -1,7 +1,12 @@
 import Settings from '@main/settings';
 import logger from '@shared/logger';
 import { Api, AppSettings, Source } from '@shared/types';
-import { getYoutubeMusicId, getYoutubePlaylistId, getYouTubeVideoId } from '@shared/utils';
+import {
+  getInstagramId,
+  getYoutubeMusicId,
+  getYoutubePlaylistId,
+  getYouTubeVideoId
+} from '@shared/utils';
 import { ChildProcess, exec } from 'child_process';
 import { promisify } from 'util';
 const execPromise = promisify(exec);
@@ -123,6 +128,9 @@ export function getSourceFromUrl(url: string): Source | null {
   if (parsedUrl.hostname.includes('x.com')) {
     return 'twitter-video';
   }
+  if (parsedUrl.hostname.includes('instagram.com')) {
+    return 'instagram-video';
+  }
   return null;
 }
 
@@ -147,6 +155,25 @@ export function getNormalizedUrl(source: Source, url: string) {
     const parsed = new URL(url);
     parsed.search = '';
     return parsed.toString();
+  }
+  if (source === 'instagram-video') {
+    const parsed = new URL(url);
+    if (parsed.pathname.startsWith('/p')) {
+      const id = getInstagramId(url);
+      return `https://www.instagram.com/p/${id}`;
+    }
+    if (parsed.pathname.startsWith('/reels')) {
+      const id = getInstagramId(url);
+      return `https://www.instagram.com/reels/${id}`;
+    }
+    if (parsed.pathname.startsWith('/reel')) {
+      const id = getInstagramId(url);
+      return `https://www.instagram.com/reel/${id}`;
+    }
+    if (!parsed.pathname.startsWith('/reel') && parsed.pathname.includes('/reel')) {
+      const id = getInstagramId(url);
+      return `https://www.instagram.com/reel/${id}`;
+    }
   }
   return '';
 }
