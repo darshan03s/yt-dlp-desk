@@ -105,6 +105,9 @@ export function getSourceFromUrl(url: string): Source | null {
     if (parsedUrl.searchParams.get('v')) {
       return 'youtube-video';
     }
+    if (parsedUrl.pathname.includes('shorts')) {
+      return 'youtube-video';
+    }
   }
   if (parsedUrl.hostname.includes('youtu.be')) {
     return 'youtube-video';
