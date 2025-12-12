@@ -1,7 +1,6 @@
 import { spawn } from 'node:child_process';
 import { FFMPEG_FOLDER_PATH, mainWindow, MEDIA_DATA_FOLDER_PATH, YTDLP_EXE_PATH } from '..';
 import path from 'node:path';
-import { URL } from 'node:url';
 import {
   downloadFile,
   pathExists,
@@ -396,32 +395,46 @@ async function getExpireTime(infoJsonPath: string) {
 
 async function downloadThumbnail(infoJson: MediaInfoJson, source: Source, url: string) {
   const safeTitle = sanitizeFileName(infoJson.fulltitle ?? infoJson.title);
-  let thumbnailUrl: URL | null = null;
-  if (infoJson.thumbnail) {
-    thumbnailUrl = new URL(infoJson.thumbnail);
-  } else {
-    thumbnailUrl = new URL(infoJson.thumbnails.at(-1)!.url);
-  }
-  if (!thumbnailUrl) {
-    logger.info(`Thumbnail url not available for ${url}`);
-    return infoJson;
-  }
-  const thumbnailUrlCleaned = thumbnailUrl!.toString();
+
   const thumbnailLocalPath = path.join(
     MEDIA_DATA_FOLDER_PATH,
     source,
     infoJson.id,
     safeTitle + '.jpg'
   );
-  try {
-    await downloadFile({ url: thumbnailUrlCleaned, destinationPath: thumbnailLocalPath });
-    logger.info(
-      `Downloaded thumbnail for ${infoJson.fulltitle ?? infoJson.title} to ${thumbnailLocalPath}`
-    );
-  } catch (error) {
-    logger.error(error);
+
+  const urls: string[] = [];
+  if (infoJson.thumbnail) urls.push(infoJson.thumbnail);
+
+  if (Array.isArray(infoJson.thumbnails)) {
+    for (const t of [...infoJson.thumbnails].reverse()) {
+      if (t?.url) urls.push(t.url);
+    }
   }
-  infoJson.thumbnail_local = thumbnailLocalPath;
+
+  for (const thumbnailUrl of urls) {
+    try {
+      const res = await fetch(thumbnailUrl, { method: 'HEAD' });
+
+      if (!res.ok) {
+        logger.warn(`Thumbnail HEAD failed (${res.status}) for ${thumbnailUrl}, trying next`);
+        continue;
+      }
+
+      await downloadFile({ url: thumbnailUrl, destinationPath: thumbnailLocalPath });
+
+      logger.info(
+        `Downloaded thumbnail for ${infoJson.fulltitle ?? infoJson.title} from ${thumbnailUrl}`
+      );
+      infoJson.thumbnail_local = thumbnailLocalPath;
+      return infoJson;
+    } catch (err) {
+      logger.warn(err);
+      continue;
+    }
+  }
+
+  logger.error(`All thumbnail URLs failed for ${url}`);
   return infoJson;
 }
 

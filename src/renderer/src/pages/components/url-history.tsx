@@ -134,11 +134,13 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
         <ItemContent className="flex flex-col gap-3">
           <ItemTitle className="text-xs line-clamp-1">{item.title}</ItemTitle>
           <ItemDescription className="flex gap-2 items-center text-xs">
-            <Anchor href={item.uploader_url}>
-              <Badge variant={'outline'} className="text-[10px]">
-                {item.uploader}
-              </Badge>
-            </Anchor>
+            {item.uploader && (
+              <Anchor href={item.uploader_url}>
+                <Badge variant={'outline'} className="text-[10px]">
+                  {item.uploader}
+                </Badge>
+              </Anchor>
+            )}
             <Badge variant={'outline'} className="text-[10px]">
               {formatDate(item.created_at)}
             </Badge>
