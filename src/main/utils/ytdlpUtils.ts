@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mainWindow, MEDIA_DATA_FOLDER_PATH, YTDLP_EXE_PATH } from '..';
+import { FFMPEG_FOLDER_PATH, mainWindow, MEDIA_DATA_FOLDER_PATH, YTDLP_EXE_PATH } from '..';
 import path from 'node:path';
 import { URL } from 'node:url';
 import {
@@ -440,6 +440,9 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
     const downloadCommandArgs = ['--js-runtimes', jsRuntimePath, '--newline'];
+
+    downloadCommandArgs.push('--ffmpeg-location');
+    downloadCommandArgs.push(FFMPEG_FOLDER_PATH);
 
     const hasAudio = selectedFormat.acodec && selectedFormat.acodec !== 'none';
 
