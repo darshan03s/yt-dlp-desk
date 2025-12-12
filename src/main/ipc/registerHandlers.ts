@@ -22,7 +22,8 @@ import {
   pauseDownload,
   resumeDownload,
   pauseAllDownloads,
-  play
+  playMedia,
+  showInFolder
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -74,7 +75,9 @@ async function registerHanlders() {
 
   ipcMain.on('yt-dlp:pause-all-downloads', pauseAllDownloads);
 
-  ipcMain.on('play', play);
+  ipcMain.on('play-media', playMedia);
+
+  ipcMain.on('show-in-folder', showInFolder);
 }
 
 export default registerHanlders;

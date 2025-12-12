@@ -39,7 +39,8 @@ const api: Api = {
   pauseDownload: (id: string) => ipcRenderer.send('yt-dlp:pause-download', id),
   resumeDownload: (id: string) => ipcRenderer.send('yt-dlp:resume-download', id),
   pauseAllDownloads: () => ipcRenderer.send('yt-dlp:pause-all-downloads'),
-  play: (path: string) => ipcRenderer.send('play', path)
+  playMedia: (filePath: string) => ipcRenderer.send('play-media', filePath),
+  showInFolder: (filePath: string) => ipcRenderer.send('show-in-folder', filePath)
 };
 
 if (process.contextIsolated) {

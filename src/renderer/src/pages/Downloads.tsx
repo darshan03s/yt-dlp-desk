@@ -13,6 +13,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ProgressBar } from './components/progress-bar';
 import {
   IconExternalLink,
+  IconFolder,
   IconInfoSquareRounded,
   IconPhoto,
   IconPlayerPause,
@@ -232,7 +233,11 @@ const DownloadCard = ({
   }
 
   function handlePlayInDefaultPlayer() {
-    window.api.play(downloadItem.download_path);
+    window.api.playMedia(downloadItem.download_path);
+  }
+
+  function handleShowInFolder() {
+    window.api.showInFolder(downloadItem.download_path);
   }
 
   return (
@@ -318,6 +323,16 @@ const DownloadCard = ({
           <div className="downloads-history-item-footer-right flex items-center gap-2">
             {downloadItem.download_status === 'completed' && (
               <>
+                <TooltipWrapper message={`Show in folder`}>
+                  <Button
+                    onClick={() => handleShowInFolder()}
+                    variant={'ghost'}
+                    size={'icon-sm'}
+                    className="size-6"
+                  >
+                    <IconFolder className="size-4" />
+                  </Button>
+                </TooltipWrapper>
                 <TooltipWrapper message={`Play in default player`}>
                   <Button
                     onClick={() => handlePlayInDefaultPlayer()}

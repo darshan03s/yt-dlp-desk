@@ -415,8 +415,16 @@ export async function pauseAllDownloads() {
   }
 }
 
-export async function play(_event: IpcMainEvent, path: string) {
-  const result = await shell.openPath(path);
+export async function playMedia(_event: IpcMainEvent, filePath: string) {
+  const result = await shell.openPath(filePath);
+  if (result) {
+    throw new Error(result);
+  }
+}
+
+export async function showInFolder(_event: IpcMainEvent, filePath: string) {
+  const folder = path.dirname(filePath);
+  const result = await shell.openPath(folder);
   if (result) {
     throw new Error(result);
   }
