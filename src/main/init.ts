@@ -7,8 +7,26 @@ import { makeDirs, pathExistsSync } from './utils/fsUtils';
 import logger from '@shared/logger';
 import Settings from './settings';
 
+function updateSettings() {
+  const settings = Settings.getInstance();
+  const existing = settings.getAll();
+  const defaults = getDefaultAppSettings();
+
+  const merged = { ...existing };
+
+  for (const key of Object.keys(defaults)) {
+    if (merged[key] === undefined) {
+      merged[key] = defaults[key];
+    }
+  }
+
+  settings.setAll(merged);
+}
+
 async function applyUpdates() {
   runMigrations();
+  updateSettings();
+
   logger.info('Applied updates');
 }
 

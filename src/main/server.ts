@@ -1,6 +1,7 @@
 import { SERVER_BASE_URL, SERVER_PORT } from '@shared/data';
 import { createServer } from 'node:http';
 import { Source } from '@shared/types';
+import { is } from '@electron-toolkit/utils';
 
 function runServer() {
   createServer(async (req, res) => {
@@ -35,8 +36,8 @@ function runServer() {
       res.end('Not found');
       return;
     }
-  }).listen(SERVER_PORT, () => {
-    console.log(`Server running on ${SERVER_PORT}`);
+  }).listen(is.dev ? 12278 : SERVER_PORT, () => {
+    console.log(`Server running on ${is.dev ? 12278 : SERVER_PORT}`);
   });
 }
 
