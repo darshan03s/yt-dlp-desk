@@ -321,18 +321,18 @@ const DownloadCard = ({
             </TooltipWrapper>
           </div>
           <div className="downloads-history-item-footer-right flex items-center gap-2">
+            <TooltipWrapper message={`Show in folder`}>
+              <Button
+                onClick={() => handleShowInFolder()}
+                variant={'ghost'}
+                size={'icon-sm'}
+                className="size-6"
+              >
+                <IconFolder className="size-4" />
+              </Button>
+            </TooltipWrapper>
             {downloadItem.download_status === 'completed' && (
               <>
-                <TooltipWrapper message={`Show in folder`}>
-                  <Button
-                    onClick={() => handleShowInFolder()}
-                    variant={'ghost'}
-                    size={'icon-sm'}
-                    className="size-6"
-                  >
-                    <IconFolder className="size-4" />
-                  </Button>
-                </TooltipWrapper>
                 <TooltipWrapper message={`Play in default player`}>
                   <Button
                     onClick={() => handlePlayInDefaultPlayer()}

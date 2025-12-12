@@ -128,7 +128,7 @@ const UrlHistoryItem = ({ item }: { item: UrlHistoryItem }) => {
             className="aspect-video rounded-sm outline-1"
           />
           <span className="bg-black text-white p-1 px-1.5 text-[10px] rounded-md absolute right-0.5 bottom-0.5">
-            {item.duration}
+            {item.duration || 'N/A'}
           </span>
         </ItemMedia>
         <ItemContent className="flex flex-col gap-3">
