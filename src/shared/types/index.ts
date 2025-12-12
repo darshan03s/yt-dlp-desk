@@ -15,11 +15,12 @@ export type AppSettings = {
   jsRuntimePath: string;
   downloadTemplate: string;
   rememberPreviousDownloadsFolder: boolean;
+  cookiesFilePath: string;
 };
 
 export type AppSettingsChange = Pick<
   AppSettings,
-  'downloadsFolder' | 'rememberPreviousDownloadsFolder'
+  'downloadsFolder' | 'rememberPreviousDownloadsFolder' | 'cookiesFilePath'
 >;
 
 export type Source = (typeof allowedSources)[number];
@@ -72,4 +73,5 @@ export type Api = {
   pauseAllDownloads: () => void;
   playMedia: (filePath: string) => void;
   showInFolder: (filePath: string) => void;
+  selectFile: () => Promise<string | null>;
 };

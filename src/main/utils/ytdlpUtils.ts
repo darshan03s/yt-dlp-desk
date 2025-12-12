@@ -5,6 +5,7 @@ import { URL } from 'node:url';
 import {
   downloadFile,
   pathExists,
+  pathExistsSync,
   readJson,
   removeEmoji,
   sanitizeFileName,
@@ -135,6 +136,14 @@ export async function createInfoJson(
       infoJsonPath.split('.info.json')[0],
       url
     ];
+
+    if (
+      settings.get('cookiesFilePath').length > 0 &&
+      pathExistsSync(settings.get('cookiesFilePath'))
+    ) {
+      infoJsonCommandArgs.push('--cookies');
+      infoJsonCommandArgs.push(settings.get('cookiesFilePath'));
+    }
 
     if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
       infoJsonCommandArgs.push('--flat-playlist');
@@ -472,6 +481,14 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
 
     if (extraOptions.liveFromStart) {
       downloadCommandArgs.push('--live-from-start');
+    }
+
+    if (
+      settings.get('cookiesFilePath').length > 0 &&
+      (await pathExists(settings.get('cookiesFilePath')))
+    ) {
+      downloadCommandArgs.push('--cookies');
+      downloadCommandArgs.push(settings.get('cookiesFilePath'));
     }
 
     downloadCommandArgs.push('--no-quiet');

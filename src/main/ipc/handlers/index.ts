@@ -429,3 +429,17 @@ export async function showInFolder(_event: IpcMainEvent, filePath: string) {
     throw new Error(result);
   }
 }
+
+export async function selectFile() {
+  const result = await dialog.showOpenDialog({
+    title: 'Select cookies file',
+    properties: ['openFile'],
+    filters: [{ name: 'Text Files', extensions: ['txt'] }]
+  });
+
+  if (result.canceled || result.filePaths.length === 0) {
+    return null;
+  }
+
+  return result.filePaths[0];
+}

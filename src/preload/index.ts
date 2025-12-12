@@ -40,7 +40,8 @@ const api: Api = {
   resumeDownload: (id: string) => ipcRenderer.send('yt-dlp:resume-download', id),
   pauseAllDownloads: () => ipcRenderer.send('yt-dlp:pause-all-downloads'),
   playMedia: (filePath: string) => ipcRenderer.send('play-media', filePath),
-  showInFolder: (filePath: string) => ipcRenderer.send('show-in-folder', filePath)
+  showInFolder: (filePath: string) => ipcRenderer.send('show-in-folder', filePath),
+  selectFile: () => ipcRenderer.invoke('select-file')
 };
 
 if (process.contextIsolated) {

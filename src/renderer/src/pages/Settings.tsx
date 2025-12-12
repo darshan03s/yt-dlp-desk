@@ -2,8 +2,9 @@ import { AppSettings, AppSettingsChange } from '@/shared/types';
 import { Button } from '@renderer/components/ui/button';
 import { Input } from '@renderer/components/ui/input';
 import { Switch } from '@renderer/components/ui/switch';
+import { TooltipWrapper } from '@renderer/components/wrappers';
 import { useSettingsStore } from '@renderer/stores/settings-store';
-import { IconFolder } from '@tabler/icons-react';
+import { IconFile, IconFolder, IconInfoCircle } from '@tabler/icons-react';
 import { useState } from 'react';
 
 const Settings = () => {
@@ -13,7 +14,8 @@ const Settings = () => {
     ytdlpVersion: initial.ytdlpVersion,
     ffmpegVersion: initial.ffmpegVersion,
     downloadsFolder: initial.downloadsFolder,
-    rememberPreviousDownloadsFolder: initial.rememberPreviousDownloadsFolder
+    rememberPreviousDownloadsFolder: initial.rememberPreviousDownloadsFolder,
+    cookiesFilePath: initial.cookiesFilePath
   });
 
   function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean) {
@@ -28,7 +30,8 @@ const Settings = () => {
   function handleSaveSettings() {
     const changedSettings: AppSettingsChange = {
       downloadsFolder: settings.downloadsFolder!,
-      rememberPreviousDownloadsFolder: settings.rememberPreviousDownloadsFolder!
+      rememberPreviousDownloadsFolder: settings.rememberPreviousDownloadsFolder!,
+      cookiesFilePath: settings.cookiesFilePath!
     };
 
     window.api.saveSettings(changedSettings);
@@ -40,6 +43,16 @@ const Settings = () => {
       setSettings((prev) => ({
         ...prev,
         downloadsFolder: path
+      }));
+    }
+  }
+
+  async function pickFile() {
+    const path = await window.api.selectFile();
+    if (path) {
+      setSettings((prev) => ({
+        ...prev,
+        cookiesFilePath: path
       }));
     }
   }
@@ -79,9 +92,11 @@ const Settings = () => {
           <span className="setting-name text-[12px] text-nowrap">Downloads Folder</span>
           <div className="h-8 w-[400px] flex items-center gap-2">
             <Input className="text-[10px]" value={settings?.downloadsFolder} disabled />
-            <Button variant={'outline'} size={'icon-sm'} onClick={pickFolder}>
-              <IconFolder />
-            </Button>
+            <TooltipWrapper message="Select folder">
+              <Button variant={'outline'} size={'icon-sm'} onClick={pickFolder}>
+                <IconFolder />
+              </Button>
+            </TooltipWrapper>
           </div>
         </div>
         <div className="flex items-center justify-between w-full px-18">
@@ -94,6 +109,25 @@ const Settings = () => {
               handleSettingsChange('rememberPreviousDownloadsFolder', value)
             }
           />
+        </div>
+        <div className="px-18 flex flex-col gap-2">
+          <h1 className="text-sm border-b pb-1 font-bold">Cookies</h1>
+          <div className="flex items-center justify-between w-full">
+            <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+              Cookies file path
+              <TooltipWrapper message="Choose cookies.txt (Netscape format)">
+                <IconInfoCircle className="size-3" />
+              </TooltipWrapper>
+            </span>
+            <div className="h-8 w-[400px] flex items-center gap-2">
+              <Input className="text-[10px]" value={settings?.cookiesFilePath} disabled />
+              <TooltipWrapper message="Select file">
+                <Button variant={'outline'} size={'icon-sm'} onClick={pickFile}>
+                  <IconFile />
+                </Button>
+              </TooltipWrapper>
+            </div>
+          </div>
         </div>
       </div>
     </div>

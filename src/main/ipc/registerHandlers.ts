@@ -23,7 +23,8 @@ import {
   resumeDownload,
   pauseAllDownloads,
   playMedia,
-  showInFolder
+  showInFolder,
+  selectFile
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -78,6 +79,8 @@ async function registerHanlders() {
   ipcMain.on('play-media', playMedia);
 
   ipcMain.on('show-in-folder', showInFolder);
+
+  ipcMain.handle('select-file', selectFile);
 }
 
 export default registerHanlders;
