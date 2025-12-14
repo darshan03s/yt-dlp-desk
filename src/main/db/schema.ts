@@ -1,7 +1,13 @@
 import { real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 
-export const downloadStatusEnum = ['downloading', 'completed', 'failed', 'paused'] as const;
+export const downloadStatusEnum = [
+  'downloading',
+  'completed',
+  'failed',
+  'paused',
+  'waiting'
+] as const;
 
 export const urlHistory = sqliteTable('url_history', {
   id: text('id').primaryKey().notNull(),

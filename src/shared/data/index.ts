@@ -9,3 +9,5 @@ export const allowedSources = [
 
 export const SERVER_PORT = 12277;
 export const SERVER_BASE_URL = 'http://localhost';
+
+export const MAX_ALLOWED_CONCURRENT_DOWNLOADS = 5;

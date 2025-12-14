@@ -19,14 +19,16 @@ import {
   deleteOneFromDownloadHistory,
   deleteAllFromDownloadHistory,
   getDownloadHistory,
-  pauseDownload,
-  resumeDownload,
   pauseAllDownloads,
   playMedia,
   showInFolder,
   selectFile,
   retryFailedDownload,
-  deleteAllMetadata
+  deleteAllMetadata,
+  getQueuedDownloads,
+  pauseRunningDownload,
+  resumePausedDownload,
+  pauseWaitingDownload
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -63,6 +65,8 @@ async function registerHanlders() {
 
   ipcMain.handle('running-downloads:get-all', getRunningDownloads);
 
+  ipcMain.handle('queued-downloads:get-all', getQueuedDownloads);
+
   ipcMain.handle('download-history:get-all', getDownloadHistory);
 
   ipcMain.handle('select-folder', selectFolder);
@@ -73,11 +77,13 @@ async function registerHanlders() {
 
   ipcMain.handle('download-history:search', downloadHistorySearch);
 
-  ipcMain.on('yt-dlp:pause-download', pauseDownload);
+  ipcMain.on('app:pause-running-download', pauseRunningDownload);
 
-  ipcMain.on('yt-dlp:resume-download', resumeDownload);
+  ipcMain.on('app:pause-waiting-download', pauseWaitingDownload);
 
-  ipcMain.on('yt-dlp:pause-all-downloads', pauseAllDownloads);
+  ipcMain.on('app:pause-all-downloads', pauseAllDownloads);
+
+  ipcMain.on('app:resume-paused-download', resumePausedDownload);
 
   ipcMain.on('play-media', playMedia);
 
@@ -85,7 +91,7 @@ async function registerHanlders() {
 
   ipcMain.handle('select-file', selectFile);
 
-  ipcMain.on('yt-dlp:retry-download', retryFailedDownload);
+  ipcMain.on('app:retry-download', retryFailedDownload);
 
   ipcMain.on('app:delete-all-metadata', deleteAllMetadata);
 }

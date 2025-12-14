@@ -1,4 +1,5 @@
-import { AppSettings, AppSettingsChange } from '@/shared/types';
+import { MAX_ALLOWED_CONCURRENT_DOWNLOADS } from '@shared/data';
+import { AppSettings, AppSettingsChange } from '@shared/types';
 import { Button } from '@renderer/components/ui/button';
 import {
   Dialog,
@@ -24,7 +25,8 @@ const Settings = () => {
     ffmpegVersion: initial.ffmpegVersion,
     downloadsFolder: initial.downloadsFolder,
     rememberPreviousDownloadsFolder: initial.rememberPreviousDownloadsFolder,
-    cookiesFilePath: initial.cookiesFilePath
+    cookiesFilePath: initial.cookiesFilePath,
+    maxConcurrentDownloads: initial.maxConcurrentDownloads
   });
   const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
 
@@ -41,7 +43,8 @@ const Settings = () => {
     const changedSettings: AppSettingsChange = {
       downloadsFolder: settings.downloadsFolder!,
       rememberPreviousDownloadsFolder: settings.rememberPreviousDownloadsFolder!,
-      cookiesFilePath: settings.cookiesFilePath!
+      cookiesFilePath: settings.cookiesFilePath!,
+      maxConcurrentDownloads: settings.maxConcurrentDownloads!
     };
 
     window.api.saveSettings(changedSettings);
@@ -69,6 +72,14 @@ const Settings = () => {
 
   function handleClearAllMetadata() {
     setIsConfirmClearAllMetadataVisible(true);
+  }
+
+  function handleMaxConcurrentDownloads(val: number) {
+    if (val < 1 || val > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
+    setSettings((prev) => ({
+      ...prev,
+      maxConcurrentDownloads: val
+    }));
   }
 
   return (
@@ -122,6 +133,18 @@ const Settings = () => {
             onCheckedChange={(value) =>
               handleSettingsChange('rememberPreviousDownloadsFolder', value)
             }
+          />
+        </div>
+        <div className="flex items-center justify-between w-full px-18">
+          <span className="setting-name text-[12px] text-nowrap">Max concurrent downloads</span>
+          <Input
+            className="w-15"
+            type="number"
+            step={1}
+            min={1}
+            max={MAX_ALLOWED_CONCURRENT_DOWNLOADS}
+            value={settings.maxConcurrentDownloads}
+            onChange={(e) => handleMaxConcurrentDownloads(Number(e.target.value))}
           />
         </div>
         <div className="px-18 flex flex-col gap-2 pt-2">

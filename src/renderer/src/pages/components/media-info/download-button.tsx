@@ -58,9 +58,13 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
 
     window.api.download(downloadOptions);
 
-    const unsubscribe = window.api.on('download-begin', () => {
+    const unsubDownloadBegin = window.api.on('download-begin', () => {
       toast.info('Download Started');
-      unsubscribe();
+      unsubDownloadBegin();
+    });
+    const unsubDownloadQueue = window.api.on('download-queued', () => {
+      toast.info('Download Queued');
+      unsubDownloadQueue();
     });
   }
 

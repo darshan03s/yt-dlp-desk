@@ -14,8 +14,7 @@ import {
   getSettings,
   getSourceFromUrl,
   getYtdlpFromPc,
-  getYtdlpVersionFromPc,
-  terminateProcess
+  getYtdlpVersionFromPc
 } from '@main/utils/appUtils';
 import { urlHistoryOperations, downloadHistoryOperations } from '@main/utils/dbUtils';
 import { downloadFfmpeg7z } from '@main/utils/downloadFfmpeg7z';
@@ -316,6 +315,11 @@ export async function getRunningDownloads() {
   return runningDownloads;
 }
 
+export async function getQueuedDownloads() {
+  const downloadManager = DownloadManager.getInstance();
+  return downloadManager.getQueuedDownloads();
+}
+
 export async function getDownloadHistory() {
   return downloadHistoryOperations.getAllByCompletedAtDesc();
 }
@@ -348,73 +352,32 @@ export async function downloadHistorySearch(_event: IpcMainInvokeEvent, searchIn
   return downloadHistoryOperations.search(searchInput);
 }
 
-export async function pauseDownload(_event: IpcMainEvent, downloadId: string) {
+export async function pauseRunningDownload(_event: IpcMainEvent, downloadId: string) {
   const downloadManager = DownloadManager.getInstance();
-  const currentlyRunningDownloads = downloadManager.currentlyRunningDownloads;
 
-  const downloadToPause = currentlyRunningDownloads.find(
-    (d) => d.downloadingItem.id === downloadId
-  );
-
-  if (!downloadToPause) {
-    logger.error(`Download item to pause not found`);
-    return;
-  }
-
-  const { downloadingItem, downloadProcess } = downloadToPause;
-
-  downloadingItem.download_status = 'paused';
-  terminateProcess(downloadProcess);
+  downloadManager.pauseRunningDownload(downloadId);
 }
 
-export async function resumeDownload(_event: IpcMainEvent, downloadId: string) {
+export async function pauseWaitingDownload(_event: IpcMainEvent, downloadId: string) {
   const downloadManager = DownloadManager.getInstance();
 
-  const pausedDownload = await downloadHistoryOperations.getById(downloadId);
+  downloadManager.pauseWaitingDownload(downloadId);
+}
 
-  if (!pausedDownload) {
-    logger.error(`Download item to resume not found`);
-    return;
-  }
+export async function resumePausedDownload(_event: IpcMainEvent, downloadId: string) {
+  const downloadManager = DownloadManager.getInstance();
 
-  pausedDownload!.download_status = 'downloading';
-
-  const downloadCommandBase = pausedDownload!.download_command_base;
-
-  const downloadCommandArgs = JSON.parse(pausedDownload!.download_command_args);
-
-  downloadManager.addDownload(pausedDownload!, downloadCommandBase, downloadCommandArgs);
-
-  downloadHistoryOperations.deleteById(downloadId);
-
-  mainWindow.webContents.send('refresh-downloads');
+  await downloadManager.resumePausedDownload(downloadId);
 }
 
 export async function pauseAllDownloads() {
   const downloadManager = DownloadManager.getInstance();
-  const running = downloadManager.currentlyRunningDownloads;
 
-  if (running.length === 0) {
-    mainWindow.webContents.send('yt-dlp:paused-all-downloads');
-    return;
-  }
+  downloadManager.pauseAllWaitingDownloads();
 
-  let exited = 0;
+  await downloadManager.pauseAllRunningDownloadsAndWait();
 
-  for (const d of running) {
-    const { downloadingItem, downloadProcess } = d;
-
-    downloadingItem.download_status = 'paused';
-
-    downloadProcess.once('exit', () => {
-      exited++;
-      if (exited === running.length) {
-        mainWindow.webContents.send('yt-dlp:paused-all-downloads');
-      }
-    });
-
-    terminateProcess(downloadProcess);
-  }
+  mainWindow.webContents.send('yt-dlp:paused-all-downloads');
 }
 
 export async function playMedia(_event: IpcMainEvent, filePath: string) {
@@ -449,24 +412,7 @@ export async function selectFile() {
 export async function retryFailedDownload(_event: IpcMainEvent, downloadId: string) {
   const downloadManager = DownloadManager.getInstance();
 
-  const failedDownload = await downloadHistoryOperations.getById(downloadId);
-
-  if (!failedDownload) {
-    logger.error(`Download item to retry not found`);
-    return;
-  }
-
-  failedDownload!.download_status = 'downloading';
-
-  const downloadCommandBase = failedDownload!.download_command_base;
-
-  const downloadCommandArgs = JSON.parse(failedDownload!.download_command_args);
-
-  downloadManager.addDownload(failedDownload!, downloadCommandBase, downloadCommandArgs);
-
-  downloadHistoryOperations.deleteById(downloadId);
-
-  mainWindow.webContents.send('refresh-downloads');
+  await downloadManager.retryFailedDownload(downloadId);
 }
 
 export async function deleteAllMetadata() {

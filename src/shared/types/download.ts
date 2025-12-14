@@ -1,7 +1,7 @@
 import { Source } from '.';
 import { MediaFormat, MediaInfoJson } from './info-json';
 
-export type DownloadStatus = 'downloading' | 'completed' | 'failed' | 'paused';
+export type DownloadStatus = 'downloading' | 'completed' | 'failed' | 'paused' | 'waiting';
 
 export type DownloadSections = {
   startTime: string;

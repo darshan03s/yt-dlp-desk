@@ -630,6 +630,6 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       added_at: new Date().toISOString()
     };
 
-    downloadManager.addDownload(newDownload, downloadCommandBase, downloadCommandArgs);
+    downloadManager.addDownload(newDownload);
   }
 }

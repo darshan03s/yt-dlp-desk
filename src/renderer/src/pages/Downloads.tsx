@@ -51,6 +51,7 @@ function updateDownloadHistoryInStore() {
 const Downloads = () => {
   const downloadHistory = useHistoryStore((state) => state.downloadHistory);
   const [runningDownloads, setRunningDownloads] = useState<RunningDownloadsList>([]);
+  const [queuedDownloads, setQueuedDownloads] = useState<RunningDownloadsList>([]);
   const [isConfirmDeleteAllModalOpen, setIsConfirmDeleteAllModalOpen] = useState(false);
 
   const searchResults = useSearchStore((state) => state.downloadHistorySearchResults);
@@ -58,6 +59,9 @@ const Downloads = () => {
   function updateDownloads() {
     window.api.getRunningDownloads().then((data) => {
       setRunningDownloads(data);
+    });
+    window.api.getQueuedDownloads().then((data) => {
+      setQueuedDownloads(data);
     });
     window.api.getDownloadHistory().then((data) => {
       useHistoryStore.setState({ downloadHistory: data });
@@ -87,7 +91,18 @@ const Downloads = () => {
     <>
       <div className="w-full flex flex-col gap-2">
         <div className="px-3 py-2 h-12 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
-          <span className="text-xs">Download History ({downloadHistory?.length})</span>
+          <span className="text-xs flex items-center gap-2">
+            Downloads
+            <span>
+              <span title="History">({downloadHistory?.length})</span>
+              {runningDownloads && runningDownloads?.length > 0 && (
+                <span title="Running">({runningDownloads?.length})</span>
+              )}
+              {queuedDownloads && queuedDownloads?.length > 0 && (
+                <span title="Queued">({queuedDownloads?.length})</span>
+              )}
+            </span>
+          </span>
           <div className="flex items-center gap-4">
             <DownloadHistorySearch />
             <TooltipWrapper side="bottom" message={`Delete downloads history`}>
@@ -106,6 +121,9 @@ const Downloads = () => {
         <div className="px-2 py-1 pb-2">
           {runningDownloads && runningDownloads.length > 0 && (
             <RunningDownloads runningDownloads={runningDownloads} />
+          )}
+          {queuedDownloads && queuedDownloads.length > 0 && (
+            <RunningDownloads runningDownloads={queuedDownloads} />
           )}
           {searchResults!.length > 0 ? (
             <DownloadHistorySearchResults downloadHistorySearchResults={searchResults} />
@@ -221,12 +239,16 @@ const DownloadCard = ({
     });
   }
 
-  function handlePauseDownload(id: string) {
-    window.api.pauseDownload(id);
+  function handlePauseRunningDownload(id: string) {
+    window.api.pauseRunningDownload(id);
   }
 
-  function handleResumeDownload(id: string) {
-    window.api.resumeDownload(id);
+  function handlePauseWaitingDownload(id: string) {
+    window.api.pauseWaitingDownload(id);
+  }
+
+  function handleResumePausedDownload(id: string) {
+    window.api.resumePausedDownload(id);
   }
 
   function handleRetryFailedDownload(id: string) {
@@ -363,7 +385,19 @@ const DownloadCard = ({
             {downloadItem.download_status === 'downloading' && (
               <TooltipWrapper message={`Pause download`}>
                 <Button
-                  onClick={() => handlePauseDownload(downloadItem.id)}
+                  onClick={() => handlePauseRunningDownload(downloadItem.id)}
+                  variant={'ghost'}
+                  size={'icon-sm'}
+                  className="size-6"
+                >
+                  <IconPlayerPause className="size-4" />
+                </Button>
+              </TooltipWrapper>
+            )}
+            {downloadItem.download_status === 'waiting' && (
+              <TooltipWrapper message={`Pause waiting download`}>
+                <Button
+                  onClick={() => handlePauseWaitingDownload(downloadItem.id)}
                   variant={'ghost'}
                   size={'icon-sm'}
                   className="size-6"
@@ -375,7 +409,7 @@ const DownloadCard = ({
             {downloadItem.download_status === 'paused' && (
               <TooltipWrapper message={`Resume download`}>
                 <Button
-                  onClick={() => handleResumeDownload(downloadItem.id)}
+                  onClick={() => handleResumePausedDownload(downloadItem.id)}
                   variant={'ghost'}
                   size={'icon-sm'}
                   className="size-6"

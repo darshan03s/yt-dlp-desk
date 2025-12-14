@@ -16,11 +16,15 @@ export type AppSettings = {
   downloadTemplate: string;
   rememberPreviousDownloadsFolder: boolean;
   cookiesFilePath: string;
+  maxConcurrentDownloads: number;
 };
 
 export type AppSettingsChange = Pick<
   AppSettings,
-  'downloadsFolder' | 'rememberPreviousDownloadsFolder' | 'cookiesFilePath'
+  | 'downloadsFolder'
+  | 'rememberPreviousDownloadsFolder'
+  | 'cookiesFilePath'
+  | 'maxConcurrentDownloads'
 >;
 
 export type Source = (typeof allowedSources)[number];
@@ -65,13 +69,15 @@ export type Api = {
   on: (channel: string, listener: (...args: unknown[]) => void) => () => Electron.IpcRenderer;
   off: (channel: string, listener: (...args: unknown[]) => void) => void;
   getRunningDownloads: () => Promise<RunningDownloadsList>;
+  getQueuedDownloads: () => Promise<RunningDownloadsList>;
   getDownloadHistory: () => Promise<DownloadHistoryList>;
   selectFolder: () => Promise<string | null>;
   saveSettings: (changedSettings: AppSettingsChange) => void;
   urlHistorySearch: (searchInput: string) => Promise<UrlHistoryList>;
   downloadHistorySearch: (searchInput: string) => Promise<DownloadHistoryList>;
-  pauseDownload: (id: string) => void;
-  resumeDownload: (id: string) => void;
+  pauseRunningDownload: (id: string) => void;
+  pauseWaitingDownload: (id: string) => void;
+  resumePausedDownload: (id: string) => void;
   pauseAllDownloads: () => void;
   playMedia: (filePath: string) => void;
   showInFolder: (filePath: string) => void;

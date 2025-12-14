@@ -31,6 +31,7 @@ const api: Api = {
     ipcRenderer.removeListener(channel, listener);
   },
   getRunningDownloads: () => ipcRenderer.invoke('running-downloads:get-all'),
+  getQueuedDownloads: () => ipcRenderer.invoke('queued-downloads:get-all'),
   getDownloadHistory: () => ipcRenderer.invoke('download-history:get-all'),
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   saveSettings: (changedSettings: AppSettingsChange) =>
@@ -38,13 +39,14 @@ const api: Api = {
   urlHistorySearch: (searchInput: string) => ipcRenderer.invoke('url-history:search', searchInput),
   downloadHistorySearch: (searchInput: string) =>
     ipcRenderer.invoke('download-history:search', searchInput),
-  pauseDownload: (id: string) => ipcRenderer.send('yt-dlp:pause-download', id),
-  resumeDownload: (id: string) => ipcRenderer.send('yt-dlp:resume-download', id),
-  pauseAllDownloads: () => ipcRenderer.send('yt-dlp:pause-all-downloads'),
+  pauseRunningDownload: (id: string) => ipcRenderer.send('app:pause-running-download', id),
+  pauseWaitingDownload: (id: string) => ipcRenderer.send('app:pause-waiting-download', id),
+  resumePausedDownload: (id: string) => ipcRenderer.send('app:resume-paused-download', id),
+  pauseAllDownloads: () => ipcRenderer.send('app:pause-all-downloads'),
   playMedia: (filePath: string) => ipcRenderer.send('play-media', filePath),
   showInFolder: (filePath: string) => ipcRenderer.send('show-in-folder', filePath),
   selectFile: () => ipcRenderer.invoke('select-file'),
-  retryFailedDownload: (id: string) => ipcRenderer.send('yt-dlp:retry-download', id),
+  retryFailedDownload: (id: string) => ipcRenderer.send('app:retry-download', id),
   deleteAllMetadata: () => ipcRenderer.send('app:delete-all-metadata')
 };
 
