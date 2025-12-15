@@ -36,14 +36,18 @@ const ConfirmYtdlp = ({
   isYtdlpPresentInPc,
   setIsYtdlpPresentInPc
 }: ConfirmYtdlpProps) => {
-  const ytdlpVersion = useSettingsStore((state) => state.ytdlpVersion);
+  const ytdlpVersion = useSettingsStore((state) => state.settings.ytdlpVersion);
   const [downloadingYtdlp, setDownloadingYtdlp] = useState(false);
 
   function handleYtdlpDownload() {
     setDownloadingYtdlp(true);
     window.api.downloadYtdlp().then(({ ytdlpPathInPc, ytdlpVersionInPc }) => {
       if (ytdlpPathInPc && ytdlpVersionInPc) {
-        useSettingsStore.setState({ ytdlpVersion: ytdlpVersionInPc, ytdlpPath: ytdlpPathInPc });
+        useSettingsStore.getState().setSettings({
+          ytdlpVersion: ytdlpVersionInPc,
+          ytdlpPath: ytdlpPathInPc
+        });
+
         setDownloadingYtdlp(false);
         setIsYtdlpPresentInPc(true);
       } else {
@@ -80,14 +84,16 @@ const ConfirmFfmpeg = ({
   isFfmpegPresentInPc,
   setIsFfmpegPresentInPc
 }: ConfirmFfmpegProps) => {
-  const ffmpegVersion = useSettingsStore((state) => state.ffmpegVersion);
+  const ffmpegVersion = useSettingsStore((state) => state.settings.ffmpegVersion);
   const [downloadingFfmpeg, setDownloadingFfmpeg] = useState(false);
 
   function handleFfmpegDownload() {
     setDownloadingFfmpeg(true);
     window.api.downloadFfmpeg().then(({ ffmpegPathInPc, ffmpegVersionInPc }) => {
       if (ffmpegPathInPc && ffmpegVersionInPc) {
-        useSettingsStore.setState({ ffmpegVersion: ffmpegVersionInPc, ffmpegPath: ffmpegPathInPc });
+        useSettingsStore
+          .getState()
+          .setSettings({ ffmpegVersion: ffmpegVersionInPc, ffmpegPath: ffmpegPathInPc });
         setDownloadingFfmpeg(false);
         setIsFfmpegPresentInPc(true);
       } else {
@@ -124,10 +130,10 @@ const YtdlpFfmpegConfirmModal = ({ open, onOpenChange }: YtdlpFfmpegConfirmModal
   const [isFfmpegPresentInPc, setIsFfmpegPresentInPc] = useState(false);
   const [isYtdlpConfirmLoading, setIsYtdlpConfirmLoading] = useState(true);
   const [isFfmpegConfirmLoading, setIsFfmpegConfirmLoading] = useState(true);
-  const ytdlpVersion = useSettingsStore((state) => state.ytdlpVersion);
-  const ytdlpPath = useSettingsStore((state) => state.ytdlpPath);
-  const ffmpegVersion = useSettingsStore((state) => state.ffmpegVersion);
-  const ffmpegPath = useSettingsStore((state) => state.ffmpegPath);
+  const ytdlpVersion = useSettingsStore((state) => state.settings.ytdlpVersion);
+  const ytdlpPath = useSettingsStore((state) => state.settings.ytdlpPath);
+  const ffmpegVersion = useSettingsStore((state) => state.settings.ffmpegVersion);
+  const ffmpegPath = useSettingsStore((state) => state.settings.ffmpegPath);
 
   console.log({ ytdlpPath, ytdlpVersion, ffmpegPath, ffmpegVersion });
 
@@ -140,7 +146,9 @@ const YtdlpFfmpegConfirmModal = ({ open, onOpenChange }: YtdlpFfmpegConfirmModal
     window.api.confirmYtdlp().then(({ ytdlpPathInPc, ytdlpVersionInPc }) => {
       if (ytdlpPathInPc && ytdlpVersionInPc) {
         setIsYtdlpPresentInPc(true);
-        useSettingsStore.setState({ ytdlpPath: ytdlpPathInPc, ytdlpVersion: ytdlpVersionInPc });
+        useSettingsStore
+          .getState()
+          .setSettings({ ytdlpPath: ytdlpPathInPc, ytdlpVersion: ytdlpVersionInPc });
       } else {
         setIsYtdlpPresentInPc(false);
       }
@@ -157,7 +165,9 @@ const YtdlpFfmpegConfirmModal = ({ open, onOpenChange }: YtdlpFfmpegConfirmModal
     window.api.confirmFfmpeg().then(({ ffmpegPathInPc, ffmpegVersionInPc }) => {
       if (ffmpegPathInPc && ffmpegVersionInPc) {
         setIsFfmpegPresentInPc(true);
-        useSettingsStore.setState({ ffmpegPath: ffmpegPathInPc, ffmpegVersion: ffmpegVersionInPc });
+        useSettingsStore
+          .getState()
+          .setSettings({ ffmpegPath: ffmpegPathInPc, ffmpegVersion: ffmpegVersionInPc });
       } else {
         setIsFfmpegPresentInPc(false);
       }

@@ -15,24 +15,21 @@ import { Switch } from '@renderer/components/ui/switch';
 import { TooltipWrapper } from '@renderer/components/wrappers';
 import { useSettingsStore } from '@renderer/stores/settings-store';
 import { IconFile, IconFolder, IconInfoCircle, IconTrash } from '@tabler/icons-react';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import equal from 'fast-deep-equal';
 
 const Settings = () => {
-  const initial = useSettingsStore.getState();
-  const [settings, setSettings] = useState<Partial<AppSettings>>({
-    appVersion: initial.appVersion,
-    ytdlpVersion: initial.ytdlpVersion,
-    ffmpegVersion: initial.ffmpegVersion,
-    downloadsFolder: initial.downloadsFolder,
-    rememberPreviousDownloadsFolder: initial.rememberPreviousDownloadsFolder,
-    cookiesFilePath: initial.cookiesFilePath,
-    maxConcurrentDownloads: initial.maxConcurrentDownloads
-  });
+  const currentSettings = useSettingsStore((state) => state.settings);
+  const [settingsChange, setSettingsChange] = useState<Partial<AppSettings>>(currentSettings);
   const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
+
+  useEffect(() => {
+    setSettingsChange(currentSettings);
+  }, [currentSettings]);
 
   function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean) {
     if (key === 'rememberPreviousDownloadsFolder') {
-      setSettings((prev) => ({
+      setSettingsChange((prev) => ({
         ...prev,
         rememberPreviousDownloadsFolder: value as boolean
       }));
@@ -41,11 +38,20 @@ const Settings = () => {
 
   function handleSaveSettings() {
     const changedSettings: AppSettingsChange = {
-      downloadsFolder: settings.downloadsFolder!,
-      rememberPreviousDownloadsFolder: settings.rememberPreviousDownloadsFolder!,
-      cookiesFilePath: settings.cookiesFilePath!,
-      maxConcurrentDownloads: settings.maxConcurrentDownloads!
+      downloadsFolder: settingsChange.downloadsFolder!,
+      rememberPreviousDownloadsFolder: settingsChange.rememberPreviousDownloadsFolder!,
+      cookiesFilePath: settingsChange.cookiesFilePath!,
+      maxConcurrentDownloads: settingsChange.maxConcurrentDownloads!
     };
+
+    const currentSettingsState = {
+      downloadsFolder: currentSettings.downloadsFolder!,
+      rememberPreviousDownloadsFolder: currentSettings.rememberPreviousDownloadsFolder!,
+      cookiesFilePath: currentSettings.cookiesFilePath!,
+      maxConcurrentDownloads: currentSettings.maxConcurrentDownloads!
+    };
+
+    if (equal(currentSettingsState, changedSettings)) return;
 
     window.api.saveSettings(changedSettings);
   }
@@ -53,7 +59,7 @@ const Settings = () => {
   async function pickFolder() {
     const path = await window.api.selectFolder();
     if (path) {
-      setSettings((prev) => ({
+      setSettingsChange((prev) => ({
         ...prev,
         downloadsFolder: path
       }));
@@ -63,7 +69,7 @@ const Settings = () => {
   async function pickFile() {
     const path = await window.api.selectFile();
     if (path) {
-      setSettings((prev) => ({
+      setSettingsChange((prev) => ({
         ...prev,
         cookiesFilePath: path
       }));
@@ -76,7 +82,7 @@ const Settings = () => {
 
   function handleMaxConcurrentDownloads(val: number) {
     if (val < 1 || val > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
-    setSettings((prev) => ({
+    setSettingsChange((prev) => ({
       ...prev,
       maxConcurrentDownloads: val
     }));
@@ -98,25 +104,25 @@ const Settings = () => {
         <div className="flex items-center justify-between w-full px-18">
           <span className="setting-name text-[12px] text-nowrap">App Version</span>
           <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {settings?.appVersion}
+            {currentSettings?.appVersion}
           </span>
         </div>
         <div className="flex items-center justify-between w-full px-18">
           <span className="setting-name text-[12px] text-nowrap">yt-dlp Version</span>
           <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {settings?.ytdlpVersion}
+            {currentSettings?.ytdlpVersion}
           </span>
         </div>
         <div className="flex items-center justify-between w-full px-18">
           <span className="setting-name text-[12px] text-nowrap">ffmpeg Version</span>
           <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {settings?.ffmpegVersion}
+            {currentSettings?.ffmpegVersion}
           </span>
         </div>
         <div className="flex items-center justify-between w-full px-18">
           <span className="setting-name text-[12px] text-nowrap">Downloads Folder</span>
           <div className="h-8 w-[400px] flex items-center gap-2">
-            <Input className="text-[10px]" value={settings?.downloadsFolder} disabled />
+            <Input className="text-[10px]" value={settingsChange?.downloadsFolder} disabled />
             <TooltipWrapper message="Select folder">
               <Button variant={'outline'} size={'icon-sm'} onClick={pickFolder}>
                 <IconFolder />
@@ -129,7 +135,7 @@ const Settings = () => {
             Remember previous downloads folder
           </span>
           <Switch
-            checked={settings?.rememberPreviousDownloadsFolder}
+            checked={settingsChange?.rememberPreviousDownloadsFolder}
             onCheckedChange={(value) =>
               handleSettingsChange('rememberPreviousDownloadsFolder', value)
             }
@@ -143,7 +149,7 @@ const Settings = () => {
             step={1}
             min={1}
             max={MAX_ALLOWED_CONCURRENT_DOWNLOADS}
-            value={settings.maxConcurrentDownloads}
+            value={settingsChange.maxConcurrentDownloads}
             onChange={(e) => handleMaxConcurrentDownloads(Number(e.target.value))}
           />
         </div>
@@ -157,7 +163,7 @@ const Settings = () => {
               </TooltipWrapper>
             </span>
             <div className="h-8 w-[400px] flex items-center gap-2">
-              <Input className="text-[10px]" value={settings?.cookiesFilePath} disabled />
+              <Input className="text-[10px]" value={settingsChange?.cookiesFilePath} disabled />
               <TooltipWrapper message="Select file">
                 <Button variant={'outline'} size={'icon-sm'} onClick={pickFile}>
                   <IconFile />

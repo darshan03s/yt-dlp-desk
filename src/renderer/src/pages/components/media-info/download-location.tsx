@@ -6,7 +6,7 @@ import { IconFolder } from '@tabler/icons-react';
 import { useEffect } from 'react';
 
 const DownloadLocation = ({ loading }: { loading: boolean }) => {
-  const downloadsFolderFromSettings = useSettingsStore((state) => state.downloadsFolder);
+  const downloadsFolderFromSettings = useSettingsStore((state) => state.settings.downloadsFolder);
   const selectedDownloadFolder = useSelectedOptionsStore((state) => state.selectedDownloadFolder);
 
   useEffect(() => {

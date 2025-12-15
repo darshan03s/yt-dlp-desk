@@ -1,13 +1,14 @@
 import { create } from 'zustand';
-import { type AppSettings } from '@/shared/types';
+import { type AppSettings } from '@shared/types';
+import { DEFAULT_MAX_CONCURRENT_DOWNLOADS } from '@shared/data';
 
-interface SettingsStore extends AppSettings {
+interface SettingsStore {
+  settings: AppSettings;
   setSettings: (settings: Partial<AppSettings>) => void;
 }
 
-export const useSettingsStore = create<SettingsStore>((set) => ({
+const initialSettingsState: AppSettings = {
   appVersion: '',
-  defaultFormat: '',
   downloadsFolder: '',
   ffmpegPath: '',
   ffmpegVersion: '',
@@ -20,5 +21,16 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
   downloadTemplate: '',
   rememberPreviousDownloadsFolder: false,
   cookiesFilePath: '',
-  setSettings: (settings) => set((state) => ({ ...state, ...settings }))
+  maxConcurrentDownloads: DEFAULT_MAX_CONCURRENT_DOWNLOADS
+};
+
+export const useSettingsStore = create<SettingsStore>((set) => ({
+  settings: initialSettingsState,
+  setSettings: (settings) =>
+    set((state) => ({
+      settings: {
+        ...state.settings,
+        ...settings
+      }
+    }))
 }));

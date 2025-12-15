@@ -15,7 +15,27 @@ interface SelectedOptionsStore {
   resetExtraOptions: () => void;
 }
 
-const initialExtraOptions: ExtraOptions = {
+const initialSelectedFormatState: SelectedFormat = {
+  ext: '',
+  format: '',
+  resolution: '',
+  fps: 0,
+  acodec: '',
+  vcodec: '',
+  filesize_approx: 0,
+  format_id: '',
+  format_note: '',
+  width: 0,
+  height: 0
+};
+
+const initialDownloadSectionsState: DownloadSections = {
+  startTime: '',
+  endTime: '',
+  forceKeyframesAtCuts: false
+};
+
+const initialExtraOptionsState: ExtraOptions = {
   embedThumbnail: false,
   embedChapters: false,
   embedSubs: false,
@@ -29,29 +49,13 @@ const initialExtraOptions: ExtraOptions = {
 };
 
 export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
-  selectedFormat: {
-    ext: '',
-    format: '',
-    resolution: '',
-    fps: 0,
-    acodec: '',
-    vcodec: '',
-    filesize_approx: 0,
-    format_id: '',
-    format_note: '',
-    width: 0,
-    height: 0
-  },
+  selectedFormat: initialSelectedFormatState,
 
-  downloadSections: {
-    startTime: '',
-    endTime: '',
-    forceKeyframesAtCuts: false
-  },
+  downloadSections: initialDownloadSectionsState,
 
   selectedDownloadFolder: '',
 
-  extraOptions: initialExtraOptions,
+  extraOptions: initialExtraOptionsState,
 
   setSelectedFormat: (data) =>
     set({
@@ -76,6 +80,6 @@ export const useSelectedOptionsStore = create<SelectedOptionsStore>((set) => ({
 
   resetExtraOptions: () =>
     set(() => ({
-      extraOptions: initialExtraOptions
+      extraOptions: initialExtraOptionsState
     }))
 }));
