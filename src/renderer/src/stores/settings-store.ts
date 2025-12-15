@@ -4,7 +4,9 @@ import { DEFAULT_MAX_CONCURRENT_DOWNLOADS } from '@shared/data';
 
 interface SettingsStore {
   settings: AppSettings;
+  settingsChange: Partial<AppSettings>;
   setSettings: (settings: Partial<AppSettings>) => void;
+  setSettingsChange: (settings: Partial<AppSettings>) => void;
 }
 
 const initialSettingsState: AppSettings = {
@@ -26,10 +28,18 @@ const initialSettingsState: AppSettings = {
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
   settings: initialSettingsState,
+  settingsChange: initialSettingsState,
   setSettings: (settings) =>
     set((state) => ({
       settings: {
         ...state.settings,
+        ...settings
+      }
+    })),
+  setSettingsChange: (settings) =>
+    set((state) => ({
+      settingsChange: {
+        ...state.settingsChange,
         ...settings
       }
     }))

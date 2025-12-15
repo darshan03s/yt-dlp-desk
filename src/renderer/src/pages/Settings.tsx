@@ -1,5 +1,5 @@
 import { MAX_ALLOWED_CONCURRENT_DOWNLOADS } from '@shared/data';
-import { AppSettings, AppSettingsChange } from '@shared/types';
+import { AppSettingsChange } from '@shared/types';
 import { Button } from '@renderer/components/ui/button';
 import {
   Dialog,
@@ -15,27 +15,23 @@ import { Switch } from '@renderer/components/ui/switch';
 import { TooltipWrapper } from '@renderer/components/wrappers';
 import { useSettingsStore } from '@renderer/stores/settings-store';
 import { IconFile, IconFolder, IconInfoCircle, IconTrash } from '@tabler/icons-react';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import equal from 'fast-deep-equal';
+import { cn } from '@renderer/lib/utils';
+import { ButtonGroup } from '@renderer/components/ui/button-group';
 
-const Settings = () => {
+const SettingsHeader = () => {
+  return (
+    <div className="px-3 py-2 h-12 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
+      <span className="text-xs">Settings</span>
+      <SaveSettingsButton />
+    </div>
+  );
+};
+
+const SaveSettingsButton = () => {
   const currentSettings = useSettingsStore((state) => state.settings);
-  const [settingsChange, setSettingsChange] = useState<Partial<AppSettings>>(currentSettings);
-  const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
-
-  useEffect(() => {
-    setSettingsChange(currentSettings);
-  }, [currentSettings]);
-
-  function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean) {
-    if (key === 'rememberPreviousDownloadsFolder') {
-      setSettingsChange((prev) => ({
-        ...prev,
-        rememberPreviousDownloadsFolder: value as boolean
-      }));
-    }
-  }
-
+  const settingsChange = useSettingsStore((state) => state.settingsChange);
   function handleSaveSettings() {
     const changedSettings: AppSettingsChange = {
       downloadsFolder: settingsChange.downloadsFolder!,
@@ -56,23 +52,67 @@ const Settings = () => {
     window.api.saveSettings(changedSettings);
   }
 
+  return (
+    <Button
+      onClick={handleSaveSettings}
+      className="text-[11px] h-7 bg-primary text-primary-foreground"
+    >
+      Save Settings
+    </Button>
+  );
+};
+
+const SettingsBlock = ({
+  children,
+  className,
+  name
+}: {
+  children: ReactNode;
+  className?: string;
+  name?: string;
+}) => {
+  return (
+    <div className={cn('settings-block w-full flex flex-col gap-1 m-0', className)}>
+      {name && <h1 className="text-sm font-bold">{name}</h1>}
+      <div className="space-y-5">{children}</div>
+    </div>
+  );
+};
+
+const SettingsItem = ({ children, className }: { children: ReactNode; className?: string }) => {
+  return (
+    <div
+      className={cn('flex items-center justify-between [&_.setting-name]:font-semibold', className)}
+    >
+      {children}
+    </div>
+  );
+};
+
+const SettingsBlocks = () => {
+  const currentSettings = useSettingsStore((state) => state.settings);
+  const settingsChange = useSettingsStore((state) => state.settingsChange);
+  const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
+
+  function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean) {
+    if (key === 'rememberPreviousDownloadsFolder') {
+      useSettingsStore
+        .getState()
+        .setSettingsChange({ rememberPreviousDownloadsFolder: value as boolean });
+    }
+  }
+
   async function pickFolder() {
     const path = await window.api.selectFolder();
     if (path) {
-      setSettingsChange((prev) => ({
-        ...prev,
-        downloadsFolder: path
-      }));
+      useSettingsStore.getState().setSettingsChange({ downloadsFolder: path });
     }
   }
 
   async function pickFile() {
     const path = await window.api.selectFile();
     if (path) {
-      setSettingsChange((prev) => ({
-        ...prev,
-        cookiesFilePath: path
-      }));
+      useSettingsStore.getState().setSettingsChange({ cookiesFilePath: path });
     }
   }
 
@@ -82,55 +122,43 @@ const Settings = () => {
 
   function handleMaxConcurrentDownloads(val: number) {
     if (val < 1 || val > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
-    setSettingsChange((prev) => ({
-      ...prev,
-      maxConcurrentDownloads: val
-    }));
+    useSettingsStore.getState().setSettingsChange({ maxConcurrentDownloads: val });
   }
 
   return (
-    <div className="w-full flex flex-col gap-2">
-      <div className="px-3 py-2 h-12 text-sm flex items-center justify-between sticky top-0 left-0 bg-background/60 backdrop-blur-md text-foreground z-49">
-        <span className="text-xs">Settings</span>
-        <Button
-          onClick={handleSaveSettings}
-          className="text-[11px] h-7 bg-primary text-primary-foreground"
-        >
-          Save Settings
-        </Button>
-      </div>
-
-      <div className="py-3 space-y-6 [&_.setting-name]:font-semibold">
-        <div className="flex items-center justify-between w-full px-18">
+    <div className="settings-blocks divide-y px-12 [&_div.settings-block]:p-2 [&_div.settings-block]:py-3.5 [&_div.settings-block]:first:pt-0 [&_div.settings-block]:last:pb-0">
+      <SettingsBlock>
+        <SettingsItem>
           <span className="setting-name text-[12px] text-nowrap">App Version</span>
           <span className="h-8 w-[400px] text-[12px] flex items-center">
             {currentSettings?.appVersion}
           </span>
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
+        </SettingsItem>
+        <SettingsItem>
           <span className="setting-name text-[12px] text-nowrap">yt-dlp Version</span>
           <span className="h-8 w-[400px] text-[12px] flex items-center">
             {currentSettings?.ytdlpVersion}
           </span>
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
-          <span className="setting-name text-[12px] text-nowrap">ffmpeg Version</span>
-          <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {currentSettings?.ffmpegVersion}
-          </span>
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
+        </SettingsItem>
+        <SettingsItem>
           <span className="setting-name text-[12px] text-nowrap">Downloads Folder</span>
           <div className="h-8 w-[400px] flex items-center gap-2">
-            <Input className="text-[10px]" value={settingsChange?.downloadsFolder} disabled />
-            <TooltipWrapper message="Select folder">
-              <Button variant={'outline'} size={'icon-sm'} onClick={pickFolder}>
-                <IconFolder />
-              </Button>
-            </TooltipWrapper>
+            <ButtonGroup className="w-full">
+              <Input className="text-[10px] h-8" value={settingsChange?.downloadsFolder} disabled />
+              <TooltipWrapper message="Select folder">
+                <Button
+                  variant={'outline'}
+                  size={'icon-sm'}
+                  className="size-8"
+                  onClick={pickFolder}
+                >
+                  <IconFolder className="size-4" />
+                </Button>
+              </TooltipWrapper>
+            </ButtonGroup>
           </div>
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
+        </SettingsItem>
+        <SettingsItem>
           <span className="setting-name text-[12px] text-nowrap">
             Remember previous downloads folder
           </span>
@@ -140,11 +168,11 @@ const Settings = () => {
               handleSettingsChange('rememberPreviousDownloadsFolder', value)
             }
           />
-        </div>
-        <div className="flex items-center justify-between w-full px-18">
+        </SettingsItem>
+        <SettingsItem>
           <span className="setting-name text-[12px] text-nowrap">Max concurrent downloads</span>
           <Input
-            className="w-15"
+            className="w-14 h-8 text-xs"
             type="number"
             step={1}
             min={1}
@@ -152,57 +180,55 @@ const Settings = () => {
             value={settingsChange.maxConcurrentDownloads}
             onChange={(e) => handleMaxConcurrentDownloads(Number(e.target.value))}
           />
-        </div>
-        <div className="px-18 flex flex-col gap-2 pt-2">
-          <h1 className="text-sm border-b pb-1 font-bold">Cookies</h1>
-          <div className="flex items-center justify-between w-full">
-            <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
-              Cookies file path
-              <TooltipWrapper message="Choose cookies.txt (Netscape format)">
-                <IconInfoCircle className="size-3" />
-              </TooltipWrapper>
-            </span>
-            <div className="h-8 w-[400px] flex items-center gap-2">
-              <Input className="text-[10px]" value={settingsChange?.cookiesFilePath} disabled />
+        </SettingsItem>
+      </SettingsBlock>
+
+      <SettingsBlock name="Cookies">
+        <SettingsItem>
+          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+            Cookies file path
+            <TooltipWrapper message="Choose cookies.txt (Netscape format)">
+              <IconInfoCircle className="size-3" />
+            </TooltipWrapper>
+          </span>
+          <div className="h-8 w-[400px] flex items-center gap-2">
+            <ButtonGroup className="w-full">
+              <Input className="text-[10px] h-8" value={settingsChange?.cookiesFilePath} disabled />
               <TooltipWrapper message="Select file">
-                <Button variant={'outline'} size={'icon-sm'} onClick={pickFile}>
-                  <IconFile />
+                <Button variant={'outline'} size={'icon-sm'} onClick={pickFile} className="size-8">
+                  <IconFile className="size-4" />
                 </Button>
               </TooltipWrapper>
-            </div>
+            </ButtonGroup>
           </div>
-        </div>
-        <div className="px-18 flex flex-col gap-2 pt-2">
-          <h1 className="text-sm border-b pb-1 font-bold">App Data</h1>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <span className="setting-name text-[12px] text-nowrap flex items-center gap-1 text-destructive">
-                Clear metadata for all media
-              </span>
-              <div className="h-8 flex items-center gap-2">
-                <Button
-                  variant={'destructive'}
-                  className="text-xs"
-                  size={'sm'}
-                  onClick={handleClearAllMetadata}
-                >
-                  Clear
-                  <IconTrash className="size-4" />
-                </Button>
-              </div>
-            </div>
+        </SettingsItem>
+      </SettingsBlock>
+
+      <SettingsBlock name="App data">
+        <SettingsItem>
+          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1 text-destructive">
+            Clear metadata for all media
+          </span>
+          <div className="h-8 flex items-center gap-2">
+            <Button
+              variant={'destructive'}
+              className="text-xs"
+              size={'sm'}
+              onClick={handleClearAllMetadata}
+            >
+              Clear Metadata
+              <IconTrash className="size-4" />
+            </Button>
           </div>
-        </div>
-      </div>
-      <ConfirmDeleteAllMetadataModal
-        open={isConfirmClearAllMetadataVisible}
-        setOpen={setIsConfirmClearAllMetadataVisible}
-      />
+          <ConfirmDeleteAllMetadataModal
+            open={isConfirmClearAllMetadataVisible}
+            setOpen={setIsConfirmClearAllMetadataVisible}
+          />
+        </SettingsItem>
+      </SettingsBlock>
     </div>
   );
 };
-
-export default Settings;
 
 const ConfirmDeleteAllMetadataModal = ({
   open,
@@ -235,3 +261,20 @@ const ConfirmDeleteAllMetadataModal = ({
     </Dialog>
   );
 };
+
+const Settings = () => {
+  const currentSettings = useSettingsStore((state) => state.settings);
+
+  useEffect(() => {
+    useSettingsStore.getState().setSettingsChange(currentSettings);
+  }, [currentSettings]);
+
+  return (
+    <div className="w-full flex flex-col gap-1">
+      <SettingsHeader />
+      <SettingsBlocks />
+    </div>
+  );
+};
+
+export default Settings;
