@@ -99,10 +99,28 @@ function createWindow(): void {
   }
 }
 
+const gotLock = app.requestSingleInstanceLock();
+const isPrimaryInstance = gotLock;
+
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+  if (!isPrimaryInstance) {
+    return;
+  }
+
   electronApp.setAppUserModelId(APP_USER_MODEL_ID);
 
   createSplash();
