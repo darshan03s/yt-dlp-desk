@@ -94,12 +94,26 @@ const SettingsBlock = ({
 };
 
 const SettingsItem = ({ children, className }: { children: ReactNode; className?: string }) => {
+  return <div className={cn('flex items-center justify-between', className)}>{children}</div>;
+};
+
+const SettingName = ({ children, className }: { children: ReactNode; className?: string }) => {
   return (
-    <div
-      className={cn('flex items-center justify-between [&_.setting-name]:font-semibold', className)}
-    >
+    <span className={cn('setting-name text-[12px] text-nowrap font-semibold', className)}>
       {children}
-    </div>
+    </span>
+  );
+};
+
+const SettingsStaticValue = ({
+  children,
+  className
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <span className={cn('h-8 w-[400px] text-[12px] flex items-center', className)}>{children}</span>
   );
 };
 
@@ -170,20 +184,16 @@ const SettingsBlocks = () => {
     <div className="settings-blocks divide-y px-12 [&_div.settings-block]:p-2 [&_div.settings-block]:py-3.5 [&_div.settings-block]:first:pt-0 [&_div.settings-block]:last:pb-0">
       <SettingsBlock>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap">App Version</span>
-          <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {currentSettings?.appVersion}
-          </span>
+          <SettingName>App Version</SettingName>
+          <SettingsStaticValue>{currentSettings?.appVersion}</SettingsStaticValue>
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap">yt-dlp Version</span>
-          <span className="h-8 w-[400px] text-[12px] flex items-center">
-            {currentSettings?.ytdlpVersion}
-          </span>
+          <SettingName>yt-dlp Version</SettingName>
+          <SettingsStaticValue>{currentSettings?.ytdlpVersion}</SettingsStaticValue>
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap">Downloads Folder</span>
-          <div className="h-8 w-[400px] flex items-center gap-2">
+          <SettingName>Downloads Folder</SettingName>
+          <div className="h-8 w-[400px] flex items-center">
             <ButtonGroup className="w-full">
               <Input className="text-[10px] h-8" value={settingsChange?.downloadsFolder} disabled />
               <TooltipWrapper message="Select folder">
@@ -200,9 +210,7 @@ const SettingsBlocks = () => {
           </div>
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap">
-            Remember previous downloads folder
-          </span>
+          <SettingName>Remember previous downloads folder</SettingName>
           <Switch
             checked={settingsChange?.rememberPreviousDownloadsFolder}
             onCheckedChange={(value) =>
@@ -211,7 +219,7 @@ const SettingsBlocks = () => {
           />
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap">Max concurrent downloads</span>
+          <SettingName>Max concurrent downloads</SettingName>
           <Input
             className="w-14 h-8 text-xs"
             type="number"
@@ -226,12 +234,12 @@ const SettingsBlocks = () => {
 
       <SettingsBlock name="Cookies">
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+          <SettingName className="flex items-center gap-1">
             Cookies file path
             <TooltipWrapper message="Choose cookies.txt (Netscape format)">
               <IconInfoCircle className="size-3" />
             </TooltipWrapper>
-          </span>
+          </SettingName>
           <div className="h-8 w-[400px] flex items-center gap-2">
             <ButtonGroup className="w-full">
               <Input className="text-[10px] h-8" value={settingsChange?.cookiesFilePath} disabled />
@@ -244,7 +252,7 @@ const SettingsBlocks = () => {
           </div>
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+          <SettingName className="flex items-center gap-1">
             Cookies from browser
             <TooltipWrapper
               className="w-[200px]"
@@ -253,7 +261,7 @@ const SettingsBlocks = () => {
             >
               <IconInfoCircle className="size-3" />
             </TooltipWrapper>
-          </span>
+          </SettingName>
           <div className="h-8 w-[400px] flex items-center gap-2">
             <Select onValueChange={(val) => handleSettingsChange('cookiesBrowser', val)}>
               <SelectTrigger className="w-full text-[10px] h-8 capitalize">
@@ -273,7 +281,7 @@ const SettingsBlocks = () => {
           </div>
         </SettingsItem>
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+          <SettingName className="flex items-center gap-1">
             Cookies browser profile
             <TooltipWrapper
               className="w-full"
@@ -282,7 +290,7 @@ const SettingsBlocks = () => {
             >
               <IconInfoCircle className="size-3" />
             </TooltipWrapper>
-          </span>
+          </SettingName>
           <div className="h-8 w-[400px] flex items-center gap-2">
             <Input
               className="text-[10px] h-8"
@@ -295,9 +303,9 @@ const SettingsBlocks = () => {
 
       <SettingsBlock name="App data">
         <SettingsItem>
-          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1 text-destructive">
+          <SettingName className="flex items-center gap-1 text-destructive">
             Clear metadata for all media
-          </span>
+          </SettingName>
           <div className="h-8 flex items-center gap-2">
             <Button
               variant={'destructive'}
