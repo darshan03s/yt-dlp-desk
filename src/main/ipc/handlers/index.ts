@@ -238,7 +238,7 @@ export async function getMediaInfoJson(
           const newUrlHistoryItem = {
             url,
             thumbnail: infoJson.thumbnail ?? infoJson.thumbnails?.at(-1)?.url ?? '',
-            title: infoJson.fulltitle ?? infoJson.title ?? '',
+            title: infoJson.fulltitle?.trim() || infoJson.title?.trim() || 'N/A',
             source: source,
             thumbnail_local: infoJson.thumbnail_local ?? '',
             uploader: infoJson.uploader ?? infoJson.channel ?? '',

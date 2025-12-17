@@ -652,7 +652,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     const newDownload: NewDownloadHistoryItem = {
       id: downloadOptions.downloadId,
       thumbnail: mediaInfo.thumbnail ?? '',
-      title: mediaInfo.fulltitle ?? mediaInfo.title ?? 'N/A',
+      title: mediaInfo.fulltitle?.trim() || mediaInfo.title?.trim() || 'N/A',
       url: url,
       source: source,
       thumbnail_local: mediaInfo.thumbnail_local || '',

@@ -35,7 +35,7 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
             className="text-xs border bg-secondary text-secondary-foreground h-10 px-2 rounded-md cursor-pointer flex items-center"
           >
             <p className="text-xs leading-5 line-clamp-1">
-              {infoJson.fulltitle ?? infoJson.title ?? 'N/A'}
+              {infoJson.fulltitle || infoJson.title || 'N/A'}
             </p>
           </div>
         )}

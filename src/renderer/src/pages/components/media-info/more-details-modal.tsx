@@ -32,7 +32,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
         <div className="w-full font-mono flex flex-col gap-2 text-xs h-70 overflow-auto">
           <div>
             <span className="font-semibold">Title</span>:{' '}
-            <span>{infoJson.fulltitle ?? infoJson.title ?? 'N/A'}</span>
+            <span>{infoJson.fulltitle || infoJson.title || 'N/A'}</span>
           </div>
           {infoJson.alt_title && (
             <div>
@@ -92,31 +92,31 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               {infoJson.thumbnail ?? infoJson.thumbnails?.at(-1)?.url ?? 'N/A'}
             </Anchor>
           </div>
-          {infoJson.view_count && (
+          {infoJson.view_count !== undefined && (
             <div>
               <span className="font-semibold">View Count</span>:{' '}
               <span>{numeral(infoJson.view_count).format('0.00a')}</span>
             </div>
           )}
-          {infoJson.comment_count && (
+          {infoJson.comment_count !== undefined && (
             <div>
               <span className="font-semibold">Comment Count</span>:{' '}
               <span>{numeral(infoJson.comment_count).format('0.00a')}</span>
             </div>
           )}
-          {infoJson.like_count && (
+          {infoJson.like_count !== undefined && (
             <div>
               <span className="font-semibold">Like Count</span>:{' '}
               <span>{numeral(infoJson.like_count).format('0.00a')}</span>
             </div>
           )}
-          {infoJson.repost_count && (
+          {infoJson.repost_count !== undefined && (
             <div>
               <span className="font-semibold">Repost Count</span>:{' '}
               <span>{numeral(infoJson.repost_count).format('0.00a')}</span>
             </div>
           )}
-          {infoJson.concurrent_view_count && (
+          {infoJson.concurrent_view_count !== undefined && (
             <div>
               <span className="font-semibold">Concurrent View Count</span>:{' '}
               <span>{numeral(infoJson.concurrent_view_count).format('0.00a')}</span>
@@ -128,34 +128,34 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               <span>{infoJson.is_live ? 'Live Now' : infoJson.was_live ? 'Was Live' : 'N/A'}</span>
             </div>
           )}
-          {infoJson.categories && (
+          {infoJson.categories !== undefined && (
             <div>
               <span className="font-semibold">Categories</span>:{' '}
               <span>{infoJson.categories?.join(', ')}</span>
             </div>
           )}
-          {infoJson.tags && (
+          {infoJson.tags !== undefined && (
             <div>
               <span className="font-semibold">Tags</span>: <span>{infoJson.tags?.join(', ')}</span>
             </div>
           )}
-          {infoJson.album && (
+          {infoJson.album !== undefined && (
             <div>
               <span className="font-semibold">Album</span>: <span>{infoJson.album}</span>
             </div>
           )}
-          {infoJson.artists && (
+          {infoJson.artists !== undefined && (
             <div>
               <span className="font-semibold">Artists</span>:{' '}
               <span>{infoJson.artists?.join(', ')}</span>
             </div>
           )}
-          {infoJson.track && (
+          {infoJson.track !== undefined && (
             <div>
               <span className="font-semibold">Track</span>: <span>{infoJson.track}</span>
             </div>
           )}
-          {infoJson.release_year && (
+          {infoJson.release_year !== undefined && (
             <div>
               <span className="font-semibold">Release Year</span>:{' '}
               <span>{infoJson.release_year}</span>
@@ -177,7 +177,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
           </div>
           <div>
             <span className="font-semibold">Description</span>:{' '}
-            {infoJson.description ? (
+            {infoJson.description !== undefined ? (
               <>
                 <br />
                 <p className="w-full resize-none p-1">{infoJson.description}</p>
@@ -186,7 +186,7 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               'N/A'
             )}
           </div>
-          {infoJson.chapters && (
+          {infoJson.chapters !== undefined && (
             <div>
               <span className="font-semibold">Chapters: </span>
               <div className="flex flex-col gap-2">
