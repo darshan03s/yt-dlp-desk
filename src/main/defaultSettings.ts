@@ -20,6 +20,7 @@ export function getDefaultAppSettings(): AppSettings {
     rememberPreviousDownloadsFolder: false,
     cookiesFilePath: '',
     maxConcurrentDownloads: DEFAULT_MAX_CONCURRENT_DOWNLOADS,
-    cookiesBrowser: ''
+    cookiesBrowser: '',
+    cookiesBrowserProfile: ''
   };
 }
