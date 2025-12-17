@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 import logger from '@shared/logger';
-import { AppSettingsChange, Source, type Api } from '@shared/types';
+import { AppSettingsChange, Source, SupportedCookieBrowser, type Api } from '@shared/types';
 import { DownloadOptions } from '@shared/types/download';
 
 // Custom APIs for renderer
@@ -50,7 +50,9 @@ const api: Api = {
   showInFolder: (filePath: string) => ipcRenderer.send('show-in-folder', filePath),
   selectFile: () => ipcRenderer.invoke('select-file'),
   retryFailedDownload: (id: string) => ipcRenderer.send('app:retry-download', id),
-  deleteAllMetadata: () => ipcRenderer.send('app:delete-all-metadata')
+  deleteAllMetadata: () => ipcRenderer.send('app:delete-all-metadata'),
+  getBrowserProfiles: (browser: SupportedCookieBrowser) =>
+    ipcRenderer.invoke('get-browser-profiles', browser)
 };
 
 if (process.contextIsolated) {

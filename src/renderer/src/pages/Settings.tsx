@@ -117,10 +117,59 @@ const SettingsStaticValue = ({
   );
 };
 
+const ConfirmDeleteAllMetadataModal = ({
+  open,
+  setOpen
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
+  function handleConfirmDeleteAllMetadata() {
+    window.api.deleteAllMetadata();
+    setOpen(false);
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete all metadata?</DialogTitle>
+          <DialogDescription>This action will delete all media metadata</DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex ">
+          <DialogClose asChild>
+            <Button variant={'outline'}>Cancel</Button>
+          </DialogClose>
+          <Button onClick={handleConfirmDeleteAllMetadata} variant={'destructive'}>
+            Continue
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const SettingsBlocks = () => {
   const currentSettings = useSettingsStore((state) => state.settings);
   const settingsChange = useSettingsStore((state) => state.settingsChange);
   const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
+  const [browserProfiles, setBrowserProfiles] = useState<string[]>([]);
+
+  function updateBrowserProfiles(browser: SupportedCookieBrowser) {
+    window.api.getBrowserProfiles(browser).then((data) => {
+      setBrowserProfiles(data);
+    });
+  }
+
+  useEffect(() => {
+    if (currentSettings.cookiesBrowser.length === 0) return;
+    updateBrowserProfiles(currentSettings.cookiesBrowser as SupportedCookieBrowser);
+  }, []);
+
+  useEffect(() => {
+    if (settingsChange.cookiesBrowser!.length === 0) return;
+    updateBrowserProfiles(settingsChange.cookiesBrowser as SupportedCookieBrowser);
+  }, [settingsChange.cookiesBrowser]);
 
   function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean | number) {
     if (key === 'rememberPreviousDownloadsFolder') {
@@ -146,6 +195,7 @@ const SettingsBlocks = () => {
       const selectedBrowser = value as SupportedCookieBrowser;
       if (selectedBrowser !== settingsChange.cookiesBrowser) {
         useSettingsStore.getState().setSettingsChange({ cookiesBrowserProfile: '' });
+        setBrowserProfiles([]);
       }
       if (selectedBrowser === currentSettings.cookiesBrowser) {
         useSettingsStore
@@ -271,7 +321,7 @@ const SettingsBlocks = () => {
                 <SelectGroup>
                   <SelectLabel>Browsers</SelectLabel>
                   {SUPPORTED_COOKIE_BROWSERS.map((browser) => (
-                    <SelectItem value={browser} key={browser} className="capitalize">
+                    <SelectItem value={browser} key={browser} className="capitalize text-xs">
                       {browser}
                     </SelectItem>
                   ))}
@@ -291,13 +341,34 @@ const SettingsBlocks = () => {
               <IconInfoCircle className="size-3" />
             </TooltipWrapper>
           </SettingName>
-          <div className="h-8 w-[400px] flex items-center gap-2">
-            <Input
-              className="text-[10px] h-8"
-              value={settingsChange?.cookiesBrowserProfile}
-              onChange={(e) => handleSettingsChange('cookiesBrowserProfile', e.target.value)}
-            />
-          </div>
+          {browserProfiles.length > 0 ? (
+            <div className="h-8 w-[400px] flex items-center">
+              <Select onValueChange={(val) => handleSettingsChange('cookiesBrowserProfile', val)}>
+                <SelectTrigger className="w-full text-[10px] h-8 capitalize">
+                  <SelectValue placeholder={settingsChange.cookiesBrowserProfile} />
+                </SelectTrigger>
+                <SelectContent className="text-sm">
+                  <SelectGroup>
+                    <SelectLabel>Browser Profiles</SelectLabel>
+                    {browserProfiles.map((profile) => (
+                      <SelectItem value={profile} key={profile} className="capitalize text-xs">
+                        {profile}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="h-8 w-[400px] flex items-center gap-2">
+              <Input
+                placeholder="Enter profile name"
+                className="text-[10px] h-8"
+                value={settingsChange?.cookiesBrowserProfile}
+                onChange={(e) => handleSettingsChange('cookiesBrowserProfile', e.target.value)}
+              />
+            </div>
+          )}
         </SettingsItem>
       </SettingsBlock>
 
@@ -324,38 +395,6 @@ const SettingsBlocks = () => {
         </SettingsItem>
       </SettingsBlock>
     </div>
-  );
-};
-
-const ConfirmDeleteAllMetadataModal = ({
-  open,
-  setOpen
-}: {
-  open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-}) => {
-  function handleConfirmDeleteAllMetadata() {
-    window.api.deleteAllMetadata();
-    setOpen(false);
-  }
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete all metadata?</DialogTitle>
-          <DialogDescription>This action will delete all media metadata</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="flex ">
-          <DialogClose asChild>
-            <Button variant={'outline'}>Cancel</Button>
-          </DialogClose>
-          <Button onClick={handleConfirmDeleteAllMetadata} variant={'destructive'}>
-            Continue
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 };
 

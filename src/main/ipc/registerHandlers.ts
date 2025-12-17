@@ -31,7 +31,8 @@ import {
   pauseWaitingDownload,
   resumePausedDownloads,
   retryFailedDownloads,
-  pauseWaitingDownloads
+  pauseWaitingDownloads,
+  getBrowserProfiles
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -103,6 +104,8 @@ async function registerHanlders() {
   ipcMain.on('app:retry-download', retryFailedDownload);
 
   ipcMain.on('app:delete-all-metadata', deleteAllMetadata);
+
+  ipcMain.handle('get-browser-profiles', getBrowserProfiles);
 }
 
 export default registerHanlders;

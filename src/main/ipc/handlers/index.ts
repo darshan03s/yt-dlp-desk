@@ -10,6 +10,7 @@ import {
   getAllInfoJsonFiles,
   getFfmpegFromPc,
   getFfmpegVersionFromPc,
+  getFirefoxProfiles,
   getNormalizedUrl,
   getSettings,
   getSourceFromUrl,
@@ -23,7 +24,7 @@ import { copyFileToFolder, copyFolder, deleteFile } from '@main/utils/fsUtils';
 import { downloadFromYtdlp, getInfoJson } from '@main/utils/ytdlpUtils';
 import { allowedSources } from '@shared/data';
 import logger from '@shared/logger';
-import { Api, AppSettingsChange, Source } from '@shared/types';
+import { Api, AppSettingsChange, Source, SupportedCookieBrowser } from '@shared/types';
 import SevenZip from '7zip-min';
 import path from 'node:path';
 import { dialog, IpcMainEvent, IpcMainInvokeEvent, shell } from 'electron';
@@ -450,4 +451,14 @@ export async function deleteAllMetadata() {
   }
 
   mainWindow.webContents.send('app:delete-all-metadata');
+}
+
+export async function getBrowserProfiles(
+  _event: IpcMainInvokeEvent,
+  browser: SupportedCookieBrowser
+) {
+  if (browser === 'firefox') {
+    return getFirefoxProfiles();
+  }
+  return [];
 }

@@ -10,9 +10,11 @@ import {
   getYouTubeVideoId
 } from '@shared/utils';
 import { ChildProcess, exec } from 'child_process';
+import { app } from 'electron';
 import { readdir } from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
+import { listFolderItems } from './fsUtils';
 const execPromise = promisify(exec);
 
 export async function getYtdlpFromSettings() {
@@ -230,4 +232,11 @@ export async function getAllInfoJsonFiles(
   );
 
   return files.flat();
+}
+
+export async function getFirefoxProfiles() {
+  const roamingAppDataPath = app.getPath('appData');
+  const firefoxProfilesFolder = path.join(roamingAppDataPath, 'Mozilla', 'Firefox', 'Profiles');
+  const profilesList = await listFolderItems(firefoxProfilesFolder);
+  return profilesList;
 }

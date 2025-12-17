@@ -104,7 +104,7 @@ export async function createInfoJson(
           `${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`
         );
       } else {
-        infoJsonCommandArgs.push(`${settings.get('cookiesFilePath')}`);
+        infoJsonCommandArgs.push(`${settings.get('cookiesBrowser')}`);
       }
     }
 
@@ -134,7 +134,7 @@ export async function createInfoJson(
         if (data.includes('HTTPError')) {
           mainWindow.webContents.send('yt-dlp:error', 'HTTP Error');
         }
-        if (data.includes('DPAPI')) {
+        if (data.includes('DPAPI') || data.includes('Could not copy Chrome cookie database')) {
           mainWindow.webContents.send(
             'yt-dlp:error',
             'Could not get cookies from the selected browser. Try a different browser'
@@ -204,7 +204,7 @@ async function addLiveFromStartFormats(url: string, infoJson: MediaInfoJson) {
     if (settings.get('cookiesBrowserProfile').length > 0) {
       args.push(`${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`);
     } else {
-      args.push(`${settings.get('cookiesFilePath')}`);
+      args.push(`${settings.get('cookiesBrowser')}`);
     }
   }
 
@@ -228,7 +228,7 @@ async function addLiveFromStartFormats(url: string, infoJson: MediaInfoJson) {
 
     child.stderr.on('data', (data) => {
       if (data.includes('ERROR')) {
-        if (data.includes('DPAPI')) {
+        if (data.includes('DPAPI') || data.includes('Could not copy Chrome cookie database')) {
           mainWindow.webContents.send(
             'yt-dlp:error',
             'Could not get cookies from the selected browser. Try a different browser'
@@ -537,7 +537,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
           `${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`
         );
       } else {
-        downloadCommandArgs.push(`${settings.get('cookiesFilePath')}`);
+        downloadCommandArgs.push(`${settings.get('cookiesBrowser')}`);
       }
     }
 

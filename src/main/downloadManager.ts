@@ -118,7 +118,7 @@ export class DownloadManager {
               'No formats available to download live from start'
             );
           }
-          if (data.includes('DPAPI')) {
+          if (data.includes('DPAPI') || data.includes('Could not copy Chrome cookie database')) {
             mainWindow.webContents.send(
               'yt-dlp:error',
               'Could not get cookies from the selected browser. Try a different browser'

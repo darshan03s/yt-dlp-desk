@@ -1,4 +1,14 @@
-import { access, mkdir, cp, copyFile, readFile, writeFile, stat, unlink } from 'node:fs/promises';
+import {
+  access,
+  mkdir,
+  cp,
+  copyFile,
+  readFile,
+  writeFile,
+  stat,
+  unlink,
+  readdir
+} from 'node:fs/promises';
 import { accessSync, constants, createWriteStream, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fetch } from 'undici';
@@ -148,4 +158,8 @@ export function getFileExtension(filePath: string | undefined): string {
   if (!filePath) return '';
   const ext = path.extname(filePath).trim();
   return ext.startsWith('.') ? ext.slice(1) : ext;
+}
+
+export async function listFolderItems(dirPath: string): Promise<string[]> {
+  return await readdir(dirPath);
 }

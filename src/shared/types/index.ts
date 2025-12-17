@@ -17,7 +17,7 @@ export type AppSettings = {
   rememberPreviousDownloadsFolder: boolean;
   cookiesFilePath: string;
   maxConcurrentDownloads: number;
-  cookiesBrowser: SupportedCookieBrowser | '';
+  cookiesBrowser: SupportedCookieBrowser | string;
   cookiesBrowserProfile: string;
 };
 
@@ -93,4 +93,5 @@ export type Api = {
   selectFile: () => Promise<string | null>;
   retryFailedDownload: (id: string) => void;
   deleteAllMetadata: () => void;
+  getBrowserProfiles: (browser: SupportedCookieBrowser) => Promise<string[]>;
 };
