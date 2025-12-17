@@ -6,7 +6,8 @@ export const allowedSources = [
   'twitter-video',
   'instagram-video',
   'reddit-video',
-  'dailymotion-video'
+  'dailymotion-video',
+  'pinterest-video'
 ] as const;
 
 export const SERVER_PORT = 12277;

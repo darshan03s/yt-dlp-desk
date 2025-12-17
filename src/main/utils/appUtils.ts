@@ -4,6 +4,7 @@ import { Api, AppSettings, Source } from '@shared/types';
 import {
   getDailymotionId,
   getInstagramId,
+  getPinterestId,
   getRedditId,
   getYoutubeMusicId,
   getYoutubePlaylistId,
@@ -141,6 +142,9 @@ export function getSourceFromUrl(url: string): Source | null {
   if (parsedUrl.hostname.includes('dailymotion.com') || parsedUrl.hostname.includes('dai.ly')) {
     return 'dailymotion-video';
   }
+  if (parsedUrl.hostname.includes('pinterest.com') || parsedUrl.hostname.includes('pin.it')) {
+    return 'pinterest-video';
+  }
   return null;
 }
 
@@ -192,6 +196,10 @@ export function getNormalizedUrl(source: Source, url: string) {
   if (source === 'dailymotion-video') {
     const id = getDailymotionId(url);
     return `https://www.dailymotion.com/video/${id}`;
+  }
+  if (source === 'pinterest-video') {
+    const id = getPinterestId(url);
+    return `https://www.pinterest.com/pin/${id}`;
   }
   return '';
 }

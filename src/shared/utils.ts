@@ -85,6 +85,17 @@ export function getDailymotionId(url: string): string | null {
   return null;
 }
 
+export function getPinterestId(url: string): string | null {
+  const parsed = new URL(url);
+  if (parsed.pathname.startsWith('/pin')) {
+    return parsed.pathname.split('/')[2];
+  }
+  if (parsed.pathname.startsWith('/')) {
+    return parsed.pathname.split('/')[1];
+  }
+  return null;
+}
+
 export const AUDIO_EXTS = new Set([
   '.mp3',
   '.m4a',
