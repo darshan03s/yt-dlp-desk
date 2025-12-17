@@ -1,4 +1,4 @@
-import { allowedSources } from '../data';
+import { allowedSources, SUPPORTED_COOKIE_BROWSERS } from '../data';
 import { DownloadOptions } from './download';
 import { DownloadHistoryList, RunningDownloadsList, UrlHistoryList } from './history';
 
@@ -8,7 +8,7 @@ export type AppSettings = {
   ytdlpVersion: string;
   ffmpegPath: string;
   ffmpegVersion: string;
-  platform: typeof process.platform | string;
+  platform: typeof process.platform;
   mediaDataFolder: string;
   downloadsFolder: string;
   userDownloadsFolder: string;
@@ -17,6 +17,8 @@ export type AppSettings = {
   rememberPreviousDownloadsFolder: boolean;
   cookiesFilePath: string;
   maxConcurrentDownloads: number;
+  cookiesBrowser: SupportedCookieBrowser | '';
+  cookiesBrowserProfile: string;
 };
 
 export type AppSettingsChange = Pick<
@@ -25,9 +27,13 @@ export type AppSettingsChange = Pick<
   | 'rememberPreviousDownloadsFolder'
   | 'cookiesFilePath'
   | 'maxConcurrentDownloads'
+  | 'cookiesBrowser'
+  | 'cookiesBrowserProfile'
 >;
 
 export type Source = (typeof allowedSources)[number];
+
+export type SupportedCookieBrowser = (typeof SUPPORTED_COOKIE_BROWSERS)[number];
 
 export type Api = {
   minimize: () => void;

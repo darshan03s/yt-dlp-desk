@@ -29,3 +29,15 @@ export const SERVER_BASE_URL = 'http://localhost';
 
 export const DEFAULT_MAX_CONCURRENT_DOWNLOADS = 2;
 export const MAX_ALLOWED_CONCURRENT_DOWNLOADS = 5;
+
+export const SUPPORTED_COOKIE_BROWSERS = [
+  'brave',
+  'chrome',
+  'chromium',
+  'edge',
+  'firefox',
+  'opera',
+  'safari',
+  'vivaldi',
+  'whale'
+] as const;

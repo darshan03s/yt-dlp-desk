@@ -117,6 +117,12 @@ export class DownloadManager {
               'yt-dlp:error',
               'No formats available to download live from start'
             );
+          }
+          if (data.includes('DPAPI')) {
+            mainWindow.webContents.send(
+              'yt-dlp:error',
+              'Could not get cookies from the selected browser. Try a different browser'
+            );
           } else {
             mainWindow.webContents.send('yt-dlp:error', data);
           }

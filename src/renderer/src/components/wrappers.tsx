@@ -5,15 +5,18 @@ interface TooltipWrapper {
   children: React.ReactNode;
   message: string;
   side?: 'top' | 'right' | 'bottom' | 'left' | undefined;
+  className?: string;
 }
 
-export const TooltipWrapper = ({ message, children, side }: TooltipWrapper) => {
+export const TooltipWrapper = ({ message, children, side, className }: TooltipWrapper) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild className="flex items-center">
         {children}
       </TooltipTrigger>
-      <TooltipContent side={side}>{message}</TooltipContent>
+      <TooltipContent side={side} className={cn('', className)}>
+        {message}
+      </TooltipContent>
     </Tooltip>
   );
 };

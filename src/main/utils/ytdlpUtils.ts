@@ -75,6 +75,7 @@ export async function createInfoJson(
   const settings = Settings.getInstance();
 
   return await new Promise((resolve, reject) => {
+    // info json create command
     const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const infoJsonCommandBase = YTDLP_EXE_PATH;
     const infoJsonCommandArgs = [
@@ -87,12 +88,24 @@ export async function createInfoJson(
       url
     ];
 
-    if (
-      settings.get('cookiesFilePath').length > 0 &&
-      pathExistsSync(settings.get('cookiesFilePath'))
-    ) {
-      infoJsonCommandArgs.push('--cookies');
-      infoJsonCommandArgs.push(settings.get('cookiesFilePath'));
+    // cookies from file
+    if (settings.get('cookiesFilePath').length > 0 && settings.get('cookiesBrowser').length === 0) {
+      if (pathExistsSync(settings.get('cookiesFilePath'))) {
+        infoJsonCommandArgs.push('--cookies');
+        infoJsonCommandArgs.push(settings.get('cookiesFilePath'));
+      }
+    }
+
+    // cookies from browser
+    if (settings.get('cookiesBrowser').length > 0) {
+      infoJsonCommandArgs.push('--cookies-from-browser');
+      if (settings.get('cookiesBrowserProfile').length > 0) {
+        infoJsonCommandArgs.push(
+          `${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`
+        );
+      } else {
+        infoJsonCommandArgs.push(`${settings.get('cookiesFilePath')}`);
+      }
     }
 
     if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
@@ -120,6 +133,12 @@ export async function createInfoJson(
         }
         if (data.includes('HTTPError')) {
           mainWindow.webContents.send('yt-dlp:error', 'HTTP Error');
+        }
+        if (data.includes('DPAPI')) {
+          mainWindow.webContents.send(
+            'yt-dlp:error',
+            'Could not get cookies from the selected browser. Try a different browser'
+          );
         } else {
           mainWindow.webContents.send('yt-dlp:error', data);
         }
@@ -165,17 +184,28 @@ export async function createInfoJson(
 }
 
 async function addLiveFromStartFormats(url: string, infoJson: MediaInfoJson) {
+  // live from start command
   const settings = Settings.getInstance();
   const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
   const baseCommand = YTDLP_EXE_PATH;
   const args = ['--js-runtimes', jsRuntimePath, '-F', url, '--live-from-start'];
 
-  if (
-    settings.get('cookiesFilePath').length > 0 &&
-    pathExistsSync(settings.get('cookiesFilePath'))
-  ) {
-    args.push('--cookies');
-    args.push(settings.get('cookiesFilePath'));
+  // cookies from file
+  if (settings.get('cookiesFilePath').length > 0 && settings.get('cookiesBrowser').length === 0) {
+    if (await pathExists(settings.get('cookiesFilePath'))) {
+      args.push('--cookies');
+      args.push(settings.get('cookiesFilePath'));
+    }
+  }
+
+  // cookies from browser
+  if (settings.get('cookiesBrowser').length > 0) {
+    args.push('--cookies-from-browser');
+    if (settings.get('cookiesBrowserProfile').length > 0) {
+      args.push(`${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`);
+    } else {
+      args.push(`${settings.get('cookiesFilePath')}`);
+    }
   }
 
   const completeCommand = baseCommand.concat(' ').concat(args.join(' '));
@@ -197,6 +227,16 @@ async function addLiveFromStartFormats(url: string, infoJson: MediaInfoJson) {
     });
 
     child.stderr.on('data', (data) => {
+      if (data.includes('ERROR')) {
+        if (data.includes('DPAPI')) {
+          mainWindow.webContents.send(
+            'yt-dlp:error',
+            'Could not get cookies from the selected browser. Try a different browser'
+          );
+        } else {
+          mainWindow.webContents.send('yt-dlp:error', data);
+        }
+      }
       console.log(data);
     });
 
@@ -394,6 +434,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     const formatId = selectedFormat.format_id!;
     let targetDownloadFileName = `${removeEmoji(mediaInfo.fulltitle ?? mediaInfo.title, '_')} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
 
+    // download command
     const jsRuntimePath = `quickjs:${settings.get('jsRuntimePath')}`;
     const downloadCommandBase = YTDLP_EXE_PATH;
     const downloadCommandArgs = ['--js-runtimes', jsRuntimePath, '--newline'];
@@ -480,12 +521,24 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
       downloadCommandArgs.push('--live-from-start');
     }
 
-    if (
-      settings.get('cookiesFilePath').length > 0 &&
-      (await pathExists(settings.get('cookiesFilePath')))
-    ) {
-      downloadCommandArgs.push('--cookies');
-      downloadCommandArgs.push(settings.get('cookiesFilePath'));
+    // cookies from file
+    if (settings.get('cookiesFilePath').length > 0 && settings.get('cookiesBrowser').length === 0) {
+      if (await pathExists(settings.get('cookiesFilePath'))) {
+        downloadCommandArgs.push('--cookies');
+        downloadCommandArgs.push(settings.get('cookiesFilePath'));
+      }
+    }
+
+    // cookies from browser
+    if (settings.get('cookiesBrowser').length > 0) {
+      downloadCommandArgs.push('--cookies-from-browser');
+      if (settings.get('cookiesBrowserProfile').length > 0) {
+        downloadCommandArgs.push(
+          `${settings.get('cookiesBrowser')}:${settings.get('cookiesBrowserProfile')}`
+        );
+      } else {
+        downloadCommandArgs.push(`${settings.get('cookiesFilePath')}`);
+      }
     }
 
     downloadCommandArgs.push('--no-quiet');

@@ -1,5 +1,5 @@
-import { MAX_ALLOWED_CONCURRENT_DOWNLOADS } from '@shared/data';
-import { AppSettingsChange } from '@shared/types';
+import { MAX_ALLOWED_CONCURRENT_DOWNLOADS, SUPPORTED_COOKIE_BROWSERS } from '@shared/data';
+import { AppSettingsChange, SupportedCookieBrowser } from '@shared/types';
 import { Button } from '@renderer/components/ui/button';
 import {
   Dialog,
@@ -19,6 +19,15 @@ import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
 import equal from 'fast-deep-equal';
 import { cn } from '@renderer/lib/utils';
 import { ButtonGroup } from '@renderer/components/ui/button-group';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@renderer/components/ui/select';
 
 const SettingsHeader = () => {
   return (
@@ -32,19 +41,24 @@ const SettingsHeader = () => {
 const SaveSettingsButton = () => {
   const currentSettings = useSettingsStore((state) => state.settings);
   const settingsChange = useSettingsStore((state) => state.settingsChange);
+
   function handleSaveSettings() {
     const changedSettings: AppSettingsChange = {
       downloadsFolder: settingsChange.downloadsFolder!,
       rememberPreviousDownloadsFolder: settingsChange.rememberPreviousDownloadsFolder!,
       cookiesFilePath: settingsChange.cookiesFilePath!,
-      maxConcurrentDownloads: settingsChange.maxConcurrentDownloads!
+      maxConcurrentDownloads: settingsChange.maxConcurrentDownloads!,
+      cookiesBrowser: settingsChange.cookiesBrowser!,
+      cookiesBrowserProfile: settingsChange.cookiesBrowserProfile!
     };
 
-    const currentSettingsState = {
+    const currentSettingsState: AppSettingsChange = {
       downloadsFolder: currentSettings.downloadsFolder!,
       rememberPreviousDownloadsFolder: currentSettings.rememberPreviousDownloadsFolder!,
       cookiesFilePath: currentSettings.cookiesFilePath!,
-      maxConcurrentDownloads: currentSettings.maxConcurrentDownloads!
+      maxConcurrentDownloads: currentSettings.maxConcurrentDownloads!,
+      cookiesBrowser: currentSettings.cookiesBrowser!,
+      cookiesBrowserProfile: currentSettings.cookiesBrowserProfile!
     };
 
     if (equal(currentSettingsState, changedSettings)) return;
@@ -94,35 +108,62 @@ const SettingsBlocks = () => {
   const settingsChange = useSettingsStore((state) => state.settingsChange);
   const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
 
-  function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean) {
+  function handleSettingsChange(key: keyof AppSettingsChange, value: string | boolean | number) {
     if (key === 'rememberPreviousDownloadsFolder') {
       useSettingsStore
         .getState()
         .setSettingsChange({ rememberPreviousDownloadsFolder: value as boolean });
+    }
+
+    if (key === 'downloadsFolder') {
+      useSettingsStore.getState().setSettingsChange({ downloadsFolder: value as string });
+    }
+
+    if (key === 'cookiesFilePath') {
+      useSettingsStore.getState().setSettingsChange({ cookiesFilePath: value as string });
+    }
+
+    if (key === 'maxConcurrentDownloads') {
+      if ((value as number) < 1 || (value as number) > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
+      useSettingsStore.getState().setSettingsChange({ maxConcurrentDownloads: value as number });
+    }
+
+    if (key === 'cookiesBrowser') {
+      const selectedBrowser = value as SupportedCookieBrowser;
+      if (selectedBrowser !== settingsChange.cookiesBrowser) {
+        useSettingsStore.getState().setSettingsChange({ cookiesBrowserProfile: '' });
+      }
+      if (selectedBrowser === currentSettings.cookiesBrowser) {
+        useSettingsStore
+          .getState()
+          .setSettingsChange({ cookiesBrowserProfile: currentSettings.cookiesBrowserProfile });
+      }
+      useSettingsStore.getState().setSettingsChange({ cookiesBrowser: selectedBrowser });
+    }
+
+    if (key === 'cookiesBrowserProfile') {
+      const profile = (value as string).trim();
+      if (profile.length === 0) return;
+      useSettingsStore.getState().setSettingsChange({ cookiesBrowserProfile: profile as string });
     }
   }
 
   async function pickFolder() {
     const path = await window.api.selectFolder();
     if (path) {
-      useSettingsStore.getState().setSettingsChange({ downloadsFolder: path });
+      handleSettingsChange('downloadsFolder', path);
     }
   }
 
   async function pickFile() {
     const path = await window.api.selectFile();
     if (path) {
-      useSettingsStore.getState().setSettingsChange({ cookiesFilePath: path });
+      handleSettingsChange('cookiesFilePath', path);
     }
   }
 
   function handleClearAllMetadata() {
     setIsConfirmClearAllMetadataVisible(true);
-  }
-
-  function handleMaxConcurrentDownloads(val: number) {
-    if (val < 1 || val > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
-    useSettingsStore.getState().setSettingsChange({ maxConcurrentDownloads: val });
   }
 
   return (
@@ -178,7 +219,7 @@ const SettingsBlocks = () => {
             min={1}
             max={MAX_ALLOWED_CONCURRENT_DOWNLOADS}
             value={settingsChange.maxConcurrentDownloads}
-            onChange={(e) => handleMaxConcurrentDownloads(Number(e.target.value))}
+            onChange={(e) => handleSettingsChange('maxConcurrentDownloads', Number(e.target.value))}
           />
         </SettingsItem>
       </SettingsBlock>
@@ -200,6 +241,54 @@ const SettingsBlocks = () => {
                 </Button>
               </TooltipWrapper>
             </ButtonGroup>
+          </div>
+        </SettingsItem>
+        <SettingsItem>
+          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+            Cookies from browser
+            <TooltipWrapper
+              className="w-[200px]"
+              side="top"
+              message="Choose browser to read cookies. Only choose the one already present in your PC"
+            >
+              <IconInfoCircle className="size-3" />
+            </TooltipWrapper>
+          </span>
+          <div className="h-8 w-[400px] flex items-center gap-2">
+            <Select onValueChange={(val) => handleSettingsChange('cookiesBrowser', val)}>
+              <SelectTrigger className="w-full text-[10px] h-8 capitalize">
+                <SelectValue placeholder={settingsChange.cookiesBrowser} />
+              </SelectTrigger>
+              <SelectContent className="text-sm">
+                <SelectGroup>
+                  <SelectLabel>Browsers</SelectLabel>
+                  {SUPPORTED_COOKIE_BROWSERS.map((browser) => (
+                    <SelectItem value={browser} key={browser} className="capitalize">
+                      {browser}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        </SettingsItem>
+        <SettingsItem>
+          <span className="setting-name text-[12px] text-nowrap flex items-center gap-1">
+            Cookies browser profile
+            <TooltipWrapper
+              className="w-full"
+              side="top"
+              message="Enter browser profile to read cookies (optional)"
+            >
+              <IconInfoCircle className="size-3" />
+            </TooltipWrapper>
+          </span>
+          <div className="h-8 w-[400px] flex items-center gap-2">
+            <Input
+              className="text-[10px] h-8"
+              value={settingsChange?.cookiesBrowserProfile}
+              onChange={(e) => handleSettingsChange('cookiesBrowserProfile', e.target.value)}
+            />
           </div>
         </SettingsItem>
       </SettingsBlock>

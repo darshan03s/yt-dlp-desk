@@ -15,7 +15,7 @@ const initialSettingsState: AppSettings = {
   ffmpegPath: '',
   ffmpegVersion: '',
   mediaDataFolder: '',
-  platform: '',
+  platform: 'win32',
   userDownloadsFolder: '',
   ytdlpPath: '',
   ytdlpVersion: '',
@@ -23,7 +23,9 @@ const initialSettingsState: AppSettings = {
   downloadTemplate: '',
   rememberPreviousDownloadsFolder: false,
   cookiesFilePath: '',
-  maxConcurrentDownloads: DEFAULT_MAX_CONCURRENT_DOWNLOADS
+  maxConcurrentDownloads: DEFAULT_MAX_CONCURRENT_DOWNLOADS,
+  cookiesBrowser: '',
+  cookiesBrowserProfile: ''
 };
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
