@@ -1,3 +1,5 @@
+import { Source } from '@shared/types';
+
 export const allowedSources = [
   'youtube-video',
   'youtube-playlist',
@@ -9,6 +11,18 @@ export const allowedSources = [
   'dailymotion-video',
   'pinterest-video'
 ] as const;
+
+export const mediaSources: readonly Source[] = [
+  'youtube-video',
+  'youtube-music',
+  'twitter-video',
+  'instagram-video',
+  'reddit-video',
+  'dailymotion-video',
+  'pinterest-video'
+];
+
+export const playlistSources: readonly Source[] = ['youtube-playlist', 'youtube-music-playlist'];
 
 export const SERVER_PORT = 12277;
 export const SERVER_BASE_URL = 'http://localhost';

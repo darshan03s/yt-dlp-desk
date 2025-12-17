@@ -1,3 +1,18 @@
+import { Source } from './types';
+
+export function getMediaId(url: string, source: Source): string | null {
+  if (source === 'youtube-video') return getYouTubeVideoId(url);
+  if (source === 'youtube-playlist') return getYoutubePlaylistId(url);
+  if (source === 'youtube-music') return getYoutubeMusicId(url);
+  if (source === 'youtube-music-playlist') return getYoutubePlaylistId(url);
+  if (source === 'twitter-video') return getTweetId(url);
+  if (source === 'instagram-video') return getInstagramId(url);
+  if (source === 'reddit-video') return getRedditId(url);
+  if (source === 'dailymotion-video') return getDailymotionId(url);
+  if (source === 'pinterest-video') return getPinterestId(url);
+  return null;
+}
+
 export function getYouTubeVideoId(url: string): string | null {
   try {
     const parsed = new URL(url);

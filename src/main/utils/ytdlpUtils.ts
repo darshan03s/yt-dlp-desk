@@ -17,93 +17,18 @@ import { writeFile } from 'node:fs/promises';
 import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
-import {
-  getDailymotionId,
-  getInstagramId,
-  getPinterestId,
-  getRedditId,
-  getTweetId,
-  getYoutubeMusicId,
-  getYoutubePlaylistId,
-  getYouTubeVideoId
-} from '@shared/utils';
 import Settings from '@main/settings';
+import { getMediaId } from '@shared/utils';
+import { mediaSources, playlistSources } from '@shared/data';
 
 function getInfoJsonPath(url: string, source: Source): string {
-  if (source === 'youtube-video') {
-    const videoId = getYouTubeVideoId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      videoId!,
-      videoId + '.info.json'
-    );
-    return infoJsonPath;
+  const id = getMediaId(url, source);
+  if (!id) {
+    logger.error(`Could not get id for ${url}}`);
+    throw new Error(`Could not get id for ${url}}`);
   }
-
-  if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
-    const playlistId = getYoutubePlaylistId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      playlistId!,
-      playlistId + '.info.json'
-    );
-    return infoJsonPath;
-  }
-
-  if (source === 'youtube-music') {
-    const musicId = getYoutubeMusicId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      musicId!,
-      musicId + '.info.json'
-    );
-    return infoJsonPath;
-  }
-
-  if (source === 'twitter-video') {
-    const tweetId = getTweetId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      tweetId!,
-      tweetId + '.info.json'
-    );
-    return infoJsonPath;
-  }
-  if (source === 'instagram-video') {
-    const instagramId = getInstagramId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      instagramId!,
-      instagramId + '.info.json'
-    );
-    return infoJsonPath;
-  }
-  if (source === 'reddit-video') {
-    const redditId = getRedditId(url);
-    const infoJsonPath = path.join(
-      MEDIA_DATA_FOLDER_PATH,
-      source,
-      redditId!,
-      redditId + '.info.json'
-    );
-    return infoJsonPath;
-  }
-  if (source === 'dailymotion-video') {
-    const dmId = getDailymotionId(url);
-    const infoJsonPath = path.join(MEDIA_DATA_FOLDER_PATH, source, dmId!, dmId + '.info.json');
-    return infoJsonPath;
-  }
-  if (source === 'pinterest-video') {
-    const pinId = getPinterestId(url);
-    const infoJsonPath = path.join(MEDIA_DATA_FOLDER_PATH, source, pinId!, pinId + '.info.json');
-    return infoJsonPath;
-  }
-  return '';
+  const infoJsonPath = path.join(MEDIA_DATA_FOLDER_PATH, source, id, id + '.info.json');
+  return infoJsonPath;
 }
 
 export async function getInfoJson(
@@ -116,13 +41,7 @@ export async function getInfoJson(
     logger.info(`Re-fetching info-json for ${url}`);
     return await createInfoJson(url, source, infoJsonPath);
   }
-  if (
-    source === 'youtube-video' ||
-    source === 'youtube-music' ||
-    source === 'instagram-video' ||
-    source === 'dailymotion-video' ||
-    source === 'pinterest-video'
-  ) {
+  if (mediaSources.includes(source)) {
     if (await pathExists(infoJsonPath)) {
       const expireTime = await getExpireTime(infoJsonPath);
       if (new Date().toISOString() > expireTime!) {
@@ -138,12 +57,7 @@ export async function getInfoJson(
     }
   }
 
-  if (
-    source === 'youtube-playlist' ||
-    source === 'youtube-music-playlist' ||
-    source === 'twitter-video' ||
-    source === 'reddit-video'
-  ) {
+  if (playlistSources.includes(source)) {
     if (await pathExists(infoJsonPath)) {
       return await readJson<MediaInfoJson>(infoJsonPath);
     } else {
@@ -217,51 +131,28 @@ export async function createInfoJson(
 
       logger.info(`Created info json for ${url}`);
 
-      if (source === 'youtube-video' || source === 'youtube-music') {
+      if (mediaSources.includes(source)) {
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
         infoJson = await addExpiresAt(infoJson, source);
         infoJson = await writeDescription(infoJson, source);
-        if (infoJson.is_live) {
-          infoJson = await addLiveFromStartFormats(url, infoJson);
+
+        if (source === 'youtube-video' || source === 'youtube-music') {
+          if (infoJson.is_live) {
+            infoJson = await addLiveFromStartFormats(url, infoJson);
+          }
         }
 
         await writeJson(infoJsonPath, infoJson);
 
         return resolve(infoJson);
       }
+
       if (source === 'youtube-playlist' || source === 'youtube-music-playlist') {
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
-
-        await writeJson(infoJsonPath, infoJson);
-
-        return resolve(infoJson);
-      }
-
-      if (source === 'twitter-video' || source === 'reddit-video') {
-        let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
-        infoJson = await addCreatedAt(infoJson);
-        infoJson = await downloadThumbnail(infoJson, source, url);
-        infoJson = await writeDescription(infoJson, source);
-
-        await writeJson(infoJsonPath, infoJson);
-
-        return resolve(infoJson);
-      }
-
-      if (
-        source === 'instagram-video' ||
-        source === 'dailymotion-video' ||
-        source === 'pinterest-video'
-      ) {
-        let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
-        infoJson = await addCreatedAt(infoJson);
-        infoJson = await downloadThumbnail(infoJson, source, url);
-        infoJson = await addExpiresAt(infoJson, source);
-        infoJson = await writeDescription(infoJson, source);
 
         await writeJson(infoJsonPath, infoJson);
 
@@ -384,7 +275,7 @@ async function addCreatedAt(infoJson: MediaInfoJson) {
 }
 
 async function addExpiresAt(infoJson: MediaInfoJson, source?: Source) {
-  if (source === 'youtube-video') {
+  if (source === 'youtube-video' || source === 'youtube-music') {
     const format = infoJson.formats.find((f) => f.vcodec !== 'none' && f.url);
 
     if (!format?.url) {
@@ -413,20 +304,12 @@ async function addExpiresAt(infoJson: MediaInfoJson, source?: Source) {
     logger.info(`Adding expire time from expire param`);
     infoJson.expires_at = new Date(Number(expireParam) * 1000).toISOString();
     return infoJson;
-  } else if (
-    source === 'instagram-video' ||
-    source === 'dailymotion-video' ||
-    source === 'pinterest-video'
-  ) {
+  } else {
     // 6 hour
     logger.info(`Adding default expire time for ${source}`);
     infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString();
     return infoJson;
   }
-  // 15 min
-  logger.info(`Adding default expire time for ${source}`);
-  infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 15).toISOString();
-  return infoJson;
 }
 
 async function getExpireTime(infoJsonPath: string) {
@@ -504,15 +387,7 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
   const { url, source, selectedFormat, downloadSections, selectedDownloadFolder, extraOptions } =
     downloadOptions;
 
-  if (
-    source === 'youtube-video' ||
-    source === 'youtube-music' ||
-    source === 'twitter-video' ||
-    source === 'instagram-video' ||
-    source === 'reddit-video' ||
-    source === 'dailymotion-video' ||
-    source === 'pinterest-video'
-  ) {
+  if (mediaSources.includes(source)) {
     console.log({ url, source, selectedFormat, downloadSections, extraOptions });
     const mediaInfo = downloadOptions.mediaInfo as MediaInfoJson;
     const infoJsonPath = getInfoJsonPath(url, source);
