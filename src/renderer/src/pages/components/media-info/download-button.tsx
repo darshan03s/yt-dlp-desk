@@ -36,12 +36,14 @@ const DownloadButton = ({ loading }: { loading: boolean }) => {
 
     if (extraOptions.liveFromStart) {
       const formatId = selectedFormat.format_id;
-      const isFormatInLiveFromStartFormats = mediaInfo.live_from_start_formats.some(
-        (f) => f.format_id === formatId
-      );
-      if (!isFormatInLiveFromStartFormats) {
-        toast.error('Format does not support live from start');
-        return;
+      if (mediaInfo.live_from_start_formats) {
+        const isFormatInLiveFromStartFormats = mediaInfo.live_from_start_formats.some(
+          (f) => f.format_id === formatId
+        );
+        if (!isFormatInLiveFromStartFormats) {
+          toast.error('Format does not support live from start');
+          return;
+        }
       }
     }
 

@@ -2,6 +2,7 @@ import Settings from '@main/settings';
 import logger from '@shared/logger';
 import { Api, AppSettings, Source } from '@shared/types';
 import {
+  getDailymotionId,
   getInstagramId,
   getRedditId,
   getYoutubeMusicId,
@@ -137,6 +138,9 @@ export function getSourceFromUrl(url: string): Source | null {
   if (parsedUrl.hostname.includes('reddit.com')) {
     return 'reddit-video';
   }
+  if (parsedUrl.hostname.includes('dailymotion.com') || parsedUrl.hostname.includes('dai.ly')) {
+    return 'dailymotion-video';
+  }
   return null;
 }
 
@@ -182,8 +186,12 @@ export function getNormalizedUrl(source: Source, url: string) {
     }
   }
   if (source === 'reddit-video') {
-    const redditId = getRedditId(url);
-    return `https://www.reddit.com/comments/${redditId}`;
+    const id = getRedditId(url);
+    return `https://www.reddit.com/comments/${id}`;
+  }
+  if (source === 'dailymotion-video') {
+    const id = getDailymotionId(url);
+    return `https://www.dailymotion.com/video/${id}`;
   }
   return '';
 }

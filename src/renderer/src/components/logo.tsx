@@ -10,7 +10,8 @@ const Logo = ({ source }: LogoProps) => {
     source === 'youtube-video' ||
     source === 'twitter-video' ||
     source === 'instagram-video' ||
-    source === 'reddit-video'
+    source === 'reddit-video' ||
+    source === 'dailymotion-video'
   ) {
     return <IconVideo className="size-4" />;
   }

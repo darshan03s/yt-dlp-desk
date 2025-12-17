@@ -18,6 +18,7 @@ import { DownloadManager } from '@main/downloadManager';
 import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
 import {
+  getDailymotionId,
   getInstagramId,
   getRedditId,
   getTweetId,
@@ -91,6 +92,11 @@ function getInfoJsonPath(url: string, source: Source): string {
     );
     return infoJsonPath;
   }
+  if (source === 'dailymotion-video') {
+    const dmId = getDailymotionId(url);
+    const infoJsonPath = path.join(MEDIA_DATA_FOLDER_PATH, source, dmId!, dmId + '.info.json');
+    return infoJsonPath;
+  }
   return '';
 }
 
@@ -104,7 +110,12 @@ export async function getInfoJson(
     logger.info(`Re-fetching info-json for ${url}`);
     return await createInfoJson(url, source, infoJsonPath);
   }
-  if (source === 'youtube-video' || source === 'youtube-music' || source === 'instagram-video') {
+  if (
+    source === 'youtube-video' ||
+    source === 'youtube-music' ||
+    source === 'instagram-video' ||
+    source === 'dailymotion-video'
+  ) {
     if (await pathExists(infoJsonPath)) {
       const expireTime = await getExpireTime(infoJsonPath);
       if (new Date().toISOString() > expireTime!) {
@@ -234,7 +245,7 @@ export async function createInfoJson(
         return resolve(infoJson);
       }
 
-      if (source === 'instagram-video') {
+      if (source === 'instagram-video' || source === 'dailymotion-video') {
         let infoJson = await readJson<MediaInfoJson>(infoJsonPath);
         infoJson = await addCreatedAt(infoJson);
         infoJson = await downloadThumbnail(infoJson, source, url);
@@ -391,7 +402,7 @@ async function addExpiresAt(infoJson: MediaInfoJson, source?: Source) {
     logger.info(`Adding expire time from expire param`);
     infoJson.expires_at = new Date(Number(expireParam) * 1000).toISOString();
     return infoJson;
-  } else if (source === 'instagram-video') {
+  } else if (source === 'instagram-video' || source === 'dailymotion-video') {
     // 6 hour
     logger.info(`Adding default expire time for ${source}`);
     infoJson.expires_at = new Date(Date.now() + 1000 * 60 * 60 * 6).toISOString();
@@ -483,7 +494,8 @@ export async function downloadFromYtdlp(downloadOptions: DownloadOptions) {
     source === 'youtube-music' ||
     source === 'twitter-video' ||
     source === 'instagram-video' ||
-    source === 'reddit-video'
+    source === 'reddit-video' ||
+    source === 'dailymotion-video'
   ) {
     console.log({ url, source, selectedFormat, downloadSections, extraOptions });
     const mediaInfo = downloadOptions.mediaInfo as MediaInfoJson;

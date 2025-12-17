@@ -107,6 +107,16 @@ export class DownloadManager {
           }
           if (data.includes('urllib3.connection.HTTPSConnection')) {
             mainWindow.webContents.send('yt-dlp:error', 'Connection error');
+          }
+          if (
+            data.includes(
+              '--live-from-start is passed, but there are no formats that can be downloaded from the start'
+            )
+          ) {
+            mainWindow.webContents.send(
+              'yt-dlp:error',
+              'No formats available to download live from start'
+            );
           } else {
             mainWindow.webContents.send('yt-dlp:error', data);
           }

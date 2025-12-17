@@ -3,6 +3,7 @@ import { Source } from '@shared/types';
 import { MediaInfoJson } from '@shared/types/info-json';
 import { Anchor } from '@renderer/components/wrappers';
 import { IconExternalLink } from '@tabler/icons-react';
+import { getDailymotionId } from '@shared/utils';
 
 const Preview = ({
   previewUrl,
@@ -24,6 +25,17 @@ const Preview = ({
           className="aspect-video w-[420px] border-none outline-0 shadow-none m-0 p-0"
           src={`${SERVER_BASE_URL}:${import.meta.env.DEV ? 12278 : SERVER_PORT}/embed?url=${url}&source=${source}`}
           scrolling="no"
+        ></iframe>
+      </div>
+    );
+  }
+  if (source === 'dailymotion-video') {
+    const id = getDailymotionId(url);
+    return (
+      <div className="w-full h-60 bg-black flex items-center justify-center">
+        <iframe
+          className="aspect-video w-[420px] border-none outline-0 shadow-none m-0 p-0"
+          src={`https://geo.dailymotion.com/player.html?video=${id}`}
         ></iframe>
       </div>
     );
