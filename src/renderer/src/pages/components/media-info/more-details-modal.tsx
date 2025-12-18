@@ -110,6 +110,12 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
               <span>{numeral(infoJson.like_count).format('0.00a')}</span>
             </div>
           )}
+          {infoJson.dislike_count !== undefined && (
+            <div>
+              <span className="font-semibold">Dislike Count</span>:{' '}
+              <span>{numeral(infoJson.dislike_count).format('0.00a')}</span>
+            </div>
+          )}
           {infoJson.repost_count !== undefined && (
             <div>
               <span className="font-semibold">Repost Count</span>:{' '}

@@ -5,6 +5,7 @@ import {
   getDailymotionId,
   getInstagramId,
   getRedditId,
+  getRumbleId,
   getYoutubeMusicId,
   getYoutubePlaylistId,
   getYouTubeVideoId
@@ -146,6 +147,9 @@ export function getSourceFromUrl(url: string): Source | null {
   if (parsedUrl.hostname.includes('pinterest.com') || parsedUrl.hostname.includes('pin.it')) {
     return 'pinterest-video';
   }
+  if (parsedUrl.hostname.includes('rumble.com')) {
+    return 'rumble-video';
+  }
   return null;
 }
 
@@ -200,6 +204,10 @@ export function getNormalizedUrl(source: Source, url: string) {
   }
   if (source === 'pinterest-video') {
     return url;
+  }
+  if (source === 'rumble-video') {
+    const id = getRumbleId(url);
+    return `https://rumble.com/${id}.html`;
   }
   return '';
 }

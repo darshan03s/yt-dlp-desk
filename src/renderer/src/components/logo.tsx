@@ -6,17 +6,6 @@ type LogoProps = {
 };
 
 const Logo = ({ source }: LogoProps) => {
-  if (
-    source === 'youtube-video' ||
-    source === 'twitter-video' ||
-    source === 'instagram-video' ||
-    source === 'reddit-video' ||
-    source === 'dailymotion-video' ||
-    source === 'pinterest-video'
-  ) {
-    return <IconVideo className="size-4" />;
-  }
-
   if (source === 'youtube-playlist') {
     return <IconPlaylist className="size-4" />;
   }
@@ -25,7 +14,7 @@ const Logo = ({ source }: LogoProps) => {
     return <IconMusic className="size-4" />;
   }
 
-  return null;
+  return <IconVideo className="size-4" />;
 };
 
 export default Logo;

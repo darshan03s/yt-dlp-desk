@@ -1,3 +1,4 @@
+import { Source } from '@shared/types';
 import { ExtraOptions as ExtraOptionsType } from '@/shared/types/download';
 import { MediaInfoJson } from '@/shared/types/info-json';
 import { Toggle } from '@renderer/components/ui/toggle';
@@ -21,6 +22,7 @@ const ExtraOptions = () => {
   const setExtraOptions = useSelectedOptionsStore((state) => state.setExtraOptions);
   const resetExtraOptions = useSelectedOptionsStore((state) => state.resetExtraOptions);
   const infoJson = useMediaInfoStore((state) => state.mediaInfo) as MediaInfoJson;
+  const source = useMediaInfoStore((state) => state.source) as Source;
 
   useEffect(() => {
     resetExtraOptions();
@@ -182,7 +184,7 @@ const ExtraOptions = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {infoJson.is_live && (
+      {infoJson.is_live && source === 'youtube-video' && (
         <div>
           <h1 className="text-xs border-border border-b mb-2 pb-1">Live options</h1>
           <div className="flex items-center gap-2 flex-wrap">
