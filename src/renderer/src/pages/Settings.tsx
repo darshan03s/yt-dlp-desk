@@ -345,14 +345,14 @@ const SettingsBlocks = () => {
           {browserProfiles.length > 0 ? (
             <div className="h-8 w-[400px] flex items-center">
               <Select onValueChange={(val) => handleSettingsChange('cookiesBrowserProfile', val)}>
-                <SelectTrigger className="w-full text-[10px] h-8 capitalize">
+                <SelectTrigger className="w-full text-[10px] h-8">
                   <SelectValue placeholder={settingsChange.cookiesBrowserProfile} />
                 </SelectTrigger>
                 <SelectContent className="text-sm">
                   <SelectGroup>
                     <SelectLabel>Browser Profiles</SelectLabel>
                     {browserProfiles.map((profile) => (
-                      <SelectItem value={profile} key={profile} className="capitalize text-xs">
+                      <SelectItem value={profile} key={profile} className="text-xs">
                         {profile}
                       </SelectItem>
                     ))}
