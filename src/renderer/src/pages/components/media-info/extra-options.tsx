@@ -43,7 +43,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconPhotoVideo /> <span>Embed Thumbnail</span>
+        <IconPhotoVideo className="size-3" /> <span>Embed Thumbnail</span>
       </Toggle>
     );
   };
@@ -58,7 +58,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconSection /> <span>Embed Chapters</span>
+        <IconSection className="size-3" /> <span>Embed Chapters</span>
       </Toggle>
     );
   };
@@ -73,7 +73,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconBadgeCc /> <span>Embed Subs</span>
+        <IconBadgeCc className="size-3" /> <span>Embed Subs</span>
       </Toggle>
     );
   };
@@ -88,7 +88,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconFileStack /> <span>Embed Metadata</span>
+        <IconFileStack className="size-3" /> <span>Embed Metadata</span>
       </Toggle>
     );
   };
@@ -103,7 +103,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconFileDescription /> <span>Write Description</span>
+        <IconFileDescription className="size-3" /> <span>Write Description</span>
       </Toggle>
     );
   };
@@ -118,7 +118,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconMessage /> <span>Write Comments</span>
+        <IconMessage className="size-3" /> <span>Write Comments</span>
       </Toggle>
     );
   };
@@ -133,7 +133,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconPhotoEdit /> <span>Write Thumbnail</span>
+        <IconPhotoEdit className="size-3" /> <span>Write Thumbnail</span>
       </Toggle>
     );
   };
@@ -148,7 +148,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <FilePen /> <span>Write Subs</span>
+        <FilePen className="size-3" /> <span>Write Subs</span>
       </Toggle>
     );
   };
@@ -163,7 +163,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <Captions /> <span>Write Auto Subs</span>
+        <Captions className="size-3" /> <span>Write Auto Subs</span>
       </Toggle>
     );
   };
@@ -178,7 +178,7 @@ const ExtraOptions = () => {
         variant="outline"
         className="data-[state=on]:bg-primary/20 data-[state=on]:*:[svg]:stroke-primary data-[state=on]:*:[span]:text-primary text-xs"
       >
-        <IconArrowBackUp /> <span>Live from start</span>
+        <IconArrowBackUp className="size-3" /> <span>Live from start</span>
       </Toggle>
     );
   };
@@ -194,7 +194,7 @@ const ExtraOptions = () => {
       )}
       <div>
         <OptionBlock name="Embed options">
-          <div className="flex items-center gap-2 flex-wrap [&_.toggle-comp]:rounded-full [&_.toggle-comp]:px-3">
+          <div className="flex items-center gap-2 flex-wrap [&_.toggle-comp]:rounded-full [&_.toggle-comp]:px-2">
             <EmbedThumbnail />
             <EmbedChapters />
             <EmbedSubs />
