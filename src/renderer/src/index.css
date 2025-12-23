@@ -2,6 +2,10 @@
 @import 'tw-animate-css';
 @import './theme.css';
 
+* {
+  box-shadow: none;
+}
+
 @font-face {
   font-family: 'Satoshi';
   src: url('./assets/Satoshi-Variable.ttf') format('truetype');
