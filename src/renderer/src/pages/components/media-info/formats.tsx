@@ -31,13 +31,14 @@ const Formats = ({ infoJson, loading }: { infoJson: MediaInfoJson; loading: bool
     <>
       {loading ? (
         <div
-          className={`relative border px-1 h-16 rounded-md w-full bg-secondary ${loading ? 'animate-fast' : ''}`}
+          className={`relative outline-1 outline-primary/30 px-1 h-16 rounded-md w-full bg-primary/10 ${loading ? 'animate-fast' : ''}`}
         ></div>
       ) : (
         infoJson.formats && (
           <div
             onClick={() => setIsAllFormatsModalOpen(true)}
-            className="selected-format relative border px-1 h-16 rounded-md w-full bg-secondary flex items-center gap-2 cursor-pointer font-satoshi"
+            title="Select format"
+            className="selected-format relative outline-1 outline-primary/30 px-1 h-16 rounded-md w-full bg-primary/10 flex items-center gap-2 cursor-pointer font-satoshi"
           >
             <div className="selected-format-left p-1 flex items-center">
               <span className="bg-primary text-primary-foreground text-xs p-2 rounded-md">

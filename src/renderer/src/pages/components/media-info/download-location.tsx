@@ -22,12 +22,13 @@ const DownloadLocation = ({ loading }: { loading: boolean }) => {
 
   return (
     <div className="flex items-center gap-2 font-satoshi">
-      <Input disabled type="text" className="text-xs" value={selectedDownloadFolder} />
+      <Input disabled type="text" className="text-xs h-8" value={selectedDownloadFolder} />
       <Button
         variant={'outline'}
         onClick={pickFolder}
         disabled={loading}
         title="Select download folder"
+        size={'icon-sm'}
       >
         <IconFolder />
       </Button>

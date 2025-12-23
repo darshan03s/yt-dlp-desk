@@ -17,7 +17,7 @@ const Sidebar = () => {
           title="Home"
           className={cn(
             buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-            `${isHome ? 'bg-muted' : ''}`
+            `${isHome ? 'bg-primary/20' : ''} hover:bg-primary/20 dark:hover:bg-primary/20`
           )}
         >
           <IconHome />
@@ -27,7 +27,7 @@ const Sidebar = () => {
           title="Downloads"
           className={cn(
             buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-            `${isDownloads ? 'bg-muted' : ''}`
+            `${isDownloads ? 'bg-primary/20' : ''} hover:bg-primary/20 dark:hover:bg-primary/20`
           )}
         >
           <IconDownload />
@@ -40,7 +40,7 @@ const Sidebar = () => {
           title="Settings"
           className={cn(
             buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
-            `${isSettings ? 'bg-muted' : ''}`
+            `${isSettings ? 'bg-primary/20' : ''} hover:bg-primary/20 dark:hover:bg-primary/20`
           )}
         >
           <IconSettings />

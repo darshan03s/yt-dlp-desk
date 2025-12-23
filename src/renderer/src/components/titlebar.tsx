@@ -44,7 +44,7 @@ const Titlebar = () => {
   }
 
   return (
-    <div className="titlebar h-(--titlebar-height) w-full bg-black text-white flex items-center select-none relative z-9999 pointer-events-auto">
+    <div className="titlebar h-(--titlebar-height) w-full bg-background text-foreground flex items-center select-none relative z-9999 pointer-events-auto">
       <div className="titlebar-left px-2 flex items-center gap-2">
         <img src={appIcon} alt="icon" width={18} height={18} className="rounded-[4px]" />
         <div className="flex items-center gap-1">
@@ -64,16 +64,16 @@ const Titlebar = () => {
         <button
           title="Minimize"
           onClick={minimize}
-          className="w-10 hover:bg-white/20 flex items-center justify-center h-10"
+          className="w-10 hover:bg-secondary flex items-center justify-center h-10"
         >
-          <Minus className="size-4 text-white/80" />
+          <Minus className="size-4 text-foreground" />
         </button>
         <button
           title="Close"
           onClick={close}
           className="w-10 hover:bg-red-600/80 flex items-center justify-center h-10 rounded-tr-lg"
         >
-          <IconX className="size-4 text-white/80" />
+          <IconX className="size-4 text-foreground" />
         </button>
       </div>
       {isConfirmExitModalVisible && (

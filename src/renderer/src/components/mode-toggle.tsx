@@ -6,8 +6,9 @@ const ModeToggle = () => {
   const { setTheme, theme } = useTheme();
   return (
     <Button
-      variant={'default'}
-      className="size-6 bg-black hover:bg-white/20"
+      title="Toggle theme"
+      variant={'ghost'}
+      className="size-6"
       onClick={() => {
         if (theme === 'dark') {
           setTheme('light');

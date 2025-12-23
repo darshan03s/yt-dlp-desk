@@ -14,7 +14,14 @@ import { Input } from '@renderer/components/ui/input';
 import { Switch } from '@renderer/components/ui/switch';
 import { TooltipWrapper } from '@renderer/components/wrappers';
 import { useSettingsStore } from '@renderer/stores/settings-store';
-import { IconFile, IconFolder, IconInfoCircle, IconTrash } from '@tabler/icons-react';
+import {
+  IconFile,
+  IconFolder,
+  IconInfoCircle,
+  IconMinus,
+  IconPlus,
+  IconTrash
+} from '@tabler/icons-react';
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import equal from 'fast-deep-equal';
 import { cn } from '@renderer/lib/utils';
@@ -193,8 +200,14 @@ const SettingsBlocks = () => {
     }
 
     if (key === 'maxConcurrentDownloads') {
-      if ((value as number) < 1 || (value as number) > MAX_ALLOWED_CONCURRENT_DOWNLOADS) return;
-      useSettingsStore.getState().setSettingsChange({ maxConcurrentDownloads: value as number });
+      if (!Number.isInteger(value)) return;
+      const v = value as number;
+      if (v === -1 && settingsChange.maxConcurrentDownloads! === 1) return;
+      if (v === 1 && settingsChange.maxConcurrentDownloads! === MAX_ALLOWED_CONCURRENT_DOWNLOADS)
+        return;
+      useSettingsStore.getState().setSettingsChange({
+        maxConcurrentDownloads: settingsChange.maxConcurrentDownloads! + (value as number)
+      });
     }
 
     if (key === 'cookiesBrowser') {
@@ -251,7 +264,11 @@ const SettingsBlocks = () => {
           <SettingName>Downloads Folder</SettingName>
           <div className="h-8 w-[400px] flex items-center">
             <ButtonGroup className="w-full">
-              <Input className="text-[10px] h-8" value={settingsChange?.downloadsFolder} disabled />
+              <Input
+                className="text-[10px] h-8"
+                value={settingsChange?.downloadsFolder}
+                onChange={() => {}}
+              />
               <TooltipWrapper message="Select folder">
                 <Button
                   variant={'outline'}
@@ -276,15 +293,23 @@ const SettingsBlocks = () => {
         </SettingsItem>
         <SettingsItem>
           <SettingName>Max concurrent downloads</SettingName>
-          <Input
-            className="w-14 h-8 text-xs"
-            type="number"
-            step={1}
-            min={1}
-            max={MAX_ALLOWED_CONCURRENT_DOWNLOADS}
-            value={settingsChange.maxConcurrentDownloads}
-            onChange={(e) => handleSettingsChange('maxConcurrentDownloads', Number(e.target.value))}
-          />
+          <ButtonGroup>
+            <Input value={settingsChange.maxConcurrentDownloads} className="h-7 w-12 text-xs" />
+            <Button
+              variant={'outline'}
+              className="h-7 w-3"
+              onClick={() => handleSettingsChange('maxConcurrentDownloads', 1)}
+            >
+              <IconPlus className="size-3" />
+            </Button>
+            <Button
+              variant={'outline'}
+              className="h-7 w-3"
+              onClick={() => handleSettingsChange('maxConcurrentDownloads', -1)}
+            >
+              <IconMinus className="size-3" />
+            </Button>
+          </ButtonGroup>
         </SettingsItem>
       </SettingsBlock>
 
@@ -298,7 +323,11 @@ const SettingsBlocks = () => {
           </SettingName>
           <div className="h-8 w-[400px] flex items-center gap-2">
             <ButtonGroup className="w-full">
-              <Input className="text-[10px] h-8" value={settingsChange?.cookiesFilePath} disabled />
+              <Input
+                className="text-[10px] h-8"
+                value={settingsChange?.cookiesFilePath}
+                onChange={() => {}}
+              />
               <TooltipWrapper message="Select file">
                 <Button variant={'outline'} size={'icon-sm'} onClick={pickFile} className="size-8">
                   <IconFile className="size-4" />

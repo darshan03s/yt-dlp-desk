@@ -114,7 +114,7 @@ const AllFormatsModal = ({
     return (
       <div
         onClick={handleFormatSelect}
-        className="selected-format p-1 relative rounded-md w-full bg-secondary flex items-center gap-2 cursor-pointer border"
+        className="selected-format p-1 relative rounded-md w-full bg-primary/10 flex items-center gap-2 cursor-pointer border border-primary/10"
       >
         <div className="selected-format-left p-1 flex items-center">
           <span className="bg-primary text-primary-foreground text-xs p-2 rounded-md">

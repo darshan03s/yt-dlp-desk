@@ -29,11 +29,12 @@ const Details = ({ infoJson }: { infoJson: MediaInfoJson }) => {
     <>
       <div className="flex flex-col gap-2">
         {isInfoJsonEmpty ? (
-          <div className="border bg-secondary h-10 px-2 rounded-md animate-fast" />
+          <div className="outline-1 outline-primary/30 bg-primary/10 h-10 px-2 rounded-md animate-fast" />
         ) : (
           <div
             onClick={() => setIsMoreDetailsModalOpen(true)}
-            className="text-xs border bg-secondary text-secondary-foreground h-10 px-2 rounded-md cursor-pointer flex items-center"
+            title="Show more details"
+            className="text-xs outline-1 outline-primary/30 bg-primary/10 text-foreground h-10 px-2 rounded-md cursor-pointer flex items-center"
           >
             <p className="text-xs leading-5 line-clamp-1 font-satoshi">
               {infoJson.fulltitle || infoJson.title || 'N/A'}
