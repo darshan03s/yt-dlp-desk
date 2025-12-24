@@ -32,7 +32,9 @@ import {
   resumePausedDownloads,
   retryFailedDownloads,
   pauseWaitingDownloads,
-  getBrowserProfiles
+  getBrowserProfiles,
+  getYtdlpVersions,
+  updateYtdlp
 } from './handlers';
 import { mainWindow } from '..';
 
@@ -106,6 +108,10 @@ async function registerHanlders() {
   ipcMain.on('app:delete-all-metadata', deleteAllMetadata);
 
   ipcMain.handle('get-browser-profiles', getBrowserProfiles);
+
+  ipcMain.handle('yt-dlp:get-versions', getYtdlpVersions);
+
+  ipcMain.on('yt-dlp:update', updateYtdlp);
 }
 
 export default registerHanlders;

@@ -24,7 +24,7 @@ import { copyFileToFolder, copyFolder, deleteFile } from '@main/utils/fsUtils';
 import { downloadFromYtdlp, getInfoJson } from '@main/utils/ytdlpUtils';
 import { allowedSources } from '@shared/data';
 import logger from '@shared/logger';
-import { Api, AppSettingsChange, Source } from '@shared/types';
+import { Api, AppSettingsChange, Source, YtdlpVersions } from '@shared/types';
 import SevenZip from '7zip-min';
 import path from 'node:path';
 import { dialog, IpcMainEvent, IpcMainInvokeEvent, shell } from 'electron';
@@ -35,7 +35,12 @@ import { NewDownloadHistoryItem } from '@main/types/db';
 import { DownloadOptions } from '@shared/types/download';
 import { MediaInfoJson } from '@shared/types/info-json';
 import Settings from '@main/settings';
-import { SupportedCookieBrowser } from 'yt-dlp-command-builder';
+import {
+  ReleaseChannel,
+  SupportedCookieBrowser,
+  YtdlpCommandBuilder
+} from 'yt-dlp-command-builder';
+import { spawn } from 'node:child_process';
 
 export async function rendererInit(): ReturnType<Api['rendererInit']> {
   try {
@@ -462,4 +467,82 @@ export async function getBrowserProfiles(
     return getFirefoxProfiles();
   }
   return [];
+}
+
+let ytdlpVersions: YtdlpVersions | null = null;
+
+export async function getYtdlpVersions(): ReturnType<Api['getYtdlpVersions']> {
+  const stableTagsUrl = 'https://api.github.com/repos/yt-dlp/yt-dlp/tags';
+
+  async function getTags(url: string) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        logger.error(`Could not fetch tags for ${url}`);
+        return null;
+      }
+
+      const data: { name: string }[] = await res.json();
+      return data.map((obj) => obj.name);
+    } catch (error) {
+      logger.error(error);
+      return null;
+    }
+  }
+
+  if (ytdlpVersions) {
+    return ytdlpVersions;
+  }
+
+  const stableTags = (await getTags(stableTagsUrl)) || ['latest'];
+  const masterTags = ['latest'];
+  const nightlyTags = ['latest'];
+
+  ytdlpVersions = {
+    stable: stableTags.slice(0, 10),
+    master: masterTags,
+    nightly: nightlyTags
+  };
+
+  return ytdlpVersions;
+}
+
+async function updateYtdlpVersionInSettings() {
+  const settings = Settings.getInstance();
+  const version = await getYtdlpVersionFromPc(settings.get('ytdlpPath'));
+  settings.set('ytdlpVersion', version);
+  mainWindow.webContents.send('settings:updated', settings.getAll(), false);
+}
+
+export function updateYtdlp(_event: IpcMainEvent, channel: ReleaseChannel, version: string) {
+  const builder = new YtdlpCommandBuilder(YTDLP_EXE_PATH).updateTo(channel, version);
+
+  const { baseCommand, args, completeCommand } = builder.get();
+
+  logger.info(`Update command: ${completeCommand}`);
+
+  const child = spawn(baseCommand, args);
+
+  child.stdout.setEncoding('utf-8');
+  child.stderr.setEncoding('utf-8');
+
+  mainWindow.webContents.send('yt-dlp:started-update');
+
+  child.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  child.stderr.on('data', (data) => {
+    console.log(`stderr: ${data}`);
+  });
+
+  child.on('close', async (code, signal) => {
+    console.log('Exit -> ', { code, signal });
+    if (code === 0) {
+      updateYtdlpVersionInSettings();
+      mainWindow.webContents.send('yt-dlp:update-success');
+    } else {
+      mainWindow.webContents.send('yt-dlp:update-failed');
+    }
+  });
 }

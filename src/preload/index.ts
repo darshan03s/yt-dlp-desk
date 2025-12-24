@@ -3,7 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload';
 import logger from '@shared/logger';
 import { AppSettingsChange, Source, type Api } from '@shared/types';
 import { DownloadOptions } from '@shared/types/download';
-import { SupportedCookieBrowser } from 'yt-dlp-command-builder';
+import { ReleaseChannel, SupportedCookieBrowser } from 'yt-dlp-command-builder';
 
 // Custom APIs for renderer
 const api: Api = {
@@ -53,7 +53,10 @@ const api: Api = {
   retryFailedDownload: (id: string) => ipcRenderer.send('app:retry-download', id),
   deleteAllMetadata: () => ipcRenderer.send('app:delete-all-metadata'),
   getBrowserProfiles: (browser: SupportedCookieBrowser) =>
-    ipcRenderer.invoke('get-browser-profiles', browser)
+    ipcRenderer.invoke('get-browser-profiles', browser),
+  getYtdlpVersions: () => ipcRenderer.invoke('yt-dlp:get-versions'),
+  updateYtdlp: (channel: ReleaseChannel, version: string) =>
+    ipcRenderer.send('yt-dlp:update', channel, version)
 };
 
 if (process.contextIsolated) {

@@ -1,5 +1,5 @@
 import { MAX_ALLOWED_CONCURRENT_DOWNLOADS } from '@shared/data';
-import { AppSettingsChange } from '@shared/types';
+import { AppSettingsChange, YtdlpVersions } from '@shared/types';
 import { Button } from '@renderer/components/ui/button';
 import {
   Dialog,
@@ -16,6 +16,7 @@ import { TooltipWrapper } from '@renderer/components/wrappers';
 import { useSettingsStore } from '@renderer/stores/settings-store';
 import {
   IconFile,
+  IconFileDownload,
   IconFolder,
   IconInfoCircle,
   IconMinus,
@@ -35,7 +36,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@renderer/components/ui/select';
-import { SUPPORTED_COOKIE_BROWSERS, SupportedCookieBrowser } from 'yt-dlp-command-builder';
+import {
+  ReleaseChannel,
+  SUPPORTED_COOKIE_BROWSERS,
+  SupportedCookieBrowser
+} from 'yt-dlp-command-builder';
 
 const SettingsHeader = () => {
   return (
@@ -162,10 +167,155 @@ const ConfirmDeleteAllMetadataModal = ({
   );
 };
 
+const YtdlpUpdateModal = ({
+  open,
+  setOpen
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
+  const [versions, setVersions] = useState<YtdlpVersions>({
+    stable: [],
+    master: [],
+    nightly: []
+  });
+
+  useEffect(() => {
+    window.api.getYtdlpVersions().then((data) => {
+      setVersions(data);
+    });
+  }, []);
+
+  function handleUpdate(channel: ReleaseChannel, version: string) {
+    window.api.updateYtdlp(channel, version);
+  }
+
+  const UpdateToStable = () => {
+    const [selectedVersion, setSelectedVersion] = useState<string>(versions.stable[0]);
+    return (
+      <div className="flex items-center justify-between">
+        <span>Stable</span>
+        <div className="w-[300px] flex items-center gap-2">
+          <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
+            <SelectTrigger size="sm" className="w-full text-[10px]">
+              <SelectValue placeholder={selectedVersion} />
+            </SelectTrigger>
+            <SelectContent position="popper" className="text-sm max-h-60 overflow-y-auto">
+              <SelectGroup>
+                <SelectLabel>Versions</SelectLabel>
+                {versions.stable.map((version) => (
+                  <SelectItem key={version} value={version}>
+                    {version}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button
+            size={'sm'}
+            className="text-xs"
+            onClick={() => handleUpdate('stable', selectedVersion)}
+          >
+            Update
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const UpdateToMaster = () => {
+    const [selectedVersion, setSelectedVersion] = useState<string>(versions.master[0]);
+    return (
+      <div className="flex items-center justify-between">
+        <span>Master</span>
+        <div className="w-[300px] flex items-center gap-2">
+          <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
+            <SelectTrigger size="sm" className="w-full text-[10px]">
+              <SelectValue placeholder={selectedVersion} />
+            </SelectTrigger>
+            <SelectContent className="text-sm">
+              <SelectGroup>
+                <SelectLabel>Versions</SelectLabel>
+                {versions.master.map((version) => (
+                  <SelectItem key={version} value={version} className="capitalize">
+                    {version}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button
+            size={'sm'}
+            className="text-xs"
+            onClick={() => handleUpdate('master', selectedVersion)}
+          >
+            Update
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const UpdateToNightly = () => {
+    const [selectedVersion, setSelectedVersion] = useState<string>(versions.nightly[0]);
+    return (
+      <div className="flex items-center justify-between">
+        <span>Nightly</span>
+        <div className="w-[300px] flex items-center gap-2">
+          <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
+            <SelectTrigger size="sm" className="w-full text-[10px]">
+              <SelectValue placeholder={selectedVersion} />
+            </SelectTrigger>
+            <SelectContent className="text-sm">
+              <SelectGroup>
+                <SelectLabel>Versions</SelectLabel>
+                {versions.nightly.map((version) => (
+                  <SelectItem key={version} value={version} className="capitalize">
+                    {version}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button
+            size={'sm'}
+            className="text-xs"
+            onClick={() => handleUpdate('nightly', selectedVersion)}
+          >
+            Update
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent className="font-satoshi">
+        <DialogHeader>
+          <DialogTitle className="font-satoshi">Update yt-dlp</DialogTitle>
+          <DialogDescription className="font-satoshi"></DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <UpdateToStable />
+          <UpdateToMaster />
+          <UpdateToNightly />
+        </div>
+        <DialogFooter className="flex ">
+          <DialogClose asChild>
+            <Button variant={'outline'}>Cancel</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const SettingsBlocks = () => {
   const currentSettings = useSettingsStore((state) => state.settings);
   const settingsChange = useSettingsStore((state) => state.settingsChange);
   const [isConfirmClearAllMetadataVisible, setIsConfirmClearAllMetadataVisible] = useState(false);
+  const [isYtdlpUpdateModalVisible, setIsYtdlpUpdateModalVisible] = useState(false);
   const [browserProfiles, setBrowserProfiles] = useState<string[]>([]);
 
   function updateBrowserProfiles(browser: SupportedCookieBrowser) {
@@ -249,8 +399,12 @@ const SettingsBlocks = () => {
     setIsConfirmClearAllMetadataVisible(true);
   }
 
+  function handleYtdlpUpdate() {
+    setIsYtdlpUpdateModalVisible(true);
+  }
+
   return (
-    <div className="settings-blocks divide-y px-12 [&_div.settings-block]:p-2 [&_div.settings-block]:py-3.5 [&_div.settings-block]:first:pt-0 [&_div.settings-block]:last:pb-0 font-satoshi">
+    <div className="settings-blocks divide-y px-12 [&_div.settings-block]:p-2 [&_div.settings-block]:py-3.5 [&_div.settings-block]:first:pt-0 font-satoshi">
       <SettingsBlock>
         <SettingsItem>
           <SettingName>App Version</SettingName>
@@ -348,11 +502,14 @@ const SettingsBlocks = () => {
             </TooltipWrapper>
           </SettingName>
           <div className="h-8 w-[400px] flex items-center gap-2">
-            <Select onValueChange={(val) => handleSettingsChange('cookiesBrowser', val)}>
+            <Select
+              value={settingsChange.cookiesBrowser}
+              onValueChange={(val) => handleSettingsChange('cookiesBrowser', val)}
+            >
               <SelectTrigger className="w-full text-[10px] h-8 capitalize">
                 <SelectValue placeholder={settingsChange.cookiesBrowser} />
               </SelectTrigger>
-              <SelectContent className="text-sm">
+              <SelectContent position="popper" className="text-sm h-[200px]">
                 <SelectGroup>
                   <SelectLabel>Browsers</SelectLabel>
                   {SUPPORTED_COOKIE_BROWSERS.map((browser) => (
@@ -378,7 +535,10 @@ const SettingsBlocks = () => {
           </SettingName>
           {browserProfiles.length > 0 ? (
             <div className="h-8 w-[400px] flex items-center">
-              <Select onValueChange={(val) => handleSettingsChange('cookiesBrowserProfile', val)}>
+              <Select
+                value={settingsChange.cookiesBrowserProfile}
+                onValueChange={(val) => handleSettingsChange('cookiesBrowserProfile', val)}
+              >
                 <SelectTrigger className="w-full text-[10px] h-8">
                   <SelectValue placeholder={settingsChange.cookiesBrowserProfile} />
                 </SelectTrigger>
@@ -404,6 +564,22 @@ const SettingsBlocks = () => {
               />
             </div>
           )}
+        </SettingsItem>
+      </SettingsBlock>
+
+      <SettingsBlock name="yt-dlp">
+        <SettingsItem>
+          <SettingName>Update yt-dlp</SettingName>
+          <div className="h-8 flex items-center gap-2">
+            <Button variant={'default'} className="text-xs" size={'sm'} onClick={handleYtdlpUpdate}>
+              See options
+              <IconFileDownload className="size-4" />
+            </Button>
+          </div>
+          <YtdlpUpdateModal
+            open={isYtdlpUpdateModalVisible}
+            setOpen={setIsYtdlpUpdateModalVisible}
+          />
         </SettingsItem>
       </SettingsBlock>
 

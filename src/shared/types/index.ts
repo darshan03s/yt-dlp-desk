@@ -1,4 +1,4 @@
-import { type SupportedCookieBrowser } from 'yt-dlp-command-builder';
+import { type ReleaseChannel, type SupportedCookieBrowser } from 'yt-dlp-command-builder';
 import { allowedSources } from '../data';
 import { DownloadOptions } from './download';
 import { DownloadHistoryList, RunningDownloadsList, UrlHistoryList } from './history';
@@ -33,6 +33,10 @@ export type AppSettingsChange = Pick<
 >;
 
 export type Source = (typeof allowedSources)[number];
+
+export type YtdlpVersions = {
+  [K in ReleaseChannel]: string[];
+};
 
 export type Api = {
   minimize: () => void;
@@ -93,4 +97,6 @@ export type Api = {
   retryFailedDownload: (id: string) => void;
   deleteAllMetadata: () => void;
   getBrowserProfiles: (browser: SupportedCookieBrowser) => Promise<string[]>;
+  getYtdlpVersions: () => Promise<YtdlpVersions>;
+  updateYtdlp: (channel: ReleaseChannel, version: string) => void;
 };

@@ -21,10 +21,15 @@ const App = () => {
   const setSettings = useSettingsStore((state) => state.setSettings);
 
   useEffect(() => {
-    const unsubUpdatedSettings = window.api.on('settings:updated', (updatedSettings) => {
-      setSettings(updatedSettings as AppSettings);
-      toast.info('Settings Updated');
-    });
+    const unsubUpdatedSettings = window.api.on(
+      'settings:updated',
+      (updatedSettings, showToast = true) => {
+        setSettings(updatedSettings as AppSettings);
+        if (showToast) {
+          toast.info('Settings Updated');
+        }
+      }
+    );
 
     const unsubUpdatedUrlHistory = window.api.on('url-history:updated', (updatedUrlHistory) => {
       useHistoryStore.setState({ urlHistory: (updatedUrlHistory as UrlHistoryItem[]) ?? [] });
@@ -39,7 +44,19 @@ const App = () => {
     });
 
     const unsubDeleteAllMetadata = window.api.on('app:delete-all-metadata', () => {
-      toast.error('Deleted all media metadata');
+      toast.info('Deleted all media metadata');
+    });
+
+    const unsubStartedYtdlpUpdate = window.api.on('yt-dlp:started-update', () => {
+      toast.info('Started yt-dlp Update');
+    });
+
+    const unsubYtdlpUpdateFailed = window.api.on('yt-dlp:update-failed', () => {
+      toast.info('yt-dlp Update failed');
+    });
+
+    const unsubYtdlpUpdateSuccess = window.api.on('yt-dlp:update-success', () => {
+      toast.info('yt-dlp Updated');
     });
 
     return () => {
@@ -48,6 +65,9 @@ const App = () => {
       unsubDownloadFailed();
       unsubYtdlpError();
       unsubDeleteAllMetadata();
+      unsubStartedYtdlpUpdate();
+      unsubYtdlpUpdateFailed();
+      unsubYtdlpUpdateSuccess();
     };
   }, []);
 
