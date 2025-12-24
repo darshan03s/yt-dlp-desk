@@ -20,7 +20,14 @@ import {
 import { urlHistoryOperations, downloadHistoryOperations } from '@main/utils/dbUtils';
 import { downloadFfmpeg7z } from '@main/utils/downloadFfmpeg7z';
 import { downloadYtDlpLatestRelease } from '@main/utils/downloadYtdlp';
-import { copyFileToFolder, copyFolder, deleteFile } from '@main/utils/fsUtils';
+import {
+  copyFileToFolder,
+  copyFolder,
+  deleteFile,
+  pathExistsSync,
+  readJson,
+  writeJson
+} from '@main/utils/fsUtils';
 import { downloadFromYtdlp, getInfoJson } from '@main/utils/ytdlpUtils';
 import { allowedSources } from '@shared/data';
 import logger from '@shared/logger';
@@ -469,9 +476,12 @@ export async function getBrowserProfiles(
   return [];
 }
 
-let ytdlpVersions: YtdlpVersions | null = null;
-
 export async function getYtdlpVersions(): ReturnType<Api['getYtdlpVersions']> {
+  type YtdlpVersionsJson = {
+    nextFetch: string;
+    versions: YtdlpVersions;
+  };
+
   const stableTagsUrl = 'https://api.github.com/repos/yt-dlp/yt-dlp/tags';
 
   async function getTags(url: string) {
@@ -490,21 +500,43 @@ export async function getYtdlpVersions(): ReturnType<Api['getYtdlpVersions']> {
     }
   }
 
-  if (ytdlpVersions) {
-    return ytdlpVersions;
+  const ytdlpVersionsJsonPath = path.join(DATA_DIR, 'yt-dlp-versions.json');
+
+  async function createYtdlpVersionsJson() {
+    const stableTags = (await getTags(stableTagsUrl)) || ['latest'];
+    const masterTags = ['latest'];
+    const nightlyTags = ['latest'];
+
+    const versions = {
+      stable: stableTags.slice(0, 10),
+      master: masterTags,
+      nightly: nightlyTags
+    };
+
+    const newYtdlpVersionsJson: YtdlpVersionsJson = {
+      nextFetch: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
+      versions
+    };
+
+    await writeJson(ytdlpVersionsJsonPath, newYtdlpVersionsJson);
+
+    return versions;
   }
 
-  const stableTags = (await getTags(stableTagsUrl)) || ['latest'];
-  const masterTags = ['latest'];
-  const nightlyTags = ['latest'];
+  if (pathExistsSync(ytdlpVersionsJsonPath)) {
+    const ytdlpVersionsJson = await readJson<YtdlpVersionsJson>(ytdlpVersionsJsonPath);
 
-  ytdlpVersions = {
-    stable: stableTags.slice(0, 10),
-    master: masterTags,
-    nightly: nightlyTags
-  };
-
-  return ytdlpVersions;
+    if (new Date().toISOString() >= ytdlpVersionsJson.nextFetch) {
+      logger.info(`Updated yt-dlp-versions.json`);
+      return createYtdlpVersionsJson();
+    } else {
+      logger.info(`Using yt-dlp-versions.json`);
+      return ytdlpVersionsJson.versions;
+    }
+  } else {
+    logger.info(`Created yt-dlp-versions.json`);
+    return createYtdlpVersionsJson();
+  }
 }
 
 async function updateYtdlpVersionInSettings() {
