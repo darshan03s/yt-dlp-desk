@@ -34,6 +34,8 @@ export function getInfoJsonCommand(url: string, source: Source, infoJsonPath: st
   const settings = Settings.getInstance();
 
   let builder = new YtdlpCommandBuilder(YTDLP_EXE_PATH)
+    .jsRuntime('deno')
+    .jsRuntime('node')
     .jsRuntime('quickjs', settings.get('jsRuntimePath'))
     .skipDownload()
     .writeInfoJson()
@@ -52,6 +54,8 @@ export function getInfoJsonCommand(url: string, source: Source, infoJsonPath: st
 export function getLiveFromStartFormatsCommand(url: string) {
   const settings = Settings.getInstance();
   let builder = new YtdlpCommandBuilder(YTDLP_EXE_PATH)
+    .jsRuntime('deno')
+    .jsRuntime('node')
     .jsRuntime('quickjs', settings.get('jsRuntimePath'))
     .listFormats()
     .url(url)
@@ -70,6 +74,8 @@ export function getDownloadCommand(downloadOptions: DownloadOptions) {
   let targetDownloadFileName = `${removeEmoji(mediaInfo.fulltitle ?? mediaInfo.title, '_')} [${selectedFormat.resolution}] [${selectedFormat.format_id}]`;
   const formatId = selectedFormat.format_id!;
   let builder = new YtdlpCommandBuilder(YTDLP_EXE_PATH)
+    .jsRuntime('deno')
+    .jsRuntime('node')
     .jsRuntime('quickjs', settings.get('jsRuntimePath'))
     .newline()
     .ffmpegLocation(settings.get('ffmpegPath'));
