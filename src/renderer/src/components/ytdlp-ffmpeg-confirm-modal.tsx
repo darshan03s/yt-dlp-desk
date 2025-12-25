@@ -57,7 +57,7 @@ const ConfirmYtdlp = ({
   }
 
   return (
-    <div className="w-full flex justify-between items-center">
+    <div className="w-full flex justify-between items-center font-satoshi">
       <div className="left flex flex-col gap-1">
         <span className="text-sm">yt-dlp</span>
         <Badge className="text-xs">
@@ -103,7 +103,7 @@ const ConfirmFfmpeg = ({
   }
 
   return (
-    <div className="w-full flex justify-between items-center">
+    <div className="w-full flex justify-between items-center font-satoshi">
       <div className="left flex flex-col gap-1">
         <span className="text-sm">ffmpeg</span>
         <Badge className="text-xs">
@@ -184,7 +184,7 @@ const YtdlpFfmpegConfirmModal = ({ open, onOpenChange }: YtdlpFfmpegConfirmModal
   return (
     <>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent>
+        <AlertDialogContent className="font-satoshi">
           <AlertDialogHeader>
             <AlertDialogTitle>Checking yt-dlp and ffmpeg</AlertDialogTitle>
             <AlertDialogDescription>

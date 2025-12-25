@@ -177,7 +177,7 @@ const Downloads = () => {
                     className="text-xs flex items-center gap-2 cursor-pointer"
                   >
                     <IconTrash className="size-3.5" />
-                    Delete downloads history
+                    Delete download history
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -263,9 +263,9 @@ const ConfirmDeleteAllModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="font-satoshi">
         <DialogHeader>
-          <DialogTitle className="font-satoshi">Delete all downloads history?</DialogTitle>
+          <DialogTitle className="font-satoshi">Delete all download history?</DialogTitle>
           <DialogDescription className="font-satoshi">
-            This action will delete all downloads history
+            This action will delete all download history
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex ">

@@ -198,7 +198,7 @@ const YtdlpUpdateModal = ({
         <div className="w-[300px] flex items-center gap-2">
           <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
             <SelectTrigger size="sm" className="w-full text-[10px]">
-              <SelectValue placeholder={selectedVersion} />
+              <SelectValue placeholder="Select a version" />
             </SelectTrigger>
             <SelectContent position="popper" className="text-sm max-h-60 overflow-y-auto">
               <SelectGroup>
@@ -231,7 +231,7 @@ const YtdlpUpdateModal = ({
         <div className="w-[300px] flex items-center gap-2">
           <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
             <SelectTrigger size="sm" className="w-full text-[10px]">
-              <SelectValue placeholder={selectedVersion} />
+              <SelectValue placeholder="Select a version" />
             </SelectTrigger>
             <SelectContent className="text-sm">
               <SelectGroup>
@@ -264,7 +264,7 @@ const YtdlpUpdateModal = ({
         <div className="w-[300px] flex items-center gap-2">
           <Select value={selectedVersion} onValueChange={(val) => setSelectedVersion(val)}>
             <SelectTrigger size="sm" className="w-full text-[10px]">
-              <SelectValue placeholder={selectedVersion} />
+              <SelectValue placeholder="Select a version" />
             </SelectTrigger>
             <SelectContent className="text-sm">
               <SelectGroup>
@@ -422,6 +422,7 @@ const SettingsBlocks = () => {
                 className="text-[10px] h-8"
                 value={settingsChange?.downloadsFolder}
                 onChange={() => {}}
+                placeholder="Select downloads folder"
               />
               <TooltipWrapper message="Select folder">
                 <Button
@@ -480,6 +481,7 @@ const SettingsBlocks = () => {
               <Input
                 className="text-[10px] h-8"
                 value={settingsChange?.cookiesFilePath}
+                placeholder="cookies.txt"
                 onChange={() => {}}
               />
               <TooltipWrapper message="Select file">
@@ -507,7 +509,7 @@ const SettingsBlocks = () => {
               onValueChange={(val) => handleSettingsChange('cookiesBrowser', val)}
             >
               <SelectTrigger className="w-full text-[10px] h-8 capitalize">
-                <SelectValue placeholder={settingsChange.cookiesBrowser} />
+                <SelectValue placeholder="Select a browser (e.g Firefox)" />
               </SelectTrigger>
               <SelectContent position="popper" className="text-sm h-[200px]">
                 <SelectGroup>
@@ -540,7 +542,7 @@ const SettingsBlocks = () => {
                 onValueChange={(val) => handleSettingsChange('cookiesBrowserProfile', val)}
               >
                 <SelectTrigger className="w-full text-[10px] h-8">
-                  <SelectValue placeholder={settingsChange.cookiesBrowserProfile} />
+                  <SelectValue placeholder="Select browser profile" />
                 </SelectTrigger>
                 <SelectContent className="text-sm">
                   <SelectGroup>

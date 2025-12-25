@@ -1,10 +1,10 @@
 import { Source } from '@shared/types';
 import { MediaInfoJson } from '@/shared/types/info-json';
-import { AlertDialogHeader } from '@renderer/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogHeader,
   DialogTitle
 } from '@renderer/components/ui/dialog';
 import { Anchor } from '@renderer/components/wrappers';
@@ -25,12 +25,12 @@ const MoreDetailsModal = ({ infoJson, open, setOpen }: MoreDetailsModalProps) =>
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
-        <AlertDialogHeader>
+        <DialogHeader>
           <DialogTitle className="font-satoshi">More Details</DialogTitle>
           <DialogDescription className="font-satoshi">
             More details for this media
           </DialogDescription>
-        </AlertDialogHeader>
+        </DialogHeader>
         <div className="w-full font-satoshi flex flex-col gap-2 text-xs h-70 overflow-auto">
           <div>
             <span className="font-semibold">Title</span>:{' '}
