@@ -648,7 +648,7 @@ const PlayMediaModal = ({
 }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent>
+      <DialogContent className="font-main">
         <DialogHeader>
           <DialogTitle>Play media</DialogTitle>
           <DialogDescription className="line-clamp-1"></DialogDescription>
